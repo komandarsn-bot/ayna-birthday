@@ -130,10 +130,15 @@ createScreenButton.addEventListener(
       existingScreen = newScreen;
     }
 
-    const link =
-      window.location.origin +
-      "/screen.html?key=" +
-      existingScreen.access_token;
+   const screenPageUrl =
+  new URL("screen.html", window.location.href);
+
+screenPageUrl.searchParams.set(
+  "key",
+  existingScreen.access_token
+);
+
+const link = screenPageUrl.toString();
 
     screenUrl.href = link;
     screenUrl.textContent = link;
