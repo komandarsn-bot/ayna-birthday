@@ -96,3 +96,24 @@ input[type="file"] {
   color: #173a35;
   font-weight: bold;
 }
+
+#people-list {
+  margin-top: 20px;
+}
+
+.person-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.person-row strong,
+.person-row span {
+  display: block;
+}
+
+.person-row span {
+  margin-top: 5px;
+  color: #687873;
+}

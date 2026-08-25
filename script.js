@@ -17,6 +17,12 @@ const createScreenButton =
 const screenUrl =
   document.querySelector("#screen-url");
 
+const loadPeopleButton =
+  document.querySelector("#load-people-button");
+
+const peopleList =
+  document.querySelector("#people-list");
+
 signupButton.addEventListener("click", async function () {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
@@ -145,6 +151,59 @@ const link = screenPageUrl.toString();
     screenUrl.hidden = false;
   }
 );
+
+
+loadPeopleButton.addEventListener(
+  "click",
+  async function () {
+    peopleList.textContent = "Загрузка...";
+
+    const { data: people, error } =
+      await supabaseClient
+        .from("people")
+        .select(
+          "id, full_name, birth_date, position"
+        )
+        .order("full_name");
+
+    if (error) {
+      peopleList.textContent =
+        "Ошибка: " + error.message;
+      return;
+    }
+
+    peopleList.innerHTML = "";
+
+    if (people.length === 0) {
+      peopleList.textContent =
+        "В списке пока никого нет";
+      return;
+    }
+
+    people.forEach(function (person) {
+      const row = document.createElement("div");
+      row.classList.add("person-row");
+
+      const information =
+        document.createElement("div");
+
+      const name = document.createElement("strong");
+      name.textContent = person.full_name;
+
+      const details = document.createElement("span");
+      details.textContent =
+        person.birth_date +
+        " · " +
+        (person.position || "Без класса или должности");
+
+      information.append(name, details);
+      row.append(information);
+      peopleList.append(row);
+    });
+  }
+);
+
+
 
 uploadButton.addEventListener("click", async function () {
   if (excelFile.files.length === 0) {
