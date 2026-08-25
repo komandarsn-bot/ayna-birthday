@@ -20,6 +20,9 @@ const screenUrl =
 const loadPeopleButton =
   document.querySelector("#load-people-button");
 
+const deleteAllButton =
+  document.querySelector("#delete-all-button");
+
 const peopleList =
   document.querySelector("#people-list");
 
@@ -243,7 +246,51 @@ peopleList.append(row);
   }
 );
 
+deleteAllButton.addEventListener(
+  "click",
+  async function () {
+    const confirmed = confirm(
+      "Удалить всех людей из вашего списка? " +
+      "Это действие нельзя отменить."
+    );
 
+    if (!confirmed) {
+      return;
+    }
+
+    const { data: sessionData } =
+      await supabaseClient.auth.getSession();
+
+    if (!sessionData.session) {
+      alert("Сначала войдите в аккаунт");
+      return;
+    }
+
+    const userId = sessionData.session.user.id;
+
+    const { error: deleteError } =
+      await supabaseClient
+        .from("people")
+        .delete()
+        .eq("user_id", userId);
+
+    if (deleteError) {
+      alert(
+        "Ошибка удаления: " +
+        deleteError.message
+      );
+      return;
+    }
+
+    peopleList.textContent =
+      "Список полностью удалён";
+
+    birthdayList.textContent =
+      "Сегодня именинников нет";
+
+    alert("Все записи удалены");
+  }
+);
 
 uploadButton.addEventListener("click", async function () {
   if (excelFile.files.length === 0) {

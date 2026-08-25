@@ -132,3 +132,13 @@ input[type="file"] {
 .delete-button:hover {
   background-color: #963b3b;
 }
+
+#delete-all-button {
+  margin-left: 10px;
+  background-color: #b94b4b;
+  color: white;
+}
+
+#delete-all-button:hover {
+  background-color: #963b3b;
+}
