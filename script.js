@@ -11,6 +11,18 @@ const signupButton = document.querySelector("#signup-button");
 const loginButton = document.querySelector("#login-button");
 const authMessage = document.querySelector("#auth-message");
 
+const authSection =
+  document.querySelector("#auth-section");
+
+const appContent =
+  document.querySelector("#app-content");
+
+const currentUserEmail =
+  document.querySelector("#current-user-email");
+
+const logoutButton =
+  document.querySelector("#logout-button");
+
 const createScreenButton =
   document.querySelector("#create-screen-button");
 
@@ -25,6 +37,22 @@ const deleteAllButton =
 
 const peopleList =
   document.querySelector("#people-list");
+
+function updateAuthView(session) {
+  const isLoggedIn = Boolean(session);
+
+  authSection.hidden = isLoggedIn;
+  appContent.hidden = !isLoggedIn;
+
+  if (isLoggedIn) {
+    currentUserEmail.textContent =
+      session.user.email;
+  } else {
+    currentUserEmail.textContent = "";
+    screenUrl.hidden = true;
+    screenUrl.textContent = "";
+  }
+}
 
 signupButton.addEventListener("click", async function () {
   const email = emailInput.value.trim();
@@ -49,6 +77,7 @@ signupButton.addEventListener("click", async function () {
 
   if (data.session) {
     authMessage.textContent = "Регистрация выполнена. Вы вошли в аккаунт.";
+    updateAuthView(data.session);
   } else {
     authMessage.textContent =
       "Регистрация выполнена. Проверьте письмо для подтверждения почты.";
@@ -80,7 +109,31 @@ loginButton.addEventListener("click", async function () {
 
   authMessage.textContent =
     "Вы вошли как " + data.user.email;
+    updateAuthView(data.session);
 });
+
+logoutButton.addEventListener(
+  "click",
+  async function () {
+    const { error } =
+      await supabaseClient.auth.signOut();
+
+    if (error) {
+      alert(
+        "Ошибка выхода: " +
+        error.message
+      );
+      return;
+    }
+
+    emailInput.value = "";
+    passwordInput.value = "";
+    authMessage.textContent = "";
+
+    updateAuthView(null);
+  }
+);
+
 
 function formatDateForDatabase(date) {
   const year = date.getFullYear();
@@ -394,3 +447,12 @@ birthdaysToday.forEach(function (person) {
   birthdayList.append(personCard);
 });
 });
+
+async function restoreSession() {
+  const { data } =
+    await supabaseClient.auth.getSession();
+
+  updateAuthView(data.session);
+}
+
+restoreSession();
