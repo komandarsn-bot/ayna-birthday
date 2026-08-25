@@ -117,3 +117,18 @@ input[type="file"] {
   margin-top: 5px;
   color: #687873;
 }
+
+.person-row {
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.delete-button {
+  background-color: #b94b4b;
+  color: white;
+  flex-shrink: 0;
+}
+
+.delete-button:hover {
+  background-color: #963b3b;
+}
