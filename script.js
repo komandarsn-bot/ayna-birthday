@@ -196,9 +196,49 @@ loadPeopleButton.addEventListener(
         " · " +
         (person.position || "Без класса или должности");
 
-      information.append(name, details);
-      row.append(information);
-      peopleList.append(row);
+      
+information.append(name, details);
+
+const deleteButton =
+  document.createElement("button");
+
+deleteButton.textContent = "Удалить";
+deleteButton.classList.add("delete-button");
+
+deleteButton.addEventListener(
+  "click",
+  async function () {
+    const confirmed = confirm(
+      "Удалить запись: " +
+      person.full_name +
+      "?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const { error: deleteError } =
+      await supabaseClient
+        .from("people")
+        .delete()
+        .eq("id", person.id);
+
+    if (deleteError) {
+      alert(
+        "Ошибка удаления: " +
+        deleteError.message
+      );
+      return;
+    }
+
+    row.remove();
+  }
+);
+
+row.append(information, deleteButton);
+peopleList.append(row);
+
     });
   }
 );
