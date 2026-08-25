@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #173a35;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.tv-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+}
+
+.today-label {
+  color: #e4c455;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+h1 {
+  margin: 10px 0 40px;
+  font-size: 72px;
+}
+
+#tv-birthday-list {
+  font-size: 32px;
+}
+
+.tv-person {
+  min-width: 500px;
+  margin: 20px;
+  padding: 30px 60px;
+  color: #173a35;
+  background-color: white;
+  border-radius: 24px;
+  border-bottom: 8px solid #e4c455;
+}
+
+.tv-person h2 {
+  margin: 0 0 10px;
+  font-size: 48px;
+}
+
+.tv-person p {
+  margin: 0;
+  font-size: 24px;
+}

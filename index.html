@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayna — экран дней рождения</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <header>
+      <h1>Экран дней рождения "Ayna"</h1>
+      <p>Загрузите список сотрудников или учеников</p>
+    </header>
+
+    <main>
+      <section class="card" id="auth-section">
+  <h2>Регистрация и вход</h2>
+
+  <div class="auth-fields">
+    <input
+      type="email"
+      id="email"
+      placeholder="Электронная почта"
+    >
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Пароль"
+    >
+  </div>
+
+  <button type="button" id="signup-button">
+    Зарегистрироваться
+  </button>
+
+  <button type="button" id="login-button">
+    Войти
+  </button>
+
+  <p id="auth-message"></p>
+
+
+<button type="button" id="create-screen-button">
+  Получить ссылку для телевизора
+</button>
+
+<p>
+  <a
+    id="screen-url"
+    target="_blank"
+    hidden
+  ></a>
+</p>
+
+</section>
+      <section class="card">
+        <h2>Загрузка Excel</h2>
+        <p>Файл должен содержать ФИО, дату рождения и класс или должность.</p>
+
+        <input type="file" id="excel-file" accept=".xlsx,.xls">
+        <button type="button" id="upload-button">Загрузить файл</button>
+      </section>
+
+      <section class="card">
+        <h2>Именинники сегодня</h2>
+        <div id="birthday-list">
+          <p>После загрузки файла здесь появятся именинники.</p>
+        </div>
+      </section>
+    </main>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
