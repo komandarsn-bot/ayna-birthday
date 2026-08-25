@@ -246,17 +246,32 @@ peopleList.append(row);
   }
 );
 
+let deleteAllIsArmed = false;
+let deleteAllTimer;
+
 deleteAllButton.addEventListener(
   "click",
   async function () {
-    const confirmed = confirm(
-      "Удалить всех людей из вашего списка? " +
-      "Это действие нельзя отменить."
-    );
+  if (!deleteAllIsArmed) {
+  deleteAllIsArmed = true;
 
-    if (!confirmed) {
-      return;
-    }
+  deleteAllButton.textContent =
+    "Нажмите ещё раз для подтверждения";
+
+  clearTimeout(deleteAllTimer);
+
+  deleteAllTimer = setTimeout(function () {
+    deleteAllIsArmed = false;
+    deleteAllButton.textContent = "Удалить всех";
+  }, 5000);
+
+  return;
+}
+
+deleteAllIsArmed = false;
+clearTimeout(deleteAllTimer);
+deleteAllButton.textContent = "Удаляем...";
+deleteAllButton.disabled = true;
 
     const { data: sessionData } =
       await supabaseClient.auth.getSession();
@@ -288,7 +303,8 @@ deleteAllButton.addEventListener(
     birthdayList.textContent =
       "Сегодня именинников нет";
 
-    alert("Все записи удалены");
+    deleteAllButton.textContent = "Удалить всех";
+deleteAllButton.disabled = false;
   }
 );
 
