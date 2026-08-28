@@ -6,22 +6,49 @@
 
     <title>Ayna — телевизионный экран</title>
 
-    <link rel="stylesheet" href="screen.css?v=2">
+    <meta name="theme-color" content="#102e2b">
+    <link rel="stylesheet" href="screen.css?v=3">
   </head>
 
   <body>
     <main class="tv-screen">
-      <p class="today-label">Сегодня праздник!</p>
+      <header class="screen-header">
+        <div class="brand" aria-label="Ayna">ayna<span class="brand-dot">.</span></div>
+        <div class="screen-date">
+          <span class="date-caption">СЕГОДНЯ</span>
+          <time id="screen-date"></time>
+        </div>
+      </header>
 
-      <h1>С днём рождения!</h1>
-
-      <div id="tv-birthday-list">
-        <p>Загружаем именинников...</p>
+      <div class="celebration-layout">
+        <section class="celebration-intro">
+          <p class="eyebrow"><span></span> МОМЕНТЫ, КОТОРЫЕ ОБЪЕДИНЯЮТ</p>
+          <h1 id="screen-title">С днём<br><em>рождения!</em></h1>
+          <p class="intro-description" id="screen-description">Сегодня — ваш день.<br>Пусть он станет началом прекрасного года.</p>
+          <div class="celebration-art" aria-hidden="true">
+            <span class="orbit orbit-one"></span>
+            <span class="orbit orbit-two"></span>
+            <span class="orbit orbit-three"></span>
+            <span class="orbit-spark">✦</span>
+            <span class="orbit-dot"></span>
+          </div>
+        </section>
+        <div id="tv-birthday-list" aria-live="off" aria-label="Именинники сегодня">
+          <article class="tv-person state-card">
+            <p class="card-eyebrow">ЕЩЁ ОДНО МГНОВЕНИЕ</p>
+            <h2>Готовим поздравления</h2>
+            <p class="state-description">Загружаем именинников…</p>
+          </article>
+        </div>
       </div>
+      <footer class="screen-footer">
+        <span>МАЛЕНЬКИЙ ПОВОД ДЛЯ БОЛЬШОЙ РАДОСТИ</span>
+        <span id="slide-counter">ЭКРАН ПОЗДРАВЛЕНИЙ</span>
+      </footer>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="screen.js?v=2"></script>
+    <script src="screen.js?v=3"></script>
   </body>
 </html>

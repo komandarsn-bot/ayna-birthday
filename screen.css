@@ -1,75 +1,250 @@
+:root {
+  color-scheme: dark;
+  --gold: #dec48b;
+  --ivory: #f6f2e8;
+  --ink: #173a35;
+}
+
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  min-height: 100vh;
-  background-color: #173a35;
-  color: white;
-  font-family: Arial, sans-serif;
+  background: #102e2b;
+  color: var(--ivory);
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
 .tv-screen {
-  box-sizing: border-box;
   min-height: 100vh;
+  padding: clamp(24px, 3.5vw, 68px) clamp(24px, 5vw, 96px);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 76% 35%, #2c50453d, transparent 58%),
+    radial-gradient(ellipse at 0% 100%, #34564b55, transparent 50%),
+    linear-gradient(115deg, #173a35, #0a2423);
+}
+.tv-screen::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 65vw;
+  height: 65vw;
+  border: 1px solid #dec48b12;
+  border-radius: 50%;
+  right: -28vw;
+  top: -32vw;
+}
+.screen-header, .screen-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.brand {
+  font-size: clamp(32px, 3.1vw, 60px);
+  font-weight: 650;
+  letter-spacing: -0.07em;
+  line-height: 1;
+}
+.brand-dot { color: var(--gold); }
+.screen-date { text-align: right; }
+.date-caption {
+  display: block;
+  color: var(--gold);
+  font-size: clamp(10px, 0.75vw, 16px);
+  letter-spacing: 0.22em;
+  margin-bottom: 6px;
+}
+#screen-date { font-size: clamp(16px, 1.4vw, 28px); font-weight: 500; }
+.celebration-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 96px);
+  padding: clamp(28px, 4vh, 60px) 0;
+}
+.eyebrow, .card-eyebrow {
+  font-size: clamp(11px, 0.9vw, 18px);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1.7;
+}
+.eyebrow {
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px;
+}
+.eyebrow span { width: 26px; height: 1px; background: var(--gold); flex-shrink: 0; }
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-size: clamp(44px, 5.1vw, 110px);
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+  margin: 0;
+}
+h1 em { color: var(--gold); font-weight: 400; }
+.intro-description {
+  font-size: clamp(17px, 1.45vw, 30px);
+  line-height: 1.6;
+  color: #bdcdc6;
+  max-width: 27em;
+  margin: 28px 0 0;
+}
+.celebration-art {
+  position: relative;
+  width: clamp(140px, 18vw, 340px);
+  height: clamp(90px, 11vw, 205px);
+  margin-top: clamp(24px, 4vh, 48px);
+}
+.orbit {
+  position: absolute;
+  inset: 15% 4%;
+  border: 1px solid #dec48b66;
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+.orbit-two { transform: rotate(30deg); border-color: #dec48b38; }
+.orbit-three { transform: rotate(90deg); border-color: #dec48b38; }
+.orbit-spark {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--gold);
+  font-size: clamp(48px, 5.3vw, 100px);
+  line-height: 1;
+}
+.orbit-dot {
+  position: absolute;
+  top: 14%; right: 15%;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 22px #dec48b44;
+}
+#tv-birthday-list { min-width: 0; width: 100%; }
+.tv-person {
+  position: relative;
+  min-height: clamp(370px, 57vh, 750px);
+  padding: clamp(30px, 3.6vw, 72px);
+  border-radius: 8px 64px 8px 8px;
+  background: var(--ivory);
+  color: var(--ink);
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 40px;
+  box-shadow: 0 30px 80px #00000026;
+  overflow: hidden;
+  animation: card-appear 0.55s ease-out both;
 }
-
-.today-label {
-  color: #e4c455;
-  font-size: 24px;
-  font-weight: bold;
+.tv-person::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid #173a3514;
+  border-radius: 3px 51px 3px 3px;
+  pointer-events: none;
 }
-
-h1 {
-  margin: 10px 0 40px;
-  font-size: 72px;
+.card-eyebrow { color: #6d705c; margin: 0 0 20px; }
+.person-monogram {
+  display: grid;
+  place-items: center;
+  width: clamp(60px, 5.5vw, 112px);
+  height: clamp(60px, 5.5vw, 112px);
+  flex-shrink: 0;
+  margin: 0 0 24px;
+  border: 1px solid #ba9e654a;
+  border-radius: 50%;
+  background: #eae3d2;
+  font-family: Georgia, serif;
+  font-size: clamp(26px, 2.5vw, 48px);
+  color: #77613c;
 }
-
-#tv-birthday-list {
-  font-size: 32px;
-  width: 100%;
-  max-width: 1100px;
-}
-
-.tv-person {
-  margin: 20px 0;
-  padding: 30px clamp(16px, 5vw, 60px);
-  color: #173a35;
-  background-color: white;
-  border-radius: 24px;
-  border-bottom: 8px solid #e4c455;
-  overflow-wrap: anywhere;
-  animation: card-appear 0.35s ease-out;
-}
-
 .tv-person h2 {
-  margin: 0 0 10px;
-  font-size: clamp(30px, 4vw, 64px);
-}
-
-.tv-person p {
   margin: 0;
-  font-size: 24px;
+  font-size: clamp(38px, 4.2vw, 88px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
-
-.tv-person .tv-greeting {
-  margin-top: 24px;
-  font-size: 22px;
+.tv-person h2.long-name { font-size: clamp(30px, 3.1vw, 66px); }
+.person-position {
+  margin: 24px 0 0;
+  padding: 8px 22px;
+  background: #173a350b;
+  border: 1px solid #173a3512;
+  border-radius: 100px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: clamp(20px, 1.65vw, 36px);
+  line-height: 1.4;
 }
-
+.tv-greeting {
+  border-top: 1px solid #173a3526;
+  padding-top: 24px;
+  margin: 32px 0 0;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: clamp(19px, 1.5vw, 32px);
+  line-height: 1.5;
+  color: #53665b;
+  max-width: 25em;
+}
+.card-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: #e6ddc9; }
+.card-progress span {
+  display: block;
+  width: 100%; height: 100%;
+  background: #b79858;
+  transform-origin: left;
+  animation: slide-progress 5s linear both;
+}
+.screen-footer {
+  padding-top: 20px;
+  border-top: 1px solid #f6f2e824;
+  color: #b5c8be;
+  font-size: clamp(10px, 0.8vw, 18px);
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+}
+#slide-counter { color: var(--gold); text-align: right; }
+.state-card h2 { font-size: clamp(32px, 3vw, 64px); }
+.state-description { font-size: clamp(18px, 1.5vw, 30px); line-height: 1.5; color: #53665b; }
 @keyframes card-appear {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-@media (max-width: 600px) {
-  .tv-screen { padding: 20px; }
-  h1 { font-size: 42px; }
+@keyframes slide-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (max-width: 900px) and (orientation: portrait) {
+  .celebration-layout { grid-template-columns: 1fr; gap: 32px; }
+  .celebration-intro { text-align: center; }
+  .eyebrow { justify-content: center; margin-bottom: 16px; }
+  h1 { font-size: clamp(44px, 8vw, 76px); }
+  h1 br { display: none; }
+  .intro-description { margin: 20px auto 0; }
+  .celebration-art { display: none; }
+  .tv-person { min-height: 380px; }
+  .screen-footer { font-size: 10px; }
 }
-
+@media (max-height: 760px) and (orientation: landscape) {
+  .tv-screen { padding-top: 24px; padding-bottom: 24px; }
+  .celebration-art { height: 75px; margin-top: 18px; }
+  .tv-person { min-height: 340px; padding: 26px; }
+  .person-monogram { width: 54px; height: 54px; margin-bottom: 16px; font-size: 25px; }
+  .card-eyebrow { margin-bottom: 12px; }
+  .tv-greeting { margin-top: 20px; padding-top: 16px; }
+  .person-position { margin-top: 16px; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .tv-person { animation: none; }
+  .tv-person, .card-progress span { animation: none; }
 }
