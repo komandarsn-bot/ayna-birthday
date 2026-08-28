@@ -16,6 +16,7 @@ body {
 
 .tv-screen {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   padding: clamp(24px, 3.5vw, 72px) clamp(24px, 5vw, 110px);
@@ -42,9 +43,9 @@ body {
   text-align: right;
 }
 
+#screen-date,
 #screen-clock {
   display: block;
-  margin-top: 6px;
   color: var(--ink);
   font-size: clamp(24px, 2.1vw, 44px);
   font-variant-numeric: tabular-nums;
@@ -52,16 +53,16 @@ body {
   line-height: 1.2;
 }
 
-#screen-date {
-  color: var(--muted);
-  font-size: clamp(16px, 1.45vw, 30px);
-  text-align: right;
-  line-height: 1.4;
+#screen-clock {
+  margin-top: 6px;
 }
 
 .birthday-stage {
   flex: 1;
-  padding-top: clamp(48px, 12vh, 150px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(24px, 4vh, 48px) 0;
   text-align: center;
 }
 
@@ -69,7 +70,6 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-bottom: clamp(32px, 5vh, 64px);
 }
 
 .tv-person {
@@ -142,7 +142,7 @@ body {
   .screen-header { grid-template-columns: 1fr; gap: 16px; }
   .school-logo { grid-column: 1; justify-self: center; }
   .screen-datetime { grid-column: 1; justify-self: center; text-align: center; }
-  #screen-date { font-size: 14px; }
+  #screen-date, #screen-clock { font-size: 24px; }
   .tv-person h2 { font-size: clamp(40px, 10vw, 60px); }
   .tv-person h2.long-name { font-size: 36px; }
 }
