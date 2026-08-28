@@ -142,3 +142,28 @@ input[type="file"] {
 #delete-all-button:hover {
   background-color: #963b3b;
 }
+
+.manual-person-form {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.manual-person-form label {
+  display: grid;
+  gap: 7px;
+  font-weight: bold;
+}
+
+.manual-person-form input {
+  padding: 12px;
+  border: 1px solid #c7d8d3;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #173a35;
+}
+
+#manual-person-message {
+  min-height: 20px;
+  margin-bottom: 0;
+}

@@ -38,6 +38,21 @@ const deleteAllButton =
 const peopleList =
   document.querySelector("#people-list");
 
+const manualFullName =
+  document.querySelector("#manual-full-name");
+
+const manualBirthDate =
+  document.querySelector("#manual-birth-date");
+
+const manualPosition =
+  document.querySelector("#manual-position");
+
+const addPersonButton =
+  document.querySelector("#add-person-button");
+
+const manualPersonMessage =
+  document.querySelector("#manual-person-message");
+
 function updateAuthView(session) {
   const isLoggedIn = Boolean(session);
 
@@ -296,6 +311,70 @@ row.append(information, deleteButton);
 peopleList.append(row);
 
     });
+  }
+);
+
+addPersonButton.addEventListener(
+  "click",
+  async function () {
+    const fullName = manualFullName.value.trim();
+    const birthDate = manualBirthDate.value;
+    const position = manualPosition.value.trim();
+
+    if (fullName === "" || birthDate === "") {
+      manualPersonMessage.textContent =
+        "Заполните имя и дату рождения";
+      return;
+    }
+
+    const { data: sessionData } =
+      await supabaseClient.auth.getSession();
+
+    if (!sessionData.session) {
+      manualPersonMessage.textContent =
+        "Сначала войдите в аккаунт";
+      return;
+    }
+
+    addPersonButton.disabled = true;
+    manualPersonMessage.textContent = "Сохраняем...";
+
+    try {
+    const { error } = await supabaseClient
+      .from("people")
+      .upsert(
+        {
+          user_id: sessionData.session.user.id,
+          full_name: fullName,
+          birth_date: birthDate,
+          position: position
+        },
+        {
+          onConflict: "user_id,full_name,birth_date"
+        }
+      );
+
+    addPersonButton.disabled = false;
+
+    if (error) {
+      manualPersonMessage.textContent =
+        "Ошибка: " + error.message;
+      return;
+    }
+
+    manualFullName.value = "";
+    manualBirthDate.value = "";
+    manualPosition.value = "";
+    manualPersonMessage.textContent =
+      "Человек успешно добавлен";
+
+    loadPeopleButton.click();
+    } catch (error) {
+      manualPersonMessage.textContent =
+        "Не удалось сохранить запись. Проверьте интернет и повторите попытку.";
+    } finally {
+      addPersonButton.disabled = false;
+    }
   }
 );
 
