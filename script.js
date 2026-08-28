@@ -224,6 +224,26 @@ const link = screenPageUrl.toString();
 );
 
 
+function sortPeopleByUpcomingBirthday(people, today = new Date()) {
+  const todayOrder = (today.getMonth() + 1) * 100 + today.getDate();
+
+  function birthdayOrder(person) {
+    // Год рождения не влияет на порядок ежегодных дней рождения.
+    const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(person.birth_date || "");
+    if (!parts) return Infinity;
+    const month = Number(parts[2]);
+    const day = Number(parts[3]);
+    if (month < 1 || month > 12 || day < 1 || day > 31) return Infinity;
+    const order = month * 100 + day;
+    return order < todayOrder ? order + 10000 : order;
+  }
+
+  return [...people].sort((a, b) =>
+    birthdayOrder(a) - birthdayOrder(b) ||
+    (a.full_name || "").localeCompare(b.full_name || "", "ru")
+  );
+}
+
 loadPeopleButton.addEventListener(
   "click",
   async function () {
@@ -251,7 +271,8 @@ loadPeopleButton.addEventListener(
       return;
     }
 
-    people.forEach(function (person) {
+    const sortedPeople = sortPeopleByUpcomingBirthday(people);
+    sortedPeople.forEach(function (person) {
       const row = document.createElement("div");
       row.classList.add("person-row");
 
