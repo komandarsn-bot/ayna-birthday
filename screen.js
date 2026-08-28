@@ -5,6 +5,7 @@ const supabaseClient = window.supabase.createClient(
 
 const tvBirthdayList = document.querySelector("#tv-birthday-list");
 const screenDate = document.querySelector("#screen-date");
+const birthdayTitle = document.querySelector("#birthday-title");
 const screenKey = new URLSearchParams(window.location.search).get("key");
 
 let currentBirthdays = [];
@@ -25,6 +26,7 @@ function updateScreenDate() {
 
 function showScreenState(title, description) {
   clearTimeout(transitionTimer);
+  birthdayTitle.hidden = true;
   const card = document.createElement("article");
   card.classList.add("tv-person", "state-card");
   const heading = document.createElement("h1");
@@ -44,14 +46,10 @@ function showCurrentBirthday() {
   const card = document.createElement("article");
   card.classList.add("tv-person");
 
-  const title = document.createElement("h1");
-  title.classList.add("birthday-title");
-  title.textContent = "С днём рождения!";
-
   const name = document.createElement("h2");
   name.textContent = person.full_name;
   if ((person.full_name || "").length > 28) name.classList.add("long-name");
-  card.append(title, name);
+  card.append(name);
 
   if (person.person_position) {
     const position = document.createElement("p");
@@ -98,6 +96,7 @@ function updateBirthdayCards(birthdays) {
     return;
   }
 
+  birthdayTitle.hidden = false;
   showCurrentBirthday();
   if (birthdays.length > 1) {
     rotationTimer = setInterval(showNextBirthday, 5000);

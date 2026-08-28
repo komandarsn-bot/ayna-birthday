@@ -42,19 +42,24 @@ body {
   line-height: 1.4;
 }
 
-#tv-birthday-list {
+.birthday-stage {
   flex: 1;
+  padding-top: clamp(48px, 12vh, 150px);
+  text-align: center;
+}
+
+#tv-birthday-list {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: clamp(32px, 5vh, 64px) 0;
+  padding-bottom: clamp(32px, 5vh, 64px);
 }
 
 .tv-person {
   width: 100%;
   max-width: 1500px;
   text-align: center;
-  padding: clamp(24px, 4vw, 80px) 0;
+  padding: 0;
   animation: card-appear 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -88,15 +93,6 @@ body {
   font-weight: 400;
   line-height: 1.4;
   overflow-wrap: anywhere;
-}
-
-.tv-person:not(.state-card)::after {
-  content: "";
-  display: block;
-  width: 48px;
-  height: 3px;
-  background: var(--accent);
-  margin: clamp(32px, 5vh, 64px) auto 0;
 }
 
 .state-card h1 {

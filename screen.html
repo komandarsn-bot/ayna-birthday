@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f7f7f5">
     <title>Skillset — дни рождения</title>
-    <link rel="stylesheet" href="screen.css?v=5">
+    <link rel="stylesheet" href="screen.css?v=6">
   </head>
   <body>
     <main class="tv-screen">
@@ -14,15 +14,18 @@
         <time id="screen-date"></time>
       </header>
 
-      <div id="tv-birthday-list" aria-live="off" aria-label="Именинники сегодня">
+      <section class="birthday-stage">
+        <h1 class="birthday-title" id="birthday-title" hidden>С днём рождения!</h1>
+        <div id="tv-birthday-list" aria-live="off" aria-label="Именинники сегодня">
         <article class="tv-person state-card">
           <h1>Загружаем именинников…</h1>
         </article>
-      </div>
+        </div>
+      </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="screen.js?v=5"></script>
+    <script src="screen.js?v=6"></script>
   </body>
 </html>
