@@ -22,17 +22,34 @@ body {
 }
 
 .screen-header {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 24px;
 }
 
 .school-logo {
+  grid-column: 2;
   display: block;
   width: clamp(170px, 18vw, 360px);
   height: auto;
   object-fit: contain;
+}
+
+.screen-datetime {
+  grid-column: 3;
+  justify-self: end;
+  text-align: right;
+}
+
+#screen-clock {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: clamp(24px, 2.1vw, 44px);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 #screen-date {
@@ -122,7 +139,9 @@ body {
 
 @media (max-width: 600px) {
   .school-logo { width: 150px; }
-  .screen-header { gap: 16px; }
+  .screen-header { grid-template-columns: 1fr; gap: 16px; }
+  .school-logo { grid-column: 1; justify-self: center; }
+  .screen-datetime { grid-column: 1; justify-self: center; text-align: center; }
   #screen-date { font-size: 14px; }
   .tv-person h2 { font-size: clamp(40px, 10vw, 60px); }
   .tv-person h2.long-name { font-size: 36px; }

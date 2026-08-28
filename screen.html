@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f7f7f5">
     <title>Skillset — дни рождения</title>
-    <link rel="stylesheet" href="screen.css?v=6">
+    <link rel="stylesheet" href="screen.css?v=7">
   </head>
   <body>
     <main class="tv-screen">
       <header class="screen-header">
         <img class="school-logo" src="skillset-logo.png" alt="Skillset" width="2172" height="724">
-        <time id="screen-date"></time>
+        <div class="screen-datetime">
+          <time id="screen-date"></time>
+          <time id="screen-clock" aria-label="Текущее время" aria-live="off"></time>
+        </div>
       </header>
 
       <section class="birthday-stage">
@@ -26,6 +29,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="screen.js?v=6"></script>
+    <script src="screen.js?v=7"></script>
   </body>
 </html>

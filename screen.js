@@ -5,6 +5,7 @@ const supabaseClient = window.supabase.createClient(
 
 const tvBirthdayList = document.querySelector("#tv-birthday-list");
 const screenDate = document.querySelector("#screen-date");
+const screenClock = document.querySelector("#screen-clock");
 const birthdayTitle = document.querySelector("#birthday-title");
 const screenKey = new URLSearchParams(window.location.search).get("key");
 
@@ -22,6 +23,11 @@ function updateScreenDate() {
   screenDate.dateTime = [today.getFullYear(),
     String(today.getMonth() + 1).padStart(2, "0"),
     String(today.getDate()).padStart(2, "0")].join("-");
+  // Берём реальное время устройства: задержки таймера не накапливаются.
+  const time = [today.getHours(), today.getMinutes(), today.getSeconds()]
+    .map(value => String(value).padStart(2, "0")).join(":");
+  screenClock.textContent = time;
+  screenClock.dateTime = time;
 }
 
 function showScreenState(title, description) {
@@ -129,4 +135,5 @@ async function loadBirthdays() {
 }
 
 loadBirthdays();
+setInterval(updateScreenDate, 1000);
 setInterval(loadBirthdays, 60000);
