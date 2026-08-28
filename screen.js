@@ -10,6 +10,7 @@ const screenKey = new URLSearchParams(window.location.search).get("key");
 let currentBirthdays = [];
 let currentIndex = 0;
 let rotationTimer;
+let transitionTimer;
 let isLoading = false;
 
 function updateScreenDate() {
@@ -23,6 +24,7 @@ function updateScreenDate() {
 }
 
 function showScreenState(title, description) {
+  clearTimeout(transitionTimer);
   const card = document.createElement("article");
   card.classList.add("tv-person", "state-card");
   const heading = document.createElement("h1");
@@ -60,12 +62,34 @@ function showCurrentBirthday() {
   tvBirthdayList.replaceChildren(card);
 }
 
+function showNextBirthday() {
+  clearTimeout(transitionTimer);
+  const currentCard = tvBirthdayList.firstElementChild;
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function finishTransition() {
+    currentIndex = (currentIndex + 1) % currentBirthdays.length;
+    showCurrentBirthday();
+  }
+
+  if (!currentCard || reduceMotion) {
+    finishTransition();
+    return;
+  }
+
+  // Сначала полностью скрываем старое имя, затем показываем новое.
+  currentCard.classList.add("is-leaving");
+  transitionTimer = setTimeout(finishTransition, 650);
+}
+
 function updateBirthdayCards(birthdays) {
   // Обновление данных раз в минуту не прерывает текущий показ.
   if (JSON.stringify(birthdays) === JSON.stringify(currentBirthdays) &&
       birthdays.length > 0) return;
 
   clearInterval(rotationTimer);
+  clearTimeout(transitionTimer);
   currentBirthdays = birthdays;
   currentIndex = 0;
 
@@ -76,10 +100,7 @@ function updateBirthdayCards(birthdays) {
 
   showCurrentBirthday();
   if (birthdays.length > 1) {
-    rotationTimer = setInterval(function () {
-      currentIndex = (currentIndex + 1) % currentBirthdays.length;
-      showCurrentBirthday();
-    }, 5000);
+    rotationTimer = setInterval(showNextBirthday, 5000);
   }
 }
 
