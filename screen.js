@@ -14,6 +14,7 @@ let currentIndex = 0;
 let rotationTimer;
 let transitionTimer;
 let isLoading = false;
+let hasLoadedData = false;
 
 function updateScreenDate() {
   const today = new Date();
@@ -88,14 +89,28 @@ function showNextBirthday() {
 }
 
 function updateBirthdayCards(birthdays) {
-  // Обновление данных раз в минуту не прерывает текущий показ.
+  // Одинаковый порядок ответа не зависит от порядка строк в базе.
+  birthdays = birthdays.map(person => ({
+    full_name: person.full_name,
+    person_position: person.person_position || ""
+  })).sort((a, b) => {
+    const first = a.full_name + "\u0000" + a.person_position;
+    const second = b.full_name + "\u0000" + b.person_position;
+    return first < second ? -1 : first > second ? 1 : 0;
+  });
+  // Не перерисовываем карточки, если в базе ничего не изменилось.
   if (JSON.stringify(birthdays) === JSON.stringify(currentBirthdays) &&
-      birthdays.length > 0) return;
+      hasLoadedData) return;
 
+  const previousPerson = currentBirthdays[currentIndex];
   clearInterval(rotationTimer);
   clearTimeout(transitionTimer);
   currentBirthdays = birthdays;
-  currentIndex = 0;
+  hasLoadedData = true;
+  currentIndex = Math.max(0, birthdays.findIndex(person =>
+    previousPerson && person.full_name === previousPerson.full_name &&
+    person.person_position === previousPerson.person_position
+  ));
 
   if (birthdays.length === 0) {
     showScreenState("Сегодня именинников нет");
@@ -127,7 +142,8 @@ async function loadBirthdays() {
   } catch (error) {
     // При временном сбое продолжаем показывать загруженные карточки.
     if (currentBirthdays.length === 0) {
-      showScreenState("Восстанавливаем связь", "Повторим попытку через минуту.");
+      hasLoadedData = false;
+      showScreenState("Восстанавливаем связь", "Повторим попытку через несколько секунд.");
     }
   } finally {
     isLoading = false;
@@ -136,4 +152,10 @@ async function loadBirthdays() {
 
 loadBirthdays();
 setInterval(updateScreenDate, 1000);
-setInterval(loadBirthdays, 60000);
+setInterval(loadBirthdays, 5000);
+
+window.addEventListener("online", loadBirthdays);
+window.addEventListener("focus", loadBirthdays);
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden) loadBirthdays();
+});
