@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
   </head>
 
   <body>
@@ -138,6 +138,35 @@
     </section>
 
     <section class="card">
+      <h2>Новости школы</h2>
+      <p>Добавьте фотографию и текст. Новость сразу появится в ТВ-цикле.</p>
+
+      <div class="news-form">
+        <label>
+          Заголовок
+          <input type="text" id="news-title" maxlength="160" placeholder="Например: Победа на олимпиаде">
+        </label>
+        <label>
+          Текст новости
+          <textarea id="news-body" maxlength="2000" rows="5" placeholder="Кратко расскажите о событии"></textarea>
+        </label>
+        <label>
+          Фотография
+          <input type="file" id="news-image" accept="image/jpeg,image/png,image/webp">
+        </label>
+      </div>
+
+      <button type="button" id="add-news-button">Опубликовать новость</button>
+      <p id="news-message"></p>
+
+      <div class="news-list-header">
+        <h3>Опубликованные новости</h3>
+        <button type="button" id="load-news-button">Обновить список</button>
+      </div>
+      <div id="news-list"><p>Загрузка новостей…</p></div>
+    </section>
+
+    <section class="card">
       <h2>Именинники сегодня</h2>
 
       <div id="birthday-list">
@@ -152,6 +181,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=6"></script>
   </body>
 </html>

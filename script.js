@@ -53,6 +53,20 @@ const addPersonButton =
 const manualPersonMessage =
   document.querySelector("#manual-person-message");
 
+const newsTitle = document.querySelector("#news-title");
+const newsBody = document.querySelector("#news-body");
+const newsImage = document.querySelector("#news-image");
+const addNewsButton = document.querySelector("#add-news-button");
+const loadNewsButton = document.querySelector("#load-news-button");
+const newsMessage = document.querySelector("#news-message");
+const newsList = document.querySelector("#news-list");
+
+function getNewsImageUrl(imagePath) {
+  return supabaseClient.storage
+    .from("news-images")
+    .getPublicUrl(imagePath).data.publicUrl;
+}
+
 function updateAuthView(session) {
   const isLoggedIn = Boolean(session);
 
@@ -62,6 +76,7 @@ function updateAuthView(session) {
   if (isLoggedIn) {
     currentUserEmail.textContent =
       session.user.email;
+    loadNewsButton.click();
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -243,6 +258,136 @@ function sortPeopleByUpcomingBirthday(people, today = new Date()) {
     (a.full_name || "").localeCompare(b.full_name || "", "ru")
   );
 }
+
+loadNewsButton.addEventListener("click", async function () {
+  newsList.textContent = "Загрузка...";
+  const { data: news, error } = await supabaseClient
+    .from("news")
+    .select("id, title, body, image_path, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    newsList.textContent = "Ошибка: " + error.message;
+    return;
+  }
+
+  newsList.replaceChildren();
+  if (news.length === 0) {
+    newsList.textContent = "Новостей пока нет";
+    return;
+  }
+
+  news.forEach(function (item) {
+    const row = document.createElement("article");
+    row.classList.add("news-row");
+
+    const image = document.createElement("img");
+    image.src = getNewsImageUrl(item.image_path);
+    image.alt = "";
+    image.loading = "lazy";
+
+    const content = document.createElement("div");
+    content.classList.add("news-row-content");
+    const title = document.createElement("strong");
+    title.textContent = item.title;
+    const body = document.createElement("span");
+    body.textContent = item.body;
+    content.append(title, body);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete-button");
+    deleteButton.textContent = "Удалить";
+    deleteButton.addEventListener("click", async function () {
+      if (!confirm("Удалить новость «" + item.title + "»?")) return;
+      deleteButton.disabled = true;
+
+      const { error: deleteError } = await supabaseClient
+        .from("news").delete().eq("id", item.id);
+      if (deleteError) {
+        alert("Ошибка удаления: " + deleteError.message);
+        deleteButton.disabled = false;
+        return;
+      }
+
+      const { error: imageError } = await supabaseClient.storage
+        .from("news-images").remove([item.image_path]);
+      if (imageError) {
+        console.warn("Не удалось удалить файл новости", imageError.message);
+      }
+      row.remove();
+      if (!newsList.children.length) newsList.textContent = "Новостей пока нет";
+    });
+
+    row.append(image, content, deleteButton);
+    newsList.append(row);
+  });
+});
+
+addNewsButton.addEventListener("click", async function () {
+  const title = newsTitle.value.trim();
+  const body = newsBody.value.trim();
+  const file = newsImage.files[0];
+
+  if (!title || !body || !file) {
+    newsMessage.textContent = "Заполните заголовок, текст и выберите фотографию";
+    return;
+  }
+
+  const allowedTypes = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp"
+  };
+  if (!allowedTypes[file.type]) {
+    newsMessage.textContent = "Можно загрузить только JPG, PNG или WebP";
+    return;
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    newsMessage.textContent = "Фотография должна быть не больше 8 МБ";
+    return;
+  }
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) {
+    newsMessage.textContent = "Сначала войдите в аккаунт";
+    return;
+  }
+
+  addNewsButton.disabled = true;
+  newsMessage.textContent = "Загружаем фотографию...";
+  const userId = sessionData.session.user.id;
+  const imagePath = userId + "/" + crypto.randomUUID() + "." + allowedTypes[file.type];
+
+  try {
+    const { error: uploadError } = await supabaseClient.storage
+      .from("news-images")
+      .upload(imagePath, file, { cacheControl: "3600", upsert: false });
+    if (uploadError) throw uploadError;
+
+    newsMessage.textContent = "Сохраняем новость...";
+    const { error: insertError } = await supabaseClient.from("news").insert({
+      user_id: userId,
+      title: title,
+      body: body,
+      image_path: imagePath
+    });
+
+    if (insertError) {
+      await supabaseClient.storage.from("news-images").remove([imagePath]);
+      throw insertError;
+    }
+
+    newsTitle.value = "";
+    newsBody.value = "";
+    newsImage.value = "";
+    newsMessage.textContent = "Новость опубликована";
+    loadNewsButton.click();
+  } catch (error) {
+    newsMessage.textContent = "Ошибка: " + error.message;
+  } finally {
+    addNewsButton.disabled = false;
+  }
+});
 
 loadPeopleButton.addEventListener(
   "click",
