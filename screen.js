@@ -122,12 +122,20 @@ function fillNewsContent(content, item, slide) {
 
   if (slide.type === "photo") {
     content.classList.add("news-photo-content");
+    const media = document.createElement("div");
+    media.classList.add("news-photo-media");
+    const background = document.createElement("img");
+    background.classList.add("news-photo-background");
+    background.src = imageUrl(slide.path);
+    background.alt = "";
+    background.setAttribute("aria-hidden", "true");
     const image = document.createElement("img");
     image.classList.add("news-photo");
     image.src = imageUrl(slide.path);
     image.alt = item.title;
-    content.append(image);
-    return { image };
+    media.append(background, image);
+    content.append(media);
+    return { image, background };
   }
 
   if (slide.type === "text") {
@@ -263,12 +271,15 @@ function transitionToNextSlide() {
 
   if (changesOnlyPhoto && currentCard) {
     const currentImage = currentCard.querySelector(".news-photo");
+    const currentBackground = currentCard.querySelector(".news-photo-background");
+    const currentContent = currentCard.querySelector(".news-info-content");
     const counter = currentCard.querySelector(".news-counter");
     if (currentImage) {
-      if (!reduceMotion) currentImage.classList.add("is-changing");
+      if (!reduceMotion && currentContent) currentContent.classList.add("is-changing");
       transitionTimer = setTimeout(function () {
         activeNewsSlide += 1;
         currentImage.src = imageUrl(nextNewsSlide.path);
+        if (currentBackground) currentBackground.src = imageUrl(nextNewsSlide.path);
         const followingSlide = currentNews.slides[activeNewsSlide + 1];
         if (followingSlide && followingSlide.type === "photo") {
           const preloadImage = new Image();
@@ -276,7 +287,7 @@ function transitionToNextSlide() {
         }
         if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
         requestAnimationFrame(function () {
-          currentImage.classList.remove("is-changing");
+          if (currentContent) currentContent.classList.remove("is-changing");
         });
         scheduleNextSlide();
       }, reduceMotion ? 0 : 500);
