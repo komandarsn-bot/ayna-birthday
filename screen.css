@@ -234,10 +234,21 @@ body {
 }
 
 .birthday-title {
-  margin: 0 0 clamp(28px, 4vh, 56px);
+  margin: 0 0 clamp(10px, 1.5vh, 20px);
   font-size: clamp(28px, 3vw, 64px);
   font-weight: 400;
   letter-spacing: -0.025em;
+}
+
+.birthday-stage.is-birthday {
+  justify-content: center;
+  transform: translateY(-2vh);
+}
+
+.birthday-stage.is-birthday #tv-birthday-list {
+  flex: 0 0 auto;
+  width: 100%;
+  align-items: center;
 }
 
 .tv-person h2 {

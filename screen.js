@@ -3,6 +3,7 @@ const tvBirthdayList = document.querySelector("#tv-birthday-list");
 const screenDate = document.querySelector("#screen-date");
 const screenClock = document.querySelector("#screen-clock");
 const birthdayTitle = document.querySelector("#birthday-title");
+const birthdayStage = document.querySelector(".birthday-stage");
 const screenKey = new URLSearchParams(window.location.search).get("key");
 
 let birthdays = [], newsItems = [];
@@ -27,6 +28,7 @@ function showScreenState(title, description) {
   clearTimeout(slideTimer);
   clearTimeout(transitionTimer);
   activeKind = null;
+  birthdayStage.classList.remove("is-birthday");
   birthdayTitle.hidden = true;
   const card = document.createElement("article");
   card.classList.add("tv-person", "state-card");
@@ -43,6 +45,7 @@ function showScreenState(title, description) {
 }
 
 function renderBirthday(person) {
+  birthdayStage.classList.add("is-birthday");
   birthdayTitle.hidden = false;
   const card = document.createElement("article");
   card.classList.add("tv-person");
@@ -162,6 +165,7 @@ function refitCurrentNewsText() {
 }
 
 function renderNews(item) {
+  birthdayStage.classList.remove("is-birthday");
   birthdayTitle.hidden = true;
   const slide = item.slides[activeNewsSlide] || item.slides[0];
   const card = document.createElement("article");
