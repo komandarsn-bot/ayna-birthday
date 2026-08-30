@@ -135,16 +135,26 @@ body {
 .news-text-slide,
 .news-qr-slide {
   display: grid;
-  grid-template-rows: 19% minmax(0, 81%);
+  grid-template-rows: 27% minmax(0, 73%);
   text-align: center;
+}
+.news-info-slide {
+  width: min(1320px, 96%);
+  max-height: 640px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(20px, 2vw, 30px);
+  background:
+    radial-gradient(circle at 96% 4%, rgba(64, 105, 130, 0.48), transparent 38%),
+    linear-gradient(145deg, #292956 0%, #343469 100%);
+  box-shadow: 0 28px 70px rgba(35, 35, 70, 0.18);
 }
 .news-static-header {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
   justify-self: center;
-  width: min(1080px, 92%);
-  padding: 0 0 clamp(12px, 1.8vh, 22px);
+  width: min(1100px, 86%);
+  padding: clamp(22px, 3vh, 34px) 0 clamp(12px, 1.8vh, 20px);
 }
 .news-static-header::before {
   content: "";
@@ -161,6 +171,7 @@ body {
   margin: 0;
   font-size: clamp(30px, 2.6vw, 48px);
   font-weight: 600;
+  color: #ffffff;
   text-align: left;
 }
 .news-info-content {
@@ -173,14 +184,14 @@ body {
 }
 .news-info-content.is-changing { opacity: 0; }
 .news-text-content {
-  padding: clamp(12px, 1.5vh, 20px) 4% 0;
+  padding: clamp(12px, 1.5vh, 20px) 7% clamp(24px, 3vh, 38px);
   overflow: hidden;
 }
 .news-body {
   margin: 0 auto;
   width: 100%;
-  max-width: 1020px;
-  color: #575866;
+  max-width: 1050px;
+  color: rgba(255, 255, 255, 0.86);
   font-size: clamp(21px, 1.8vw, 34px);
   line-height: 1.5;
   text-align: left;
@@ -197,24 +208,24 @@ body {
   z-index: 2;
   padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(247, 247, 245, 0.9);
-  color: var(--muted);
+  background: rgba(255, 255, 255, 0.11);
+  color: rgba(255, 255, 255, 0.72);
   font-size: clamp(14px, 1vw, 19px);
 }
 .news-qr-content {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: clamp(4px, 0.7vh, 10px) 4% 0;
+  padding: clamp(4px, 0.7vh, 10px) 7% clamp(24px, 3vh, 38px);
 }
 .news-qr-instruction {
   margin: clamp(16px, 2vh, 28px) 0;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.72);
   font-size: clamp(18px, 1.5vw, 28px);
 }
 .news-qr-action {
   margin: clamp(14px, 2vh, 24px) 0 0;
-  color: var(--ink);
+  color: #ffffff;
   font-size: clamp(20px, 1.8vw, 34px);
   font-weight: 600;
 }
