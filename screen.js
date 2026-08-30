@@ -86,6 +86,19 @@ function drawQrCode(qrTarget, linkUrl) {
   });
 }
 
+function setNewsBodyContent(body, text) {
+  body.replaceChildren();
+  const paragraphs = String(text || "")
+    .split(/\r?\n+/)
+    .map(paragraph => paragraph.trim())
+    .filter(Boolean);
+  (paragraphs.length ? paragraphs : [""]).forEach(function (paragraphText) {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = paragraphText;
+    body.append(paragraph);
+  });
+}
+
 function fitNewsText(body, container) {
   if (!body || !container) return;
   const availableHeight = Math.max(1, container.clientHeight - 4);
@@ -152,9 +165,9 @@ function renderNews(item) {
     header.append(title);
     const content = document.createElement("div");
     content.classList.add("news-info-content", "news-text-content");
-    const body = document.createElement("p");
+    const body = document.createElement("div");
     body.classList.add("news-body");
-    body.textContent = slide.text;
+    setNewsBodyContent(body, slide.text);
     content.append(body);
     card.append(header, content);
   } else {
@@ -258,7 +271,7 @@ function transitionToNextSlide() {
       if (!reduceMotion) currentBody.classList.add("is-changing");
       transitionTimer = setTimeout(function () {
         activeNewsSlide += 1;
-        currentBody.textContent = nextNewsSlide.text;
+        setNewsBodyContent(currentBody, nextNewsSlide.text);
         fitNewsText(currentBody, currentCard.querySelector(".news-info-content"));
         if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
         requestAnimationFrame(function () {
