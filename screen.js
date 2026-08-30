@@ -95,6 +95,11 @@ function renderNews(item) {
     image.classList.add("news-photo");
     image.src = imageUrl(slide.path);
     image.alt = item.title;
+    const nextSlide = item.slides[activeNewsSlide + 1];
+    if (nextSlide && nextSlide.type === "photo") {
+      const preloadImage = new Image();
+      preloadImage.src = imageUrl(nextSlide.path);
+    }
     const caption = document.createElement("div");
     caption.classList.add("news-photo-caption");
     caption.append(label, title);
@@ -179,6 +184,31 @@ function transitionToNextSlide() {
   clearTimeout(transitionTimer);
   const currentCard = tvBirthdayList.firstElementChild;
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const currentNews = activeKind === "news" ? newsItems[activeIndex] : null;
+  const currentNewsSlide = currentNews ? currentNews.slides[activeNewsSlide] : null;
+  const nextNewsSlide = currentNews ? currentNews.slides[activeNewsSlide + 1] : null;
+  const changesOnlyPhoto = currentNewsSlide && nextNewsSlide &&
+    currentNewsSlide.type === "photo" && nextNewsSlide.type === "photo";
+
+  if (changesOnlyPhoto && currentCard) {
+    const currentImage = currentCard.querySelector(".news-photo");
+    const counter = currentCard.querySelector(".news-counter");
+    if (currentImage) {
+      if (!reduceMotion) currentImage.classList.add("is-changing");
+      transitionTimer = setTimeout(function () {
+        activeNewsSlide += 1;
+        currentImage.src = imageUrl(nextNewsSlide.path);
+        if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
+        requestAnimationFrame(function () {
+          currentImage.classList.remove("is-changing");
+        });
+        scheduleNextSlide();
+      }, reduceMotion ? 0 : 500);
+      return;
+    }
+  }
+
   function finish() {
     chooseNextSlide();
     renderCurrentSlide();

@@ -107,7 +107,7 @@ body {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   border-radius: 16px;
-  background: #efefec;
+  background: transparent;
 }
 .news-photo {
   display: block;
@@ -116,7 +116,10 @@ body {
   min-width: 0;
   min-height: 0;
   object-fit: contain;
+  opacity: 1;
+  transition: opacity 0.5s ease;
 }
+.news-photo.is-changing { opacity: 0; }
 .news-photo-caption {
   position: static;
   width: 100%;
