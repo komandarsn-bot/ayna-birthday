@@ -217,8 +217,10 @@ input[type="file"] {
 .news-row-content span { margin-top: 6px; color: #687873; white-space: pre-wrap; }
 .news-image-count, .news-link-preview { font-size: 14px; color: #687873; }
 .news-link-preview { overflow-wrap: anywhere; }
+.news-actions { display: flex; flex-direction: column; gap: 10px; }
 
 @media (max-width: 600px) {
   .news-row { align-items: flex-start; flex-wrap: wrap; }
   .news-row img { width: 100%; height: 180px; }
+  .news-actions { width: 100%; flex-direction: row; flex-wrap: wrap; }
 }

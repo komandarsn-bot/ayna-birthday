@@ -59,10 +59,14 @@ const newsImage = document.querySelector("#news-image");
 const newsLink = document.querySelector("#news-link");
 const newsQrText = document.querySelector("#news-qr-text");
 const newsActiveDays = document.querySelector("#news-active-days");
+const cancelNewsEditButton = document.querySelector("#cancel-news-edit-button");
 const addNewsButton = document.querySelector("#add-news-button");
 const loadNewsButton = document.querySelector("#load-news-button");
 const newsMessage = document.querySelector("#news-message");
 const newsList = document.querySelector("#news-list");
+
+let editingNewsId = null;
+let editingNewsImagePaths = [];
 
 function getNewsImageUrl(imagePath) {
   return supabaseClient.storage
@@ -76,6 +80,24 @@ function getNewsImagePaths(item) {
   }
   return item.image_path ? [item.image_path] : [];
 }
+
+function resetNewsForm() {
+  editingNewsId = null;
+  editingNewsImagePaths = [];
+  newsTitle.value = "";
+  newsBody.value = "";
+  newsImage.value = "";
+  newsLink.value = "";
+  newsQrText.value = "";
+  newsActiveDays.value = "7";
+  addNewsButton.textContent = "Опубликовать";
+  cancelNewsEditButton.hidden = true;
+}
+
+cancelNewsEditButton.addEventListener("click", function () {
+  resetNewsForm();
+  newsMessage.textContent = "Редактирование отменено";
+});
 
 function updateAuthView(session) {
   const isLoggedIn = Boolean(session);
@@ -331,6 +353,28 @@ loadNewsButton.addEventListener("click", async function () {
       content.append(expiration);
     }
 
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.textContent = "Редактировать";
+    editButton.addEventListener("click", function () {
+      editingNewsId = item.id;
+      editingNewsImagePaths = imagePaths;
+      newsTitle.value = item.title || "";
+      newsBody.value = item.body || "";
+      newsImage.value = "";
+      newsLink.value = item.link_url || "";
+      newsQrText.value = item.qr_text || "";
+      const remainingDays = item.expires_at
+        ? Math.max(1, Math.ceil((new Date(item.expires_at).getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+        : 7;
+      newsActiveDays.value = String(Math.min(365, remainingDays));
+      addNewsButton.textContent = "Сохранить изменения";
+      cancelNewsEditButton.hidden = false;
+      newsMessage.textContent = "Редактируется публикация «" + item.title + "»";
+      newsTitle.scrollIntoView({ behavior: "smooth", block: "center" });
+      newsTitle.focus({ preventScroll: true });
+    });
+
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
     deleteButton.textContent = "Удалить";
@@ -352,10 +396,14 @@ loadNewsButton.addEventListener("click", async function () {
         console.warn("Не удалось удалить файл новости", imageError.message);
       }
       row.remove();
+      if (editingNewsId === item.id) resetNewsForm();
       if (!newsList.children.length) newsList.textContent = "Публикаций пока нет";
     });
 
-    row.append(image, content, deleteButton);
+    const actions = document.createElement("div");
+    actions.classList.add("news-actions");
+    actions.append(editButton, deleteButton);
+    row.append(image, content, actions);
     newsList.append(row);
   });
 });
@@ -368,8 +416,10 @@ addNewsButton.addEventListener("click", async function () {
   const qrText = newsQrText.value.trim();
   const activeDays = Number(newsActiveDays.value);
 
-  if (!title || !body || !files.length) {
-    newsMessage.textContent = "Заполните заголовок, текст и выберите фотографии";
+  if (!title || !body || (!editingNewsId && !files.length)) {
+    newsMessage.textContent = editingNewsId
+      ? "Заполните заголовок и текст"
+      : "Заполните заголовок, текст и выберите фотографии";
     return;
   }
 
@@ -435,30 +485,45 @@ addNewsButton.addEventListener("click", async function () {
       uploadedPaths.push(imagePath);
     }
 
-    newsMessage.textContent = "Сохраняем публикацию...";
-    const { error: insertError } = await supabaseClient.from("news").insert({
-      user_id: userId,
+    newsMessage.textContent = editingNewsId ? "Сохраняем изменения..." : "Сохраняем публикацию...";
+    const publicationData = {
       title: title,
       body: body,
-      image_path: uploadedPaths[0],
-      image_paths: uploadedPaths,
       link_url: linkUrl || null,
       qr_text: qrText || null,
       expires_at: new Date(Date.now() + activeDays * 24 * 60 * 60 * 1000).toISOString()
-    });
+    };
 
-    if (insertError) {
-      await supabaseClient.storage.from("news-images").remove(uploadedPaths);
-      throw insertError;
+    if (uploadedPaths.length) {
+      publicationData.image_path = uploadedPaths[0];
+      publicationData.image_paths = uploadedPaths;
     }
 
-    newsTitle.value = "";
-    newsBody.value = "";
-    newsImage.value = "";
-    newsLink.value = "";
-    newsQrText.value = "";
-    newsActiveDays.value = "7";
-    newsMessage.textContent = "Публикация добавлена";
+    let saveError;
+    if (editingNewsId) {
+      const result = await supabaseClient
+        .from("news")
+        .update(publicationData)
+        .eq("id", editingNewsId);
+      saveError = result.error;
+    } else {
+      publicationData.user_id = userId;
+      const result = await supabaseClient.from("news").insert(publicationData);
+      saveError = result.error;
+    }
+
+    if (saveError) throw saveError;
+
+    if (editingNewsId && uploadedPaths.length && editingNewsImagePaths.length) {
+      const { error: oldImagesError } = await supabaseClient.storage
+        .from("news-images")
+        .remove(editingNewsImagePaths);
+      if (oldImagesError) console.warn("Не удалось удалить старые фотографии", oldImagesError.message);
+    }
+
+    const wasEditing = Boolean(editingNewsId);
+    resetNewsForm();
+    newsMessage.textContent = wasEditing ? "Изменения сохранены" : "Публикация добавлена";
     loadNewsButton.click();
   } catch (error) {
     if (uploadedPaths.length) {
