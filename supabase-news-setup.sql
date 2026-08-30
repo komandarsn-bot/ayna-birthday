@@ -8,6 +8,7 @@ create table if not exists public.news (
   image_paths text[] not null default '{}',
   link_url text,
   qr_text text,
+  expires_at timestamptz not null default (now() + interval '7 days'),
   is_published boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -16,6 +17,12 @@ create table if not exists public.news (
 alter table public.news add column if not exists image_paths text[] not null default '{}';
 alter table public.news add column if not exists link_url text;
 alter table public.news add column if not exists qr_text text;
+alter table public.news add column if not exists expires_at timestamptz;
+update public.news
+set expires_at = now() + interval '7 days'
+where expires_at is null;
+alter table public.news alter column expires_at set default (now() + interval '7 days');
+alter table public.news alter column expires_at set not null;
 alter table public.news alter column image_path drop not null;
 update public.news
 set image_paths = array[image_path]
@@ -85,6 +92,7 @@ returns table (
   news_image_paths text[],
   news_link_url text,
   news_qr_text text,
+  news_expires_at timestamptz,
   news_created_at timestamptz
 )
 language sql
@@ -104,11 +112,13 @@ as $$
     end,
     n.link_url,
     n.qr_text,
+    n.expires_at,
     n.created_at
   from public.screens s
   join public.news n on n.user_id = s.user_id
   where s.access_token = p_access_token
     and n.is_published = true
+    and n.expires_at > now()
   order by n.created_at desc, n.id desc
   limit 10;
 $$;

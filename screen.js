@@ -90,7 +90,9 @@ function fitNewsText(body, container) {
   if (!body || !container) return;
   const availableHeight = Math.max(1, container.clientHeight - 4);
   let minimumSize = 10;
-  let maximumSize = 54;
+  const title = tvBirthdayList.querySelector(".news-static-header h2");
+  const titleSize = title ? parseFloat(getComputedStyle(title).fontSize) : 54;
+  let maximumSize = Math.max(minimumSize, titleSize);
   let bestSize = minimumSize;
 
   for (let attempt = 0; attempt < 12; attempt += 1) {

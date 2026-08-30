@@ -182,6 +182,7 @@ input[type="file"] {
 
 .news-form input[type="text"],
 .news-form input[type="url"],
+.news-form input[type="number"],
 .news-form textarea {
   padding: 12px;
   border: 1px solid #c7d8d3;

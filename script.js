@@ -58,6 +58,7 @@ const newsBody = document.querySelector("#news-body");
 const newsImage = document.querySelector("#news-image");
 const newsLink = document.querySelector("#news-link");
 const newsQrText = document.querySelector("#news-qr-text");
+const newsActiveDays = document.querySelector("#news-active-days");
 const addNewsButton = document.querySelector("#add-news-button");
 const loadNewsButton = document.querySelector("#load-news-button");
 const newsMessage = document.querySelector("#news-message");
@@ -272,7 +273,7 @@ loadNewsButton.addEventListener("click", async function () {
   newsList.textContent = "Загрузка...";
   const { data: news, error } = await supabaseClient
     .from("news")
-    .select("id, title, body, image_path, image_paths, link_url, qr_text, created_at")
+    .select("id, title, body, image_path, image_paths, link_url, qr_text, expires_at, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -320,6 +321,15 @@ loadNewsButton.addEventListener("click", async function () {
       qrText.textContent = "Подпись QR: " + item.qr_text;
       content.append(qrText);
     }
+    if (item.expires_at) {
+      const expiration = document.createElement("span");
+      const expirationDate = new Date(item.expires_at);
+      const isExpired = expirationDate.getTime() <= Date.now();
+      expiration.textContent = isExpired
+        ? "Срок показа завершён"
+        : "Активно до: " + expirationDate.toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" });
+      content.append(expiration);
+    }
 
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
@@ -356,6 +366,7 @@ addNewsButton.addEventListener("click", async function () {
   const files = Array.from(newsImage.files);
   const linkUrl = newsLink.value.trim();
   const qrText = newsQrText.value.trim();
+  const activeDays = Number(newsActiveDays.value);
 
   if (!title || !body || !files.length) {
     newsMessage.textContent = "Заполните заголовок, текст и выберите фотографии";
@@ -379,6 +390,11 @@ addNewsButton.addEventListener("click", async function () {
 
   if (qrText && !linkUrl) {
     newsMessage.textContent = "Для подписи QR-кода сначала укажите ссылку";
+    return;
+  }
+
+  if (!Number.isInteger(activeDays) || activeDays < 1 || activeDays > 365) {
+    newsMessage.textContent = "Укажите срок показа от 1 до 365 дней";
     return;
   }
 
@@ -427,7 +443,8 @@ addNewsButton.addEventListener("click", async function () {
       image_path: uploadedPaths[0],
       image_paths: uploadedPaths,
       link_url: linkUrl || null,
-      qr_text: qrText || null
+      qr_text: qrText || null,
+      expires_at: new Date(Date.now() + activeDays * 24 * 60 * 60 * 1000).toISOString()
     });
 
     if (insertError) {
@@ -440,6 +457,7 @@ addNewsButton.addEventListener("click", async function () {
     newsImage.value = "";
     newsLink.value = "";
     newsQrText.value = "";
+    newsActiveDays.value = "7";
     newsMessage.textContent = "Публикация добавлена";
     loadNewsButton.click();
   } catch (error) {
