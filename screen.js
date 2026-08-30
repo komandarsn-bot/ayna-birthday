@@ -77,6 +77,33 @@ function renderBirthday(person) {
   tvBirthdayList.replaceChildren(card);
 }
 
+function fillQrContent(content, item) {
+  content.replaceChildren();
+  content.classList.add("news-qr-content");
+  const instruction = document.createElement("p");
+  instruction.classList.add("news-qr-instruction");
+  instruction.textContent = "Наведите камеру телефона";
+  const qrTarget = document.createElement("div");
+  qrTarget.classList.add("news-qr-code");
+  const action = document.createElement("p");
+  action.classList.add("news-qr-action");
+  action.textContent = item.qr_text || "Подробнее и регистрация";
+  content.append(instruction, qrTarget, action);
+  return qrTarget;
+}
+
+function drawQrCode(qrTarget, linkUrl) {
+  if (!qrTarget || !window.QRCode) return;
+  new QRCode(qrTarget, {
+    text: linkUrl,
+    width: 250,
+    height: 250,
+    colorDark: "#30305f",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
 function renderNews(item) {
   birthdayTitle.hidden = true;
   const slide = item.slides[activeNewsSlide] || item.slides[0];
@@ -102,26 +129,26 @@ function renderNews(item) {
     caption.append(title);
     card.append(image, caption);
   } else if (slide.type === "text") {
+    card.classList.add("news-info-slide");
+    const header = document.createElement("div");
+    header.classList.add("news-static-header");
+    header.append(title);
     const content = document.createElement("div");
-    content.classList.add("news-text-content");
+    content.classList.add("news-info-content", "news-text-content");
     const body = document.createElement("p");
     body.classList.add("news-body");
     body.textContent = slide.text;
-    content.append(title, body);
-    card.append(content);
+    content.append(body);
+    card.append(header, content);
   } else {
+    card.classList.add("news-info-slide");
+    const header = document.createElement("div");
+    header.classList.add("news-static-header");
+    header.append(title);
     const content = document.createElement("div");
-    content.classList.add("news-qr-content");
-    const instruction = document.createElement("p");
-    instruction.classList.add("news-qr-instruction");
-    instruction.textContent = "Наведите камеру телефона";
-    qrTarget = document.createElement("div");
-    qrTarget.classList.add("news-qr-code");
-    const action = document.createElement("p");
-    action.classList.add("news-qr-action");
-    action.textContent = item.qr_text || "Подробнее и регистрация";
-    content.append(title, instruction, qrTarget, action);
-    card.append(content);
+    content.classList.add("news-info-content");
+    qrTarget = fillQrContent(content, item);
+    card.append(header, content);
   }
 
   if (item.slide_count > 1) {
@@ -132,16 +159,7 @@ function renderNews(item) {
   }
   tvBirthdayList.replaceChildren(card);
 
-  if (qrTarget && window.QRCode) {
-    new QRCode(qrTarget, {
-      text: item.link_url,
-      width: 250,
-      height: 250,
-      colorDark: "#30305f",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.M
-    });
-  }
+  drawQrCode(qrTarget, item.link_url);
 }
 
 function renderCurrentSlide() {
@@ -189,6 +207,8 @@ function transitionToNextSlide() {
     currentNewsSlide.type === "photo" && nextNewsSlide.type === "photo";
   const changesOnlyText = currentNewsSlide && nextNewsSlide &&
     currentNewsSlide.type === "text" && nextNewsSlide.type === "text";
+  const changesTextToQr = currentNewsSlide && nextNewsSlide &&
+    currentNewsSlide.type === "text" && nextNewsSlide.type === "qr";
 
   if (changesOnlyPhoto && currentCard) {
     const currentImage = currentCard.querySelector(".news-photo");
@@ -219,6 +239,28 @@ function transitionToNextSlide() {
         if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
         requestAnimationFrame(function () {
           currentBody.classList.remove("is-changing");
+        });
+        scheduleNextSlide();
+      }, reduceMotion ? 0 : 500);
+      return;
+    }
+  }
+
+  if (changesTextToQr && currentCard) {
+    const currentContent = currentCard.querySelector(".news-info-content");
+    const counter = currentCard.querySelector(".news-counter");
+    if (currentContent) {
+      if (!reduceMotion) currentContent.classList.add("is-changing");
+      transitionTimer = setTimeout(function () {
+        activeNewsSlide += 1;
+        currentCard.classList.remove("news-text-slide");
+        currentCard.classList.add("news-qr-slide");
+        currentContent.classList.remove("news-text-content");
+        const qrTarget = fillQrContent(currentContent, currentNews);
+        drawQrCode(qrTarget, currentNews.link_url);
+        if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
+        requestAnimationFrame(function () {
+          currentContent.classList.remove("is-changing");
         });
         scheduleNextSlide();
       }, reduceMotion ? 0 : 500);
