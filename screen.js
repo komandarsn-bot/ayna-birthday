@@ -23,24 +23,6 @@ function imageUrl(path) {
   return supabaseClient.storage.from("news-images").getPublicUrl(path).data.publicUrl;
 }
 
-function splitTextIntoSlides(text, maximumLength = 320) {
-  const normalized = String(text || "").trim().replace(/\s+/g, " ");
-  if (!normalized) return [""];
-  const parts = [];
-  let currentPart = "";
-  normalized.split(" ").forEach(function (word) {
-    const candidate = currentPart ? currentPart + " " + word : word;
-    if (currentPart && candidate.length > maximumLength) {
-      parts.push(currentPart);
-      currentPart = word;
-    } else {
-      currentPart = candidate;
-    }
-  });
-  if (currentPart) parts.push(currentPart);
-  return parts;
-}
-
 function showScreenState(title, description) {
   clearTimeout(slideTimer);
   clearTimeout(transitionTimer);
@@ -104,6 +86,16 @@ function drawQrCode(qrTarget, linkUrl) {
   });
 }
 
+function fitNewsText(body, container) {
+  if (!body || !container) return;
+  body.style.fontSize = "";
+  let fontSize = parseFloat(getComputedStyle(body).fontSize);
+  while (body.scrollHeight > container.clientHeight && fontSize > 15) {
+    fontSize -= 1;
+    body.style.fontSize = fontSize + "px";
+  }
+}
+
 function renderNews(item) {
   birthdayTitle.hidden = true;
   const slide = item.slides[activeNewsSlide] || item.slides[0];
@@ -160,6 +152,9 @@ function renderNews(item) {
   tvBirthdayList.replaceChildren(card);
 
   drawQrCode(qrTarget, item.link_url);
+  if (slide.type === "text") {
+    fitNewsText(card.querySelector(".news-body"), card.querySelector(".news-info-content"));
+  }
 }
 
 function renderCurrentSlide() {
@@ -169,7 +164,10 @@ function renderCurrentSlide() {
 
 function scheduleNextSlide() {
   clearTimeout(slideTimer);
-  slideTimer = setTimeout(transitionToNextSlide, 5000);
+  const currentNews = activeKind === "news" ? newsItems[activeIndex] : null;
+  const currentSlide = currentNews ? currentNews.slides[activeNewsSlide] : null;
+  const duration = currentSlide && currentSlide.type === "text" ? 15000 : 5000;
+  slideTimer = setTimeout(transitionToNextSlide, duration);
 }
 
 function chooseNextSlide() {
@@ -236,6 +234,7 @@ function transitionToNextSlide() {
       transitionTimer = setTimeout(function () {
         activeNewsSlide += 1;
         currentBody.textContent = nextNewsSlide.text;
+        fitNewsText(currentBody, currentCard.querySelector(".news-info-content"));
         if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
         requestAnimationFrame(function () {
           currentBody.classList.remove("is-changing");
@@ -311,7 +310,7 @@ function updateNews(data) {
     const imagePaths = Array.isArray(item.news_image_paths) && item.news_image_paths.length
       ? item.news_image_paths.filter(Boolean)
       : (item.news_image_path ? [item.news_image_path] : []);
-    const textParts = splitTextIntoSlides(item.news_body);
+    const textParts = [String(item.news_body || "").trim()];
     const slides = imagePaths.map(path => ({ type: "photo", path }));
     textParts.filter(Boolean).forEach(text => slides.push({ type: "text", text }));
     if (item.news_link_url) slides.push({ type: "qr" });

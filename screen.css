@@ -135,7 +135,7 @@ body {
 .news-text-slide,
 .news-qr-slide {
   display: grid;
-  grid-template-rows: 38% minmax(0, 62%);
+  grid-template-rows: 27% minmax(0, 73%);
   text-align: center;
 }
 .news-static-header {
@@ -155,12 +155,13 @@ body {
 .news-info-content.is-changing { opacity: 0; }
 .news-text-content {
   padding: clamp(8px, 1vh, 14px) 4% 0;
+  overflow: hidden;
 }
 .news-body {
   margin: 0 auto;
   color: var(--muted);
   font-size: clamp(21px, 1.8vw, 34px);
-  line-height: 1.42;
+  line-height: 1.35;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   opacity: 1;
