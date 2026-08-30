@@ -159,8 +159,9 @@ body {
 .news-static-header::before {
   content: "";
   flex: 0 0 auto;
+  align-self: stretch;
   width: 4px;
-  height: clamp(52px, 6vh, 76px);
+  min-height: clamp(58px, 7vh, 86px);
   margin-right: clamp(18px, 2vw, 30px);
   border-radius: 999px;
   background: var(--accent);
@@ -194,7 +195,10 @@ body {
   color: rgba(255, 255, 255, 0.86);
   font-size: clamp(21px, 1.8vw, 34px);
   line-height: 1.5;
-  text-align: left;
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-word;
+  hyphens: auto;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   opacity: 1;
