@@ -203,7 +203,9 @@ function scheduleNextSlide() {
   clearTimeout(slideTimer);
   const currentNews = activeKind === "news" ? newsItems[activeIndex] : null;
   const currentSlide = currentNews ? currentNews.slides[activeNewsSlide] : null;
-  const duration = currentSlide && currentSlide.type === "text" ? 15000 : 5000;
+  let duration = 5000;
+  if (currentSlide && currentSlide.type === "text") duration = 15000;
+  if (currentSlide && currentSlide.type === "qr") duration = 10000;
   slideTimer = setTimeout(transitionToNextSlide, duration);
 }
 
