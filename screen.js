@@ -88,12 +88,35 @@ function drawQrCode(qrTarget, linkUrl) {
 
 function fitNewsText(body, container) {
   if (!body || !container) return;
-  body.style.fontSize = "";
-  let fontSize = parseFloat(getComputedStyle(body).fontSize);
-  while (body.scrollHeight > container.clientHeight && fontSize > 15) {
-    fontSize -= 1;
-    body.style.fontSize = fontSize + "px";
+  const availableHeight = Math.max(1, container.clientHeight - 4);
+  let minimumSize = 10;
+  let maximumSize = 54;
+  let bestSize = minimumSize;
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const candidateSize = (minimumSize + maximumSize) / 2;
+    body.style.fontSize = candidateSize + "px";
+    if (body.scrollHeight <= availableHeight && body.scrollWidth <= container.clientWidth) {
+      bestSize = candidateSize;
+      minimumSize = candidateSize;
+    } else {
+      maximumSize = candidateSize;
+    }
   }
+  body.style.fontSize = Math.floor(bestSize) + "px";
+}
+
+function refitCurrentNewsText() {
+  if (activeKind !== "news") return;
+  const currentNews = newsItems[activeIndex];
+  const currentSlide = currentNews && currentNews.slides[activeNewsSlide];
+  if (!currentSlide || currentSlide.type !== "text") return;
+  requestAnimationFrame(function () {
+    fitNewsText(
+      tvBirthdayList.querySelector(".news-body"),
+      tvBirthdayList.querySelector(".news-info-content")
+    );
+  });
 }
 
 function renderNews(item) {
@@ -363,4 +386,5 @@ setInterval(updateScreenDate, 1000);
 setInterval(loadContent, 5000);
 window.addEventListener("online", loadContent);
 window.addEventListener("focus", loadContent);
+window.addEventListener("resize", refitCurrentNewsText);
 document.addEventListener("visibilitychange", function () { if (!document.hidden) loadContent(); });
