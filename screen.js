@@ -23,7 +23,7 @@ function imageUrl(path) {
   return supabaseClient.storage.from("news-images").getPublicUrl(path).data.publicUrl;
 }
 
-function splitTextIntoSlides(text, maximumLength = 240) {
+function splitTextIntoSlides(text, maximumLength = 190) {
   const normalized = String(text || "").trim().replace(/\s+/g, " ");
   if (!normalized) return [""];
   const parts = [];
@@ -79,56 +79,62 @@ function renderBirthday(person) {
 
 function renderNews(item) {
   birthdayTitle.hidden = true;
+  const slide = item.slides[activeNewsSlide] || item.slides[0];
   const card = document.createElement("article");
-  card.classList.add("news-card");
+  card.classList.add("news-slide", `news-${slide.type}-slide`);
 
-  const imagePath = item.image_paths.length
-    ? item.image_paths[activeNewsSlide % item.image_paths.length]
-    : "";
-  const image = document.createElement("img");
-  if (imagePath) image.src = imageUrl(imagePath);
-  image.alt = item.title;
-  const content = document.createElement("div");
-  content.classList.add("news-card-content");
   const label = document.createElement("p");
   label.classList.add("news-label");
   label.textContent = "Афиша";
   const title = document.createElement("h2");
   title.textContent = item.title;
-  const body = document.createElement("p");
-  body.classList.add("news-body");
-  body.textContent = item.text_parts[activeNewsSlide % item.text_parts.length];
-  content.append(label, title, body);
 
-  const meta = document.createElement("div");
-  meta.classList.add("news-meta");
+  let qrTarget = null;
+  if (slide.type === "photo") {
+    const image = document.createElement("img");
+    image.classList.add("news-photo");
+    image.src = imageUrl(slide.path);
+    image.alt = item.title;
+    const caption = document.createElement("div");
+    caption.classList.add("news-photo-caption");
+    caption.append(label, title);
+    card.append(image, caption);
+  } else if (slide.type === "text") {
+    const content = document.createElement("div");
+    content.classList.add("news-text-content");
+    const body = document.createElement("p");
+    body.classList.add("news-body");
+    body.textContent = slide.text;
+    content.append(label, title, body);
+    card.append(content);
+  } else {
+    const content = document.createElement("div");
+    content.classList.add("news-qr-content");
+    const instruction = document.createElement("p");
+    instruction.classList.add("news-qr-instruction");
+    instruction.textContent = "Наведите камеру телефона";
+    qrTarget = document.createElement("div");
+    qrTarget.classList.add("news-qr-code");
+    const action = document.createElement("p");
+    action.classList.add("news-qr-action");
+    action.textContent = "Подробнее и регистрация";
+    content.append(label, title, instruction, qrTarget, action);
+    card.append(content);
+  }
+
   if (item.slide_count > 1) {
     const counter = document.createElement("span");
     counter.classList.add("news-counter");
     counter.textContent = `${activeNewsSlide + 1} / ${item.slide_count}`;
-    meta.append(counter);
+    card.append(counter);
   }
-
-  let qrTarget = null;
-  if (item.link_url) {
-    const qrBlock = document.createElement("div");
-    qrBlock.classList.add("news-qr");
-    qrTarget = document.createElement("div");
-    qrTarget.classList.add("news-qr-code");
-    const caption = document.createElement("span");
-    caption.textContent = "Наведите камеру для регистрации";
-    qrBlock.append(qrTarget, caption);
-    meta.append(qrBlock);
-  }
-  if (meta.children.length) content.append(meta);
-  card.append(image, content);
   tvBirthdayList.replaceChildren(card);
 
   if (qrTarget && window.QRCode) {
     new QRCode(qrTarget, {
       text: item.link_url,
-      width: 150,
-      height: 150,
+      width: 250,
+      height: 250,
       colorDark: "#30305f",
       colorLight: "#ffffff",
       correctLevel: QRCode.CorrectLevel.M
@@ -217,13 +223,18 @@ function updateNews(data) {
       ? item.news_image_paths.filter(Boolean)
       : (item.news_image_path ? [item.news_image_path] : []);
     const textParts = splitTextIntoSlides(item.news_body);
+    const slides = imagePaths.map(path => ({ type: "photo", path }));
+    textParts.filter(Boolean).forEach(text => slides.push({ type: "text", text }));
+    if (item.news_link_url) slides.push({ type: "qr" });
+    if (!slides.length) slides.push({ type: "text", text: "" });
     return {
       id: item.news_id,
       title: item.news_title,
       body: item.news_body,
       image_paths: imagePaths,
       text_parts: textParts,
-      slide_count: Math.max(imagePaths.length, textParts.length, 1),
+      slides: slides,
+      slide_count: slides.length,
       link_url: item.news_link_url || "",
       created_at: item.news_created_at
     };
