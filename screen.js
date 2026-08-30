@@ -23,7 +23,7 @@ function imageUrl(path) {
   return supabaseClient.storage.from("news-images").getPublicUrl(path).data.publicUrl;
 }
 
-function splitTextIntoSlides(text, maximumLength = 360) {
+function splitTextIntoSlides(text, maximumLength = 240) {
   const normalized = String(text || "").trim().replace(/\s+/g, " ");
   if (!normalized) return [""];
   const parts = [];

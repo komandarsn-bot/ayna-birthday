@@ -107,3 +107,6 @@ $$;
 
 revoke all on function public.get_screen_news(uuid) from public;
 grant execute on function public.get_screen_news(uuid) to anon, authenticated;
+
+-- Supabase сразу обновит сведения о новых колонках и функции.
+notify pgrst, 'reload schema';
