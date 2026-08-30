@@ -97,7 +97,21 @@ function setNewsBodyContent(body, text) {
     .filter(Boolean);
   (paragraphs.length ? paragraphs : [""]).forEach(function (paragraphText) {
     const paragraph = document.createElement("p");
-    paragraph.textContent = paragraphText;
+    const boldPattern = /\*([^*]+)\*/g;
+    let previousIndex = 0;
+    let match;
+    while ((match = boldPattern.exec(paragraphText)) !== null) {
+      if (match.index > previousIndex) {
+        paragraph.append(document.createTextNode(paragraphText.slice(previousIndex, match.index)));
+      }
+      const strong = document.createElement("strong");
+      strong.textContent = match[1];
+      paragraph.append(strong);
+      previousIndex = boldPattern.lastIndex;
+    }
+    if (previousIndex < paragraphText.length) {
+      paragraph.append(document.createTextNode(paragraphText.slice(previousIndex)));
+    }
     body.append(paragraph);
   });
 }

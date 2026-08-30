@@ -179,6 +179,7 @@ input[type="file"] {
   gap: 7px;
   font-weight: bold;
 }
+.news-form small { color: #687873; font-weight: 400; }
 
 .news-form input[type="text"],
 .news-form input[type="url"],
