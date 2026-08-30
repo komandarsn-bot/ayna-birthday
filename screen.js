@@ -23,7 +23,7 @@ function imageUrl(path) {
   return supabaseClient.storage.from("news-images").getPublicUrl(path).data.publicUrl;
 }
 
-function splitTextIntoSlides(text, maximumLength = 190) {
+function splitTextIntoSlides(text, maximumLength = 320) {
   const normalized = String(text || "").trim().replace(/\s+/g, " ");
   if (!normalized) return [""];
   const parts = [];
@@ -83,9 +83,6 @@ function renderNews(item) {
   const card = document.createElement("article");
   card.classList.add("news-slide", `news-${slide.type}-slide`);
 
-  const label = document.createElement("p");
-  label.classList.add("news-label");
-  label.textContent = "Афиша";
   const title = document.createElement("h2");
   title.textContent = item.title;
 
@@ -102,7 +99,7 @@ function renderNews(item) {
     }
     const caption = document.createElement("div");
     caption.classList.add("news-photo-caption");
-    caption.append(label, title);
+    caption.append(title);
     card.append(image, caption);
   } else if (slide.type === "text") {
     const content = document.createElement("div");
@@ -110,7 +107,7 @@ function renderNews(item) {
     const body = document.createElement("p");
     body.classList.add("news-body");
     body.textContent = slide.text;
-    content.append(label, title, body);
+    content.append(title, body);
     card.append(content);
   } else {
     const content = document.createElement("div");
@@ -122,8 +119,8 @@ function renderNews(item) {
     qrTarget.classList.add("news-qr-code");
     const action = document.createElement("p");
     action.classList.add("news-qr-action");
-    action.textContent = "Подробнее и регистрация";
-    content.append(label, title, instruction, qrTarget, action);
+    action.textContent = item.qr_text || "Подробнее и регистрация";
+    content.append(title, instruction, qrTarget, action);
     card.append(content);
   }
 
@@ -190,6 +187,8 @@ function transitionToNextSlide() {
   const nextNewsSlide = currentNews ? currentNews.slides[activeNewsSlide + 1] : null;
   const changesOnlyPhoto = currentNewsSlide && nextNewsSlide &&
     currentNewsSlide.type === "photo" && nextNewsSlide.type === "photo";
+  const changesOnlyText = currentNewsSlide && nextNewsSlide &&
+    currentNewsSlide.type === "text" && nextNewsSlide.type === "text";
 
   if (changesOnlyPhoto && currentCard) {
     const currentImage = currentCard.querySelector(".news-photo");
@@ -202,6 +201,24 @@ function transitionToNextSlide() {
         if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
         requestAnimationFrame(function () {
           currentImage.classList.remove("is-changing");
+        });
+        scheduleNextSlide();
+      }, reduceMotion ? 0 : 500);
+      return;
+    }
+  }
+
+  if (changesOnlyText && currentCard) {
+    const currentBody = currentCard.querySelector(".news-body");
+    const counter = currentCard.querySelector(".news-counter");
+    if (currentBody) {
+      if (!reduceMotion) currentBody.classList.add("is-changing");
+      transitionTimer = setTimeout(function () {
+        activeNewsSlide += 1;
+        currentBody.textContent = nextNewsSlide.text;
+        if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
+        requestAnimationFrame(function () {
+          currentBody.classList.remove("is-changing");
         });
         scheduleNextSlide();
       }, reduceMotion ? 0 : 500);
@@ -266,6 +283,7 @@ function updateNews(data) {
       slides: slides,
       slide_count: slides.length,
       link_url: item.news_link_url || "",
+      qr_text: item.news_qr_text || "",
       created_at: item.news_created_at
     };
   });

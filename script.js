@@ -57,6 +57,7 @@ const newsTitle = document.querySelector("#news-title");
 const newsBody = document.querySelector("#news-body");
 const newsImage = document.querySelector("#news-image");
 const newsLink = document.querySelector("#news-link");
+const newsQrText = document.querySelector("#news-qr-text");
 const addNewsButton = document.querySelector("#add-news-button");
 const loadNewsButton = document.querySelector("#load-news-button");
 const newsMessage = document.querySelector("#news-message");
@@ -271,7 +272,7 @@ loadNewsButton.addEventListener("click", async function () {
   newsList.textContent = "Загрузка...";
   const { data: news, error } = await supabaseClient
     .from("news")
-    .select("id, title, body, image_path, image_paths, link_url, created_at")
+    .select("id, title, body, image_path, image_paths, link_url, qr_text, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -281,7 +282,7 @@ loadNewsButton.addEventListener("click", async function () {
 
   newsList.replaceChildren();
   if (news.length === 0) {
-    newsList.textContent = "В афише пока нет публикаций";
+    newsList.textContent = "Публикаций пока нет";
     return;
   }
 
@@ -314,6 +315,11 @@ loadNewsButton.addEventListener("click", async function () {
       link.textContent = "QR-ссылка: " + item.link_url;
       content.append(link);
     }
+    if (item.qr_text) {
+      const qrText = document.createElement("span");
+      qrText.textContent = "Подпись QR: " + item.qr_text;
+      content.append(qrText);
+    }
 
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
@@ -336,7 +342,7 @@ loadNewsButton.addEventListener("click", async function () {
         console.warn("Не удалось удалить файл новости", imageError.message);
       }
       row.remove();
-      if (!newsList.children.length) newsList.textContent = "В афише пока нет публикаций";
+      if (!newsList.children.length) newsList.textContent = "Публикаций пока нет";
     });
 
     row.append(image, content, deleteButton);
@@ -349,6 +355,7 @@ addNewsButton.addEventListener("click", async function () {
   const body = newsBody.value.trim();
   const files = Array.from(newsImage.files);
   const linkUrl = newsLink.value.trim();
+  const qrText = newsQrText.value.trim();
 
   if (!title || !body || !files.length) {
     newsMessage.textContent = "Заполните заголовок, текст и выберите фотографии";
@@ -368,6 +375,11 @@ addNewsButton.addEventListener("click", async function () {
       newsMessage.textContent = "Введите полную ссылку, начинающуюся с https://";
       return;
     }
+  }
+
+  if (qrText && !linkUrl) {
+    newsMessage.textContent = "Для подписи QR-кода сначала укажите ссылку";
+    return;
   }
 
   const allowedTypes = {
@@ -414,7 +426,8 @@ addNewsButton.addEventListener("click", async function () {
       body: body,
       image_path: uploadedPaths[0],
       image_paths: uploadedPaths,
-      link_url: linkUrl || null
+      link_url: linkUrl || null,
+      qr_text: qrText || null
     });
 
     if (insertError) {
@@ -426,7 +439,8 @@ addNewsButton.addEventListener("click", async function () {
     newsBody.value = "";
     newsImage.value = "";
     newsLink.value = "";
-    newsMessage.textContent = "Публикация добавлена в афишу";
+    newsQrText.value = "";
+    newsMessage.textContent = "Публикация добавлена";
     loadNewsButton.click();
   } catch (error) {
     if (uploadedPaths.length) {

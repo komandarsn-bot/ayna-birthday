@@ -138,7 +138,7 @@
     </section>
 
     <section class="card">
-      <h2>Афиша</h2>
+      <h2>Публикации</h2>
       <p>Добавьте фотографии, текст и при необходимости ссылку. Публикация сразу появится в ТВ-цикле.</p>
 
       <div class="news-form">
@@ -158,13 +158,17 @@
           Ссылка для QR-кода (необязательно)
           <input type="url" id="news-link" placeholder="https://example.com/registration">
         </label>
+        <label>
+          Текст возле QR-кода (необязательно)
+          <input type="text" id="news-qr-text" maxlength="240" placeholder="Например: Зарегистрируйтесь до 15 сентября">
+        </label>
       </div>
 
-      <button type="button" id="add-news-button">Опубликовать в афише</button>
+      <button type="button" id="add-news-button">Опубликовать</button>
       <p id="news-message"></p>
 
       <div class="news-list-header">
-        <h3>Опубликовано в афише</h3>
+        <h3>Опубликованные материалы</h3>
         <button type="button" id="load-news-button">Обновить список</button>
       </div>
       <div id="news-list"><p>Загрузка публикаций…</p></div>
@@ -185,6 +189,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=7"></script>
+    <script src="script.js?v=8"></script>
   </body>
 </html>
