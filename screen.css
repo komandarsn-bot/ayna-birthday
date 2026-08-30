@@ -104,6 +104,8 @@ body {
 .news-slide.is-leaving { animation: card-disappear 0.65s ease both; }
 
 .news-photo-slide {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   border-radius: 16px;
   background: #efefec;
 }
@@ -111,16 +113,15 @@ body {
   display: block;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   object-fit: contain;
 }
 .news-photo-caption {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  position: static;
+  width: 100%;
   padding: clamp(18px, 2.5vh, 32px) clamp(24px, 3vw, 48px);
-  background: rgba(247, 247, 245, 0.94);
-  backdrop-filter: blur(10px);
+  background: #f7f7f5;
 }
 .news-label {
   margin: 0 0 clamp(7px, 1vh, 12px);
