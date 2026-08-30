@@ -56,6 +56,7 @@ const manualPersonMessage =
 const newsTitle = document.querySelector("#news-title");
 const newsBody = document.querySelector("#news-body");
 const newsImage = document.querySelector("#news-image");
+const newsLink = document.querySelector("#news-link");
 const addNewsButton = document.querySelector("#add-news-button");
 const loadNewsButton = document.querySelector("#load-news-button");
 const newsMessage = document.querySelector("#news-message");
@@ -65,6 +66,13 @@ function getNewsImageUrl(imagePath) {
   return supabaseClient.storage
     .from("news-images")
     .getPublicUrl(imagePath).data.publicUrl;
+}
+
+function getNewsImagePaths(item) {
+  if (Array.isArray(item.image_paths) && item.image_paths.length) {
+    return item.image_paths.filter(Boolean);
+  }
+  return item.image_path ? [item.image_path] : [];
 }
 
 function updateAuthView(session) {
@@ -263,7 +271,7 @@ loadNewsButton.addEventListener("click", async function () {
   newsList.textContent = "Загрузка...";
   const { data: news, error } = await supabaseClient
     .from("news")
-    .select("id, title, body, image_path, created_at")
+    .select("id, title, body, image_path, image_paths, link_url, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -273,7 +281,7 @@ loadNewsButton.addEventListener("click", async function () {
 
   newsList.replaceChildren();
   if (news.length === 0) {
-    newsList.textContent = "Новостей пока нет";
+    newsList.textContent = "В афише пока нет публикаций";
     return;
   }
 
@@ -282,7 +290,8 @@ loadNewsButton.addEventListener("click", async function () {
     row.classList.add("news-row");
 
     const image = document.createElement("img");
-    image.src = getNewsImageUrl(item.image_path);
+    const imagePaths = getNewsImagePaths(item);
+    image.src = getNewsImageUrl(imagePaths[0]);
     image.alt = "";
     image.loading = "lazy";
 
@@ -293,12 +302,24 @@ loadNewsButton.addEventListener("click", async function () {
     const body = document.createElement("span");
     body.textContent = item.body;
     content.append(title, body);
+    if (imagePaths.length > 1) {
+      const count = document.createElement("span");
+      count.classList.add("news-image-count");
+      count.textContent = "Фотографий: " + imagePaths.length;
+      content.append(count);
+    }
+    if (item.link_url) {
+      const link = document.createElement("span");
+      link.classList.add("news-link-preview");
+      link.textContent = "QR-ссылка: " + item.link_url;
+      content.append(link);
+    }
 
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("delete-button");
     deleteButton.textContent = "Удалить";
     deleteButton.addEventListener("click", async function () {
-      if (!confirm("Удалить новость «" + item.title + "»?")) return;
+      if (!confirm("Удалить публикацию «" + item.title + "»?")) return;
       deleteButton.disabled = true;
 
       const { error: deleteError } = await supabaseClient
@@ -310,12 +331,12 @@ loadNewsButton.addEventListener("click", async function () {
       }
 
       const { error: imageError } = await supabaseClient.storage
-        .from("news-images").remove([item.image_path]);
+        .from("news-images").remove(imagePaths);
       if (imageError) {
         console.warn("Не удалось удалить файл новости", imageError.message);
       }
       row.remove();
-      if (!newsList.children.length) newsList.textContent = "Новостей пока нет";
+      if (!newsList.children.length) newsList.textContent = "В афише пока нет публикаций";
     });
 
     row.append(image, content, deleteButton);
@@ -326,11 +347,27 @@ loadNewsButton.addEventListener("click", async function () {
 addNewsButton.addEventListener("click", async function () {
   const title = newsTitle.value.trim();
   const body = newsBody.value.trim();
-  const file = newsImage.files[0];
+  const files = Array.from(newsImage.files);
+  const linkUrl = newsLink.value.trim();
 
-  if (!title || !body || !file) {
-    newsMessage.textContent = "Заполните заголовок, текст и выберите фотографию";
+  if (!title || !body || !files.length) {
+    newsMessage.textContent = "Заполните заголовок, текст и выберите фотографии";
     return;
+  }
+
+  if (files.length > 8) {
+    newsMessage.textContent = "Для одной публикации можно выбрать не больше 8 фотографий";
+    return;
+  }
+
+  if (linkUrl) {
+    try {
+      const parsedUrl = new URL(linkUrl);
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) throw new Error();
+    } catch {
+      newsMessage.textContent = "Введите полную ссылку, начинающуюся с https://";
+      return;
+    }
   }
 
   const allowedTypes = {
@@ -338,12 +375,12 @@ addNewsButton.addEventListener("click", async function () {
     "image/png": "png",
     "image/webp": "webp"
   };
-  if (!allowedTypes[file.type]) {
+  if (files.some(file => !allowedTypes[file.type])) {
     newsMessage.textContent = "Можно загрузить только JPG, PNG или WebP";
     return;
   }
-  if (file.size > 8 * 1024 * 1024) {
-    newsMessage.textContent = "Фотография должна быть не больше 8 МБ";
+  if (files.some(file => file.size > 8 * 1024 * 1024)) {
+    newsMessage.textContent = "Каждая фотография должна быть не больше 8 МБ";
     return;
   }
 
@@ -354,35 +391,47 @@ addNewsButton.addEventListener("click", async function () {
   }
 
   addNewsButton.disabled = true;
-  newsMessage.textContent = "Загружаем фотографию...";
+  newsMessage.textContent = "Подготавливаем фотографии...";
   const userId = sessionData.session.user.id;
-  const imagePath = userId + "/" + crypto.randomUUID() + "." + allowedTypes[file.type];
+  const uploadedPaths = [];
 
   try {
-    const { error: uploadError } = await supabaseClient.storage
-      .from("news-images")
-      .upload(imagePath, file, { cacheControl: "3600", upsert: false });
-    if (uploadError) throw uploadError;
+    for (let index = 0; index < files.length; index += 1) {
+      const file = files[index];
+      const imagePath = userId + "/" + crypto.randomUUID() + "." + allowedTypes[file.type];
+      newsMessage.textContent = `Загружаем фотографию ${index + 1} из ${files.length}...`;
+      const { error: uploadError } = await supabaseClient.storage
+        .from("news-images")
+        .upload(imagePath, file, { cacheControl: "3600", upsert: false });
+      if (uploadError) throw uploadError;
+      uploadedPaths.push(imagePath);
+    }
 
-    newsMessage.textContent = "Сохраняем новость...";
+    newsMessage.textContent = "Сохраняем публикацию...";
     const { error: insertError } = await supabaseClient.from("news").insert({
       user_id: userId,
       title: title,
       body: body,
-      image_path: imagePath
+      image_path: uploadedPaths[0],
+      image_paths: uploadedPaths,
+      link_url: linkUrl || null
     });
 
     if (insertError) {
-      await supabaseClient.storage.from("news-images").remove([imagePath]);
+      await supabaseClient.storage.from("news-images").remove(uploadedPaths);
       throw insertError;
     }
 
     newsTitle.value = "";
     newsBody.value = "";
     newsImage.value = "";
-    newsMessage.textContent = "Новость опубликована";
+    newsLink.value = "";
+    newsMessage.textContent = "Публикация добавлена в афишу";
     loadNewsButton.click();
   } catch (error) {
+    if (uploadedPaths.length) {
+      await supabaseClient.storage.from("news-images").remove(uploadedPaths);
+    }
     newsMessage.textContent = "Ошибка: " + error.message;
   } finally {
     addNewsButton.disabled = false;

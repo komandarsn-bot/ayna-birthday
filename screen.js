@@ -7,6 +7,7 @@ const screenKey = new URLSearchParams(window.location.search).get("key");
 
 let birthdays = [], newsItems = [];
 let activeKind = null, activeIndex = 0;
+let activeNewsSlide = 0;
 let slideTimer, transitionTimer, isLoading = false;
 
 function updateScreenDate() {
@@ -20,6 +21,24 @@ function updateScreenDate() {
 
 function imageUrl(path) {
   return supabaseClient.storage.from("news-images").getPublicUrl(path).data.publicUrl;
+}
+
+function splitTextIntoSlides(text, maximumLength = 360) {
+  const normalized = String(text || "").trim().replace(/\s+/g, " ");
+  if (!normalized) return [""];
+  const parts = [];
+  let currentPart = "";
+  normalized.split(" ").forEach(function (word) {
+    const candidate = currentPart ? currentPart + " " + word : word;
+    if (currentPart && candidate.length > maximumLength) {
+      parts.push(currentPart);
+      currentPart = word;
+    } else {
+      currentPart = candidate;
+    }
+  });
+  if (currentPart) parts.push(currentPart);
+  return parts;
 }
 
 function showScreenState(title, description) {
@@ -62,22 +81,59 @@ function renderNews(item) {
   birthdayTitle.hidden = true;
   const card = document.createElement("article");
   card.classList.add("news-card");
+
+  const imagePath = item.image_paths.length
+    ? item.image_paths[activeNewsSlide % item.image_paths.length]
+    : "";
   const image = document.createElement("img");
-  image.src = imageUrl(item.image_path);
+  if (imagePath) image.src = imageUrl(imagePath);
   image.alt = item.title;
   const content = document.createElement("div");
   content.classList.add("news-card-content");
   const label = document.createElement("p");
   label.classList.add("news-label");
-  label.textContent = "Новости школы";
+  label.textContent = "Афиша";
   const title = document.createElement("h2");
   title.textContent = item.title;
   const body = document.createElement("p");
   body.classList.add("news-body");
-  body.textContent = item.body;
+  body.textContent = item.text_parts[activeNewsSlide % item.text_parts.length];
   content.append(label, title, body);
+
+  const meta = document.createElement("div");
+  meta.classList.add("news-meta");
+  if (item.slide_count > 1) {
+    const counter = document.createElement("span");
+    counter.classList.add("news-counter");
+    counter.textContent = `${activeNewsSlide + 1} / ${item.slide_count}`;
+    meta.append(counter);
+  }
+
+  let qrTarget = null;
+  if (item.link_url) {
+    const qrBlock = document.createElement("div");
+    qrBlock.classList.add("news-qr");
+    qrTarget = document.createElement("div");
+    qrTarget.classList.add("news-qr-code");
+    const caption = document.createElement("span");
+    caption.textContent = "Наведите камеру для регистрации";
+    qrBlock.append(qrTarget, caption);
+    meta.append(qrBlock);
+  }
+  if (meta.children.length) content.append(meta);
   card.append(image, content);
   tvBirthdayList.replaceChildren(card);
+
+  if (qrTarget && window.QRCode) {
+    new QRCode(qrTarget, {
+      text: item.link_url,
+      width: 150,
+      height: 150,
+      colorDark: "#30305f",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
 }
 
 function renderCurrentSlide() {
@@ -87,18 +143,29 @@ function renderCurrentSlide() {
 
 function scheduleNextSlide() {
   clearTimeout(slideTimer);
-  slideTimer = setTimeout(transitionToNextSlide, activeKind === "news" ? 10000 : 5000);
+  slideTimer = setTimeout(transitionToNextSlide, 5000);
 }
 
 function chooseNextSlide() {
   if (activeKind === "birthday") {
     if (activeIndex + 1 < birthdays.length) activeIndex += 1;
-    else if (newsItems.length) { activeKind = "news"; activeIndex = 0; }
+    else if (newsItems.length) { activeKind = "news"; activeIndex = 0; activeNewsSlide = 0; }
     else activeIndex = 0;
   } else if (activeKind === "news") {
-    if (activeIndex + 1 < newsItems.length) activeIndex += 1;
-    else if (birthdays.length) { activeKind = "birthday"; activeIndex = 0; }
-    else activeIndex = 0;
+    const currentNews = newsItems[activeIndex];
+    if (currentNews && activeNewsSlide + 1 < currentNews.slide_count) {
+      activeNewsSlide += 1;
+    } else if (activeIndex + 1 < newsItems.length) {
+      activeIndex += 1;
+      activeNewsSlide = 0;
+    } else if (birthdays.length) {
+      activeKind = "birthday";
+      activeIndex = 0;
+      activeNewsSlide = 0;
+    } else {
+      activeIndex = 0;
+      activeNewsSlide = 0;
+    }
   }
 }
 
@@ -123,6 +190,7 @@ function startSequence() {
   else if (newsItems.length) activeKind = "news";
   else { showScreenState("Сегодня пока нет новых публикаций"); return; }
   activeIndex = 0;
+  activeNewsSlide = 0;
   renderCurrentSlide();
   scheduleNextSlide();
 }
@@ -144,19 +212,29 @@ function updateBirthdays(data) {
 }
 
 function updateNews(data) {
-  const normalized = data.map(item => ({
-    id: item.news_id,
-    title: item.news_title,
-    body: item.news_body,
-    image_path: item.news_image_path,
-    created_at: item.news_created_at
-  }));
+  const normalized = data.map(function (item) {
+    const imagePaths = Array.isArray(item.news_image_paths) && item.news_image_paths.length
+      ? item.news_image_paths.filter(Boolean)
+      : (item.news_image_path ? [item.news_image_path] : []);
+    const textParts = splitTextIntoSlides(item.news_body);
+    return {
+      id: item.news_id,
+      title: item.news_title,
+      body: item.news_body,
+      image_paths: imagePaths,
+      text_parts: textParts,
+      slide_count: Math.max(imagePaths.length, textParts.length, 1),
+      link_url: item.news_link_url || "",
+      created_at: item.news_created_at
+    };
+  });
   const changed = JSON.stringify(normalized) !== JSON.stringify(newsItems);
   const currentId = activeKind === "news" && newsItems[activeIndex] ? newsItems[activeIndex].id : null;
   newsItems = normalized;
   if (!activeKind || (activeKind === "news" && !newsItems.length)) startSequence();
   else if (changed && activeKind === "news") {
     activeIndex = Math.max(0, newsItems.findIndex(item => item.id === currentId));
+    activeNewsSlide = Math.min(activeNewsSlide, newsItems[activeIndex].slide_count - 1);
     renderCurrentSlide();
     scheduleNextSlide();
   }

@@ -138,8 +138,8 @@
     </section>
 
     <section class="card">
-      <h2>Новости школы</h2>
-      <p>Добавьте фотографию и текст. Новость сразу появится в ТВ-цикле.</p>
+      <h2>Афиша</h2>
+      <p>Добавьте фотографии, текст и при необходимости ссылку. Публикация сразу появится в ТВ-цикле.</p>
 
       <div class="news-form">
         <label>
@@ -147,23 +147,27 @@
           <input type="text" id="news-title" maxlength="160" placeholder="Например: Победа на олимпиаде">
         </label>
         <label>
-          Текст новости
-          <textarea id="news-body" maxlength="2000" rows="5" placeholder="Кратко расскажите о событии"></textarea>
+          Текст публикации
+          <textarea id="news-body" maxlength="6000" rows="7" placeholder="Расскажите о событии — длинный текст автоматически разделится на слайды"></textarea>
         </label>
         <label>
-          Фотография
-          <input type="file" id="news-image" accept="image/jpeg,image/png,image/webp">
+          Фотографии (до 8)
+          <input type="file" id="news-image" accept="image/jpeg,image/png,image/webp" multiple>
+        </label>
+        <label>
+          Ссылка для QR-кода (необязательно)
+          <input type="url" id="news-link" placeholder="https://example.com/registration">
         </label>
       </div>
 
-      <button type="button" id="add-news-button">Опубликовать новость</button>
+      <button type="button" id="add-news-button">Опубликовать в афише</button>
       <p id="news-message"></p>
 
       <div class="news-list-header">
-        <h3>Опубликованные новости</h3>
+        <h3>Опубликовано в афише</h3>
         <button type="button" id="load-news-button">Обновить список</button>
       </div>
-      <div id="news-list"><p>Загрузка новостей…</p></div>
+      <div id="news-list"><p>Загрузка публикаций…</p></div>
     </section>
 
     <section class="card">
@@ -181,6 +185,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=6"></script>
+    <script src="script.js?v=7"></script>
   </body>
 </html>

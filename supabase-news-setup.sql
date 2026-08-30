@@ -1,13 +1,27 @@
--- Таблица новостей
+-- Таблица публикаций для раздела «Афиша»
 create table if not exists public.news (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
   title text not null check (char_length(title) between 1 and 160),
-  body text not null check (char_length(body) between 1 and 2000),
-  image_path text not null,
+  body text not null check (char_length(body) between 1 and 6000),
+  image_path text,
+  image_paths text[] not null default '{}',
+  link_url text,
   is_published boolean not null default true,
   created_at timestamptz not null default now()
 );
+
+-- Обновление уже существующей таблицы без удаления старых публикаций.
+alter table public.news add column if not exists image_paths text[] not null default '{}';
+alter table public.news add column if not exists link_url text;
+alter table public.news alter column image_path drop not null;
+update public.news
+set image_paths = array[image_path]
+where cardinality(image_paths) = 0 and image_path is not null;
+
+alter table public.news drop constraint if exists news_body_check;
+alter table public.news add constraint news_body_check
+  check (char_length(body) between 1 and 6000);
 
 alter table public.news enable row level security;
 
@@ -27,7 +41,7 @@ drop policy if exists "news_owner_delete" on public.news;
 create policy "news_owner_delete" on public.news
   for delete to authenticated using (auth.uid() = user_id);
 
--- Публичная папка: новости предназначены для показа на телевизоре.
+-- Публичная папка: материалы афиши предназначены для показа на телевизоре.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
   'news-images', 'news-images', true, 8388608,
@@ -54,13 +68,16 @@ create policy "news_images_owner_delete" on storage.objects
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
--- Публичный ТВ-экран получает только опубликованные новости владельца ссылки.
-create or replace function public.get_screen_news(p_access_token uuid)
+-- Публичный ТВ-экран получает только опубликованные материалы владельца ссылки.
+drop function if exists public.get_screen_news(uuid);
+create function public.get_screen_news(p_access_token uuid)
 returns table (
   news_id uuid,
   news_title text,
   news_body text,
   news_image_path text,
+  news_image_paths text[],
+  news_link_url text,
   news_created_at timestamptz
 )
 language sql
@@ -68,7 +85,18 @@ security definer
 set search_path = public
 stable
 as $$
-  select n.id, n.title, n.body, n.image_path, n.created_at
+  select
+    n.id,
+    n.title,
+    n.body,
+    n.image_path,
+    case
+      when cardinality(n.image_paths) > 0 then n.image_paths
+      when n.image_path is not null then array[n.image_path]
+      else '{}'::text[]
+    end,
+    n.link_url,
+    n.created_at
   from public.screens s
   join public.news n on n.user_id = s.user_id
   where s.access_token = p_access_token

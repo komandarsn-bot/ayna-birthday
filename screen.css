@@ -100,7 +100,7 @@ body {
   height: 100%;
   object-fit: contain;
   border-radius: 12px;
-  background: #ececea;
+  background: #f0f0ed;
 }
 .news-label {
   margin: 0 0 20px;
@@ -120,10 +120,37 @@ body {
   font-size: clamp(20px, 2vw, 38px);
   line-height: 1.45;
   white-space: pre-wrap;
-  display: -webkit-box;
-  -webkit-line-clamp: 7;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.news-meta {
+  margin-top: clamp(24px, 3vh, 42px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.news-counter {
+  color: var(--muted);
+  font-size: clamp(16px, 1.2vw, 24px);
+}
+.news-qr {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--muted);
+  font-size: clamp(15px, 1.2vw, 22px);
+  line-height: 1.35;
+}
+.news-qr-code {
+  flex: 0 0 auto;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fff;
+}
+.news-qr-code img, .news-qr-code canvas {
+  display: block;
+  width: 130px !important;
+  height: 130px !important;
 }
 
 .birthday-title {
@@ -189,6 +216,8 @@ body {
   .tv-person h2.long-name { font-size: 36px; }
   .news-card { height: auto; grid-template-columns: 1fr; gap: 24px; text-align: center; }
   .news-card img { height: 34vh; }
+  .news-meta, .news-qr { justify-content: center; }
+  .news-meta { align-items: center; flex-wrap: wrap; }
 }
 
 @media (prefers-reduced-motion: reduce) {

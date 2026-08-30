@@ -181,6 +181,7 @@ input[type="file"] {
 }
 
 .news-form input[type="text"],
+.news-form input[type="url"],
 .news-form textarea {
   padding: 12px;
   border: 1px solid #c7d8d3;
@@ -206,12 +207,15 @@ input[type="file"] {
   width: 120px;
   height: 80px;
   flex-shrink: 0;
-  object-fit: cover;
+  object-fit: contain;
+  background: #f2f1ed;
   border-radius: 8px;
 }
 .news-row-content { flex: 1; min-width: 0; }
 .news-row-content strong, .news-row-content span { display: block; }
 .news-row-content span { margin-top: 6px; color: #687873; white-space: pre-wrap; }
+.news-image-count, .news-link-preview { font-size: 14px; color: #687873; }
+.news-link-preview { overflow-wrap: anywhere; }
 
 @media (max-width: 600px) {
   .news-row { align-items: flex-start; flex-wrap: wrap; }
