@@ -99,6 +99,33 @@ function setNewsBodyContent(body, text) {
   });
 }
 
+function fillNewsContent(content, item, slide) {
+  content.className = "news-info-content";
+  content.replaceChildren();
+
+  if (slide.type === "photo") {
+    content.classList.add("news-photo-content");
+    const image = document.createElement("img");
+    image.classList.add("news-photo");
+    image.src = imageUrl(slide.path);
+    image.alt = item.title;
+    content.append(image);
+    return { image };
+  }
+
+  if (slide.type === "text") {
+    content.classList.add("news-text-content");
+    const body = document.createElement("div");
+    body.classList.add("news-body");
+    setNewsBodyContent(body, slide.text);
+    content.append(body);
+    return { body };
+  }
+
+  const qrTarget = fillQrContent(content, item);
+  return { qrTarget };
+}
+
 function fitNewsText(body, container) {
   if (!body || !container) return;
   const availableHeight = Math.max(1, container.clientHeight - 4);
@@ -138,47 +165,21 @@ function renderNews(item) {
   birthdayTitle.hidden = true;
   const slide = item.slides[activeNewsSlide] || item.slides[0];
   const card = document.createElement("article");
-  card.classList.add("news-slide", `news-${slide.type}-slide`);
+  card.classList.add("news-slide", "news-info-slide", `news-${slide.type}-slide`);
 
   const title = document.createElement("h2");
   title.textContent = item.title;
+  const header = document.createElement("div");
+  header.classList.add("news-static-header");
+  header.append(title);
+  const content = document.createElement("div");
+  const renderedContent = fillNewsContent(content, item, slide);
+  card.append(header, content);
 
-  let qrTarget = null;
-  if (slide.type === "photo") {
-    const image = document.createElement("img");
-    image.classList.add("news-photo");
-    image.src = imageUrl(slide.path);
-    image.alt = item.title;
-    const nextSlide = item.slides[activeNewsSlide + 1];
-    if (nextSlide && nextSlide.type === "photo") {
-      const preloadImage = new Image();
-      preloadImage.src = imageUrl(nextSlide.path);
-    }
-    const caption = document.createElement("div");
-    caption.classList.add("news-photo-caption");
-    caption.append(title);
-    card.append(image, caption);
-  } else if (slide.type === "text") {
-    card.classList.add("news-info-slide");
-    const header = document.createElement("div");
-    header.classList.add("news-static-header");
-    header.append(title);
-    const content = document.createElement("div");
-    content.classList.add("news-info-content", "news-text-content");
-    const body = document.createElement("div");
-    body.classList.add("news-body");
-    setNewsBodyContent(body, slide.text);
-    content.append(body);
-    card.append(header, content);
-  } else {
-    card.classList.add("news-info-slide");
-    const header = document.createElement("div");
-    header.classList.add("news-static-header");
-    header.append(title);
-    const content = document.createElement("div");
-    content.classList.add("news-info-content");
-    qrTarget = fillQrContent(content, item);
-    card.append(header, content);
+  const nextSlide = item.slides[activeNewsSlide + 1];
+  if (nextSlide && nextSlide.type === "photo") {
+    const preloadImage = new Image();
+    preloadImage.src = imageUrl(nextSlide.path);
   }
 
   if (item.slide_count > 1) {
@@ -189,10 +190,8 @@ function renderNews(item) {
   }
   tvBirthdayList.replaceChildren(card);
 
-  drawQrCode(qrTarget, item.link_url);
-  if (slide.type === "text") {
-    fitNewsText(card.querySelector(".news-body"), card.querySelector(".news-info-content"));
-  }
+  drawQrCode(renderedContent.qrTarget, item.link_url);
+  if (renderedContent.body) fitNewsText(renderedContent.body, content);
 }
 
 function renderCurrentSlide() {
@@ -241,10 +240,6 @@ function transitionToNextSlide() {
   const nextNewsSlide = currentNews ? currentNews.slides[activeNewsSlide + 1] : null;
   const changesOnlyPhoto = currentNewsSlide && nextNewsSlide &&
     currentNewsSlide.type === "photo" && nextNewsSlide.type === "photo";
-  const changesOnlyText = currentNewsSlide && nextNewsSlide &&
-    currentNewsSlide.type === "text" && nextNewsSlide.type === "text";
-  const changesTextToQr = currentNewsSlide && nextNewsSlide &&
-    currentNewsSlide.type === "text" && nextNewsSlide.type === "qr";
 
   if (changesOnlyPhoto && currentCard) {
     const currentImage = currentCard.querySelector(".news-photo");
@@ -254,6 +249,11 @@ function transitionToNextSlide() {
       transitionTimer = setTimeout(function () {
         activeNewsSlide += 1;
         currentImage.src = imageUrl(nextNewsSlide.path);
+        const followingSlide = currentNews.slides[activeNewsSlide + 1];
+        if (followingSlide && followingSlide.type === "photo") {
+          const preloadImage = new Image();
+          preloadImage.src = imageUrl(followingSlide.path);
+        }
         if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
         requestAnimationFrame(function () {
           currentImage.classList.remove("is-changing");
@@ -264,37 +264,19 @@ function transitionToNextSlide() {
     }
   }
 
-  if (changesOnlyText && currentCard) {
-    const currentBody = currentCard.querySelector(".news-body");
-    const counter = currentCard.querySelector(".news-counter");
-    if (currentBody) {
-      if (!reduceMotion) currentBody.classList.add("is-changing");
-      transitionTimer = setTimeout(function () {
-        activeNewsSlide += 1;
-        setNewsBodyContent(currentBody, nextNewsSlide.text);
-        fitNewsText(currentBody, currentCard.querySelector(".news-info-content"));
-        if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
-        requestAnimationFrame(function () {
-          currentBody.classList.remove("is-changing");
-        });
-        scheduleNextSlide();
-      }, reduceMotion ? 0 : 500);
-      return;
-    }
-  }
-
-  if (changesTextToQr && currentCard) {
+  if (currentNewsSlide && nextNewsSlide && currentCard) {
     const currentContent = currentCard.querySelector(".news-info-content");
     const counter = currentCard.querySelector(".news-counter");
     if (currentContent) {
       if (!reduceMotion) currentContent.classList.add("is-changing");
       transitionTimer = setTimeout(function () {
         activeNewsSlide += 1;
-        currentCard.classList.remove("news-text-slide");
-        currentCard.classList.add("news-qr-slide");
-        currentContent.classList.remove("news-text-content");
-        const qrTarget = fillQrContent(currentContent, currentNews);
-        drawQrCode(qrTarget, currentNews.link_url);
+        currentCard.classList.remove("news-photo-slide", "news-text-slide", "news-qr-slide");
+        currentCard.classList.add(`news-${nextNewsSlide.type}-slide`);
+        const renderedContent = fillNewsContent(currentContent, currentNews, nextNewsSlide);
+        if (!reduceMotion) currentContent.classList.add("is-changing");
+        drawQrCode(renderedContent.qrTarget, currentNews.link_url);
+        if (renderedContent.body) fitNewsText(renderedContent.body, currentContent);
         if (counter) counter.textContent = `${activeNewsSlide + 1} / ${currentNews.slide_count}`;
         requestAnimationFrame(function () {
           currentContent.classList.remove("is-changing");

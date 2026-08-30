@@ -103,10 +103,6 @@ body {
 }
 .news-slide.is-leaving { animation: card-disappear 0.65s ease both; }
 
-.news-photo-slide {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-}
 .news-photo {
   display: block;
   width: 100%;
@@ -119,28 +115,16 @@ body {
   transition: opacity 0.5s ease;
 }
 .news-photo.is-changing { opacity: 0; }
-.news-photo-caption {
-  position: static;
-  width: 100%;
-  padding: clamp(18px, 2.5vh, 32px) clamp(24px, 3vw, 48px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background: transparent;
-}
-.news-photo-caption h2 { color: #ffffff; }
 .news-slide h2 {
   margin: 0;
   font-size: clamp(28px, 3vw, 56px);
   line-height: 1.15;
   letter-spacing: -0.03em;
 }
-.news-text-slide,
-.news-qr-slide {
+.news-info-slide {
   display: grid;
   grid-template-rows: 27% minmax(0, 73%);
   text-align: center;
-}
-.news-info-slide,
-.news-photo-slide {
   width: min(1320px, 96%);
   max-height: 640px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -154,9 +138,11 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   justify-self: center;
   width: min(1100px, 86%);
   padding: clamp(22px, 3vh, 34px) 0 clamp(12px, 1.8vh, 20px);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.38);
 }
 .news-static-header h2 {
   width: auto;
@@ -165,7 +151,7 @@ body {
   font-size: clamp(30px, 2.6vw, 48px);
   font-weight: 600;
   color: #ffffff;
-  text-align: left;
+  text-align: center;
 }
 .news-info-content {
   min-height: 0;
@@ -174,6 +160,10 @@ body {
   justify-content: center;
   opacity: 1;
   transition: opacity 0.5s ease;
+}
+.news-photo-content {
+  min-height: 0;
+  padding: clamp(12px, 1.5vh, 20px) 5% clamp(18px, 2.5vh, 30px);
 }
 .news-info-content.is-changing { opacity: 0; }
 .news-text-content {
@@ -305,7 +295,6 @@ body {
   .tv-person h2 { font-size: clamp(40px, 10vw, 60px); }
   .tv-person h2.long-name { font-size: 36px; }
   .news-slide { height: 100%; }
-  .news-photo-caption { text-align: left; }
 }
 
 @media (prefers-reduced-motion: reduce) {
