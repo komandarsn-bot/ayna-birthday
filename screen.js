@@ -67,7 +67,7 @@ function fillQrContent(content, item) {
   content.classList.add("news-qr-content");
   const instruction = document.createElement("p");
   instruction.classList.add("news-qr-instruction");
-  instruction.textContent = "Наведите камеру телефона";
+  instruction.textContent = "Отсканируйте QR-код";
   const qrTarget = document.createElement("div");
   qrTarget.classList.add("news-qr-code");
   const action = document.createElement("p");
@@ -169,17 +169,22 @@ function fillNewsContent(content, item, slide) {
 
 function fitNewsText(body, container) {
   if (!body || !container) return;
-  const availableHeight = Math.max(1, container.clientHeight - 4);
-  let minimumSize = 10;
+  const containerStyle = getComputedStyle(container);
+  const horizontalPadding = parseFloat(containerStyle.paddingLeft) + parseFloat(containerStyle.paddingRight);
+  const verticalPadding = parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
+  const availableHeight = Math.max(1, container.clientHeight - verticalPadding - 4);
+  const availableWidth = Math.max(1, container.clientWidth - horizontalPadding - 4);
+  const isAnnouncement = container.classList.contains("news-announcement-text");
+  let minimumSize = isAnnouncement ? 14 : 10;
   const title = tvBirthdayList.querySelector(".news-static-header h2");
   const titleSize = title ? parseFloat(getComputedStyle(title).fontSize) : 54;
-  let maximumSize = Math.max(minimumSize, Math.min(36, titleSize * 0.72));
+  let maximumSize = Math.max(minimumSize, Math.min(isAnnouncement ? 28 : 36, titleSize * 0.72));
   let bestSize = minimumSize;
 
   for (let attempt = 0; attempt < 12; attempt += 1) {
     const candidateSize = (minimumSize + maximumSize) / 2;
     body.style.fontSize = candidateSize + "px";
-    if (body.scrollHeight <= availableHeight && body.scrollWidth <= container.clientWidth) {
+    if (body.scrollHeight <= availableHeight && body.scrollWidth <= availableWidth) {
       bestSize = candidateSize;
       minimumSize = candidateSize;
     } else {
