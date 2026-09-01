@@ -425,22 +425,63 @@ body {
   transform: translate(-50%, -48%);
   border-radius: clamp(18px, 1.7vw, 26px);
   background:
-    radial-gradient(circle at 6% 22%, rgba(255, 118, 28, 1) 0 6px, transparent 7px),
-    radial-gradient(circle at 12% 73%, rgba(255, 198, 62, 0.98) 0 5px, transparent 6px),
-    radial-gradient(circle at 19% 14%, rgba(132, 191, 226, 0.95) 0 5px, transparent 6px),
-    radial-gradient(circle at 17% 88%, rgba(255, 118, 28, 0.96) 0 4px, transparent 5px),
-    radial-gradient(circle at 81% 18%, rgba(255, 198, 62, 0.98) 0 6px, transparent 7px),
-    radial-gradient(circle at 93% 69%, rgba(255, 118, 28, 1) 0 5px, transparent 6px),
-    radial-gradient(circle at 86% 86%, rgba(132, 191, 226, 0.94) 0 6px, transparent 7px),
-    radial-gradient(circle at 95% 12%, rgba(255, 198, 62, 0.94) 0 4px, transparent 5px),
-    linear-gradient(32deg, transparent 46%, rgba(255, 118, 28, 0.98) 47% 55%, transparent 56%) 8% 47% / 26px 26px no-repeat,
-    linear-gradient(-38deg, transparent 45%, rgba(255, 198, 62, 0.94) 46% 55%, transparent 56%) 94% 35% / 28px 28px no-repeat,
-    linear-gradient(42deg, transparent 46%, rgba(132, 191, 226, 0.9) 47% 55%, transparent 56%) 13% 35% / 22px 22px no-repeat,
-    linear-gradient(-28deg, transparent 46%, rgba(255, 118, 28, 0.92) 47% 55%, transparent 56%) 88% 55% / 24px 24px no-repeat,
+    radial-gradient(circle at 7% 24%, rgba(243, 106, 22, 0.92) 0 4px, transparent 5px),
+    radial-gradient(circle at 13% 72%, rgba(244, 178, 47, 0.85) 0 3px, transparent 4px),
+    radial-gradient(circle at 20% 15%, rgba(118, 166, 195, 0.72) 0 3px, transparent 4px),
+    radial-gradient(circle at 82% 20%, rgba(244, 178, 47, 0.86) 0 4px, transparent 5px),
+    radial-gradient(circle at 91% 68%, rgba(243, 106, 22, 0.88) 0 3px, transparent 4px),
+    radial-gradient(circle at 86% 84%, rgba(118, 166, 195, 0.7) 0 4px, transparent 5px),
+    linear-gradient(32deg, transparent 48%, rgba(243, 106, 22, 0.72) 49% 53%, transparent 54%) 9% 46% / 18px 18px no-repeat,
+    linear-gradient(-38deg, transparent 47%, rgba(244, 178, 47, 0.68) 48% 53%, transparent 54%) 94% 34% / 20px 20px no-repeat,
     radial-gradient(ellipse at center, rgba(255, 255, 255, 0.055), transparent 58%);
-  opacity: 0.94;
+  opacity: 0.72;
   animation: birthday-confetti-drift 8s ease-in-out infinite alternate;
 }
+
+.birthday-confetti-bursts {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: min(1080px, 84vw);
+  height: min(370px, 41vh);
+  pointer-events: none;
+  transform: translate(-50%, -48%);
+  overflow: hidden;
+  border-radius: clamp(18px, 1.7vw, 26px);
+}
+
+.birthday-stage:not(.is-birthday) .birthday-confetti-bursts { display: none; }
+
+.confetti-burst {
+  position: absolute;
+  bottom: 8%;
+  width: 1px;
+  height: 1px;
+}
+
+.confetti-burst-left { left: 4%; }
+.confetti-burst-right { right: 4%; transform: scaleX(-1); }
+
+.confetti-burst i {
+  --x: 120px;
+  --y: -250px;
+  position: absolute;
+  width: 8px;
+  height: 15px;
+  border-radius: 2px;
+  background: #f36a16;
+  opacity: 0;
+  animation: confetti-cannon 4.8s cubic-bezier(0.2, 0.65, 0.35, 1) infinite;
+}
+
+.confetti-burst i:nth-child(2) { --x: 180px; --y: -210px; background: #f4b22f; animation-delay: 0.08s; }
+.confetti-burst i:nth-child(3) { --x: 230px; --y: -160px; background: #76a6c3; animation-delay: 0.16s; }
+.confetti-burst i:nth-child(4) { --x: 275px; --y: -105px; background: #ffffff; animation-delay: 0.24s; }
+.confetti-burst i:nth-child(5) { --x: 95px; --y: -175px; background: #f4b22f; animation-delay: 0.32s; }
+.confetti-burst i:nth-child(6) { --x: 205px; --y: -275px; background: #f36a16; animation-delay: 0.4s; }
+.confetti-burst i:nth-child(7) { --x: 310px; --y: -190px; background: #76a6c3; animation-delay: 0.48s; }
+.confetti-burst i:nth-child(8) { --x: 145px; --y: -120px; background: #ffffff; animation-delay: 0.56s; }
 
 .birthday-stage.is-birthday #tv-birthday-list {
   position: relative;
@@ -505,12 +546,20 @@ body {
 }
 
 @keyframes birthday-confetti-drift {
-  from { transform: translate(-50%, -49%); opacity: 0.82; }
-  to { transform: translate(-50%, -46.5%); opacity: 1; }
+  from { transform: translate(-50%, -49%); opacity: 0.58; }
+  to { transform: translate(-50%, -46.5%); opacity: 0.78; }
+}
+
+@keyframes confetti-cannon {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.7); }
+  5% { opacity: 1; }
+  42% { opacity: 0.95; transform: translate(var(--x), var(--y)) rotate(430deg) scale(1); }
+  60%, 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(620deg) scale(0.85); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .birthday-stage.is-birthday::after { animation: none; }
+  .confetti-burst i { animation: none; }
 }
 
 @media (max-width: 600px) {
