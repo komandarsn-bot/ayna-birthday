@@ -63,6 +63,7 @@ body {
 }
 
 .birthday-stage {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -269,10 +270,13 @@ body {
 }
 
 .birthday-title {
-  margin: 0 0 clamp(10px, 1.5vh, 20px);
-  font-size: clamp(28px, 3vw, 64px);
-  font-weight: 400;
-  letter-spacing: -0.025em;
+  position: relative;
+  z-index: 1;
+  margin: 0 0 clamp(8px, 1vh, 14px);
+  color: rgba(48, 48, 95, 0.84);
+  font-size: clamp(26px, 2.65vw, 54px);
+  font-weight: 450;
+  letter-spacing: -0.02em;
 }
 
 .birthday-stage.is-birthday {
@@ -280,7 +284,26 @@ body {
   transform: translateY(-2vh);
 }
 
+.birthday-stage.is-birthday::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(980px, 78vw);
+  height: min(520px, 52vh);
+  pointer-events: none;
+  transform: translate(-50%, -46%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(243, 106, 22, 0.055) 0%,
+    rgba(48, 48, 95, 0.025) 44%,
+    transparent 72%
+  );
+}
+
 .birthday-stage.is-birthday #tv-birthday-list {
+  position: relative;
+  z-index: 1;
   flex: 0 0 auto;
   width: 100%;
   align-items: center;
@@ -288,22 +311,28 @@ body {
 
 .tv-person h2 {
   margin: 0 auto;
-  max-width: 100%;
-  font-size: clamp(48px, 7vw, 150px);
-  font-weight: 600;
-  line-height: 1.13;
-  letter-spacing: -0.04em;
+  max-width: 90%;
+  font-size: clamp(48px, 6.5vw, 132px);
+  font-weight: 620;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
   overflow-wrap: anywhere;
 }
 
 .tv-person h2.long-name { font-size: clamp(38px, 5vw, 108px); }
 
 .person-position {
-  margin: clamp(20px, 3vh, 40px) 0 0;
-  color: var(--muted);
-  font-size: clamp(26px, 3vw, 64px);
-  font-weight: 400;
-  line-height: 1.4;
+  display: inline-block;
+  margin: clamp(16px, 2vh, 26px) 0 0;
+  padding: clamp(7px, 0.8vh, 12px) clamp(20px, 2vw, 34px);
+  border: 1px solid rgba(48, 48, 95, 0.1);
+  border-radius: 999px;
+  background: rgba(48, 48, 95, 0.055);
+  color: rgba(48, 48, 95, 0.72);
+  font-size: clamp(24px, 2.35vw, 48px);
+  font-weight: 450;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
   overflow-wrap: anywhere;
 }
 
