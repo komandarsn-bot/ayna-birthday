@@ -413,6 +413,31 @@ body {
   box-shadow: 0 28px 70px rgba(35, 35, 70, 0.18);
 }
 
+.birthday-stage.is-birthday::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  width: min(1080px, 84vw);
+  height: min(370px, 41vh);
+  pointer-events: none;
+  transform: translate(-50%, -48%);
+  border-radius: clamp(18px, 1.7vw, 26px);
+  background:
+    radial-gradient(circle at 7% 24%, rgba(243, 106, 22, 0.92) 0 4px, transparent 5px),
+    radial-gradient(circle at 13% 72%, rgba(244, 178, 47, 0.85) 0 3px, transparent 4px),
+    radial-gradient(circle at 20% 15%, rgba(118, 166, 195, 0.72) 0 3px, transparent 4px),
+    radial-gradient(circle at 82% 20%, rgba(244, 178, 47, 0.86) 0 4px, transparent 5px),
+    radial-gradient(circle at 91% 68%, rgba(243, 106, 22, 0.88) 0 3px, transparent 4px),
+    radial-gradient(circle at 86% 84%, rgba(118, 166, 195, 0.7) 0 4px, transparent 5px),
+    linear-gradient(32deg, transparent 48%, rgba(243, 106, 22, 0.72) 49% 53%, transparent 54%) 9% 46% / 18px 18px no-repeat,
+    linear-gradient(-38deg, transparent 47%, rgba(244, 178, 47, 0.68) 48% 53%, transparent 54%) 94% 34% / 20px 20px no-repeat,
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.055), transparent 58%);
+  opacity: 0.72;
+  animation: birthday-confetti-drift 8s ease-in-out infinite alternate;
+}
+
 .birthday-stage.is-birthday #tv-birthday-list {
   position: relative;
   z-index: 1;
@@ -430,6 +455,7 @@ body {
   line-height: 1.08;
   letter-spacing: -0.045em;
   overflow-wrap: anywhere;
+  text-shadow: 0 8px 30px rgba(8, 8, 30, 0.24);
 }
 
 .tv-person h2.long-name { font-size: clamp(38px, 5vw, 108px); }
@@ -472,6 +498,15 @@ body {
 @keyframes card-disappear {
   from { opacity: 1; }
   to { opacity: 0; }
+}
+
+@keyframes birthday-confetti-drift {
+  from { transform: translate(-50%, -49%); opacity: 0.58; }
+  to { transform: translate(-50%, -46.5%); opacity: 0.78; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .birthday-stage.is-birthday::after { animation: none; }
 }
 
 @media (max-width: 600px) {
