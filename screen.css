@@ -395,6 +395,10 @@ body {
   letter-spacing: -0.02em;
 }
 
+.birthday-title[hidden] {
+  display: none;
+}
+
 .birthday-gift-icon {
   width: clamp(42px, 3.8vw, 68px);
   height: clamp(42px, 3.8vw, 68px);
