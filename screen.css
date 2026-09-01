@@ -293,10 +293,10 @@ body {
 .news-announcement-text .news-body {
   max-width: none;
   line-height: 1.34;
-  text-align: left;
-  text-align-last: auto;
-  text-justify: auto;
-  hyphens: none;
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-word;
+  hyphens: auto;
   white-space: normal;
 }
 
