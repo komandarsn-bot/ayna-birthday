@@ -4,6 +4,7 @@ const screenDate = document.querySelector("#screen-date");
 const screenClock = document.querySelector("#screen-clock");
 const birthdayTitle = document.querySelector("#birthday-title");
 const birthdayStage = document.querySelector(".birthday-stage");
+const birthdayConfettiBursts = document.querySelector(".birthday-confetti-bursts");
 const screenKey = new URLSearchParams(window.location.search).get("key");
 
 let birthdays = [], newsItems = [];
@@ -47,6 +48,9 @@ function showScreenState(title, description) {
 function renderBirthday(person) {
   birthdayStage.classList.add("is-birthday");
   birthdayTitle.hidden = false;
+  birthdayConfettiBursts.classList.remove("is-bursting");
+  void birthdayConfettiBursts.offsetWidth;
+  birthdayConfettiBursts.classList.add("is-bursting");
   const card = document.createElement("article");
   card.classList.add("tv-person");
   const name = document.createElement("h2");
