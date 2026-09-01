@@ -7,6 +7,29 @@ const birthdayStage = document.querySelector(".birthday-stage");
 const birthdayConfettiBursts = document.querySelector(".birthday-confetti-bursts");
 const screenKey = new URLSearchParams(window.location.search).get("key");
 
+const confettiColors = ["#ff7417", "#ffc83d", "#79cfff", "#ffffff", "#ff4f75", "#7ee0bd"];
+
+function prepareConfettiBurst() {
+  birthdayConfettiBursts.querySelectorAll(".confetti-burst").forEach(function (burst) {
+    while (burst.children.length < 20) burst.append(document.createElement("i"));
+    burst.querySelectorAll("i").forEach(function (piece) {
+      const x = 90 + Math.random() * 420;
+      const y = -(130 + Math.random() * 330);
+      piece.style.setProperty("--x", x.toFixed(0) + "px");
+      piece.style.setProperty("--y", y.toFixed(0) + "px");
+      piece.style.setProperty("--end-x", (x + 25 + Math.random() * 100).toFixed(0) + "px");
+      piece.style.setProperty("--end-y", (y + 80 + Math.random() * 150).toFixed(0) + "px");
+      piece.style.setProperty("--spin", (360 + Math.random() * 900).toFixed(0) + "deg");
+      piece.style.width = (6 + Math.random() * 8).toFixed(0) + "px";
+      piece.style.height = (8 + Math.random() * 15).toFixed(0) + "px";
+      piece.style.borderRadius = Math.random() > 0.65 ? "50%" : "2px";
+      piece.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+      piece.style.animationDelay = (Math.random() * 0.38).toFixed(2) + "s";
+      piece.style.animationDuration = (1.65 + Math.random() * 0.75).toFixed(2) + "s";
+    });
+  });
+}
+
 let birthdays = [], newsItems = [];
 let activeKind = null, activeIndex = 0;
 let activeNewsSlide = 0;
@@ -48,6 +71,7 @@ function showScreenState(title, description) {
 function renderBirthday(person) {
   birthdayStage.classList.add("is-birthday");
   birthdayTitle.hidden = false;
+  prepareConfettiBurst();
   birthdayConfettiBursts.classList.remove("is-bursting");
   void birthdayConfettiBursts.offsetWidth;
   birthdayConfettiBursts.classList.add("is-bursting");
