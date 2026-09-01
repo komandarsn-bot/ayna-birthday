@@ -425,16 +425,20 @@ body {
   transform: translate(-50%, -48%);
   border-radius: clamp(18px, 1.7vw, 26px);
   background:
-    radial-gradient(circle at 7% 24%, rgba(243, 106, 22, 0.92) 0 4px, transparent 5px),
-    radial-gradient(circle at 13% 72%, rgba(244, 178, 47, 0.85) 0 3px, transparent 4px),
-    radial-gradient(circle at 20% 15%, rgba(118, 166, 195, 0.72) 0 3px, transparent 4px),
-    radial-gradient(circle at 82% 20%, rgba(244, 178, 47, 0.86) 0 4px, transparent 5px),
-    radial-gradient(circle at 91% 68%, rgba(243, 106, 22, 0.88) 0 3px, transparent 4px),
-    radial-gradient(circle at 86% 84%, rgba(118, 166, 195, 0.7) 0 4px, transparent 5px),
-    linear-gradient(32deg, transparent 48%, rgba(243, 106, 22, 0.72) 49% 53%, transparent 54%) 9% 46% / 18px 18px no-repeat,
-    linear-gradient(-38deg, transparent 47%, rgba(244, 178, 47, 0.68) 48% 53%, transparent 54%) 94% 34% / 20px 20px no-repeat,
+    radial-gradient(circle at 6% 22%, rgba(255, 118, 28, 1) 0 6px, transparent 7px),
+    radial-gradient(circle at 12% 73%, rgba(255, 198, 62, 0.98) 0 5px, transparent 6px),
+    radial-gradient(circle at 19% 14%, rgba(132, 191, 226, 0.95) 0 5px, transparent 6px),
+    radial-gradient(circle at 17% 88%, rgba(255, 118, 28, 0.96) 0 4px, transparent 5px),
+    radial-gradient(circle at 81% 18%, rgba(255, 198, 62, 0.98) 0 6px, transparent 7px),
+    radial-gradient(circle at 93% 69%, rgba(255, 118, 28, 1) 0 5px, transparent 6px),
+    radial-gradient(circle at 86% 86%, rgba(132, 191, 226, 0.94) 0 6px, transparent 7px),
+    radial-gradient(circle at 95% 12%, rgba(255, 198, 62, 0.94) 0 4px, transparent 5px),
+    linear-gradient(32deg, transparent 46%, rgba(255, 118, 28, 0.98) 47% 55%, transparent 56%) 8% 47% / 26px 26px no-repeat,
+    linear-gradient(-38deg, transparent 45%, rgba(255, 198, 62, 0.94) 46% 55%, transparent 56%) 94% 35% / 28px 28px no-repeat,
+    linear-gradient(42deg, transparent 46%, rgba(132, 191, 226, 0.9) 47% 55%, transparent 56%) 13% 35% / 22px 22px no-repeat,
+    linear-gradient(-28deg, transparent 46%, rgba(255, 118, 28, 0.92) 47% 55%, transparent 56%) 88% 55% / 24px 24px no-repeat,
     radial-gradient(ellipse at center, rgba(255, 255, 255, 0.055), transparent 58%);
-  opacity: 0.72;
+  opacity: 0.94;
   animation: birthday-confetti-drift 8s ease-in-out infinite alternate;
 }
 
@@ -501,8 +505,8 @@ body {
 }
 
 @keyframes birthday-confetti-drift {
-  from { transform: translate(-50%, -49%); opacity: 0.58; }
-  to { transform: translate(-50%, -46.5%); opacity: 0.78; }
+  from { transform: translate(-50%, -49%); opacity: 0.82; }
+  to { transform: translate(-50%, -46.5%); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
