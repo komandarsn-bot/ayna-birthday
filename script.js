@@ -54,8 +54,10 @@ const manualPersonMessage =
   document.querySelector("#manual-person-message");
 
 const newsTitle = document.querySelector("#news-title");
+const newsType = document.querySelector("#news-type");
 const newsBody = document.querySelector("#news-body");
 const newsImage = document.querySelector("#news-image");
+const newsImageField = document.querySelector("#news-image-field");
 const newsLink = document.querySelector("#news-link");
 const newsQrText = document.querySelector("#news-qr-text");
 const newsActiveDays = document.querySelector("#news-active-days");
@@ -67,6 +69,15 @@ const newsList = document.querySelector("#news-list");
 
 let editingNewsId = null;
 let editingNewsImagePaths = [];
+
+function updateNewsTypeFields() {
+  const isAnnouncement = newsType.value === "announcement";
+  newsImageField.hidden = isAnnouncement;
+  if (isAnnouncement) newsImage.value = "";
+  newsLink.required = isAnnouncement;
+}
+
+newsType.addEventListener("change", updateNewsTypeFields);
 
 function getNewsImageUrl(imagePath) {
   return supabaseClient.storage
@@ -84,6 +95,7 @@ function getNewsImagePaths(item) {
 function resetNewsForm() {
   editingNewsId = null;
   editingNewsImagePaths = [];
+  newsType.value = "story";
   newsTitle.value = "";
   newsBody.value = "";
   newsImage.value = "";
@@ -92,6 +104,7 @@ function resetNewsForm() {
   newsActiveDays.value = "7";
   addNewsButton.textContent = "Опубликовать";
   cancelNewsEditButton.hidden = true;
+  updateNewsTypeFields();
 }
 
 cancelNewsEditButton.addEventListener("click", function () {
@@ -313,11 +326,18 @@ loadNewsButton.addEventListener("click", async function () {
     const row = document.createElement("article");
     row.classList.add("news-row");
 
-    const image = document.createElement("img");
     const imagePaths = getNewsImagePaths(item);
-    image.src = getNewsImageUrl(imagePaths[0]);
-    image.alt = "";
-    image.loading = "lazy";
+    let preview;
+    if (imagePaths.length) {
+      preview = document.createElement("img");
+      preview.src = getNewsImageUrl(imagePaths[0]);
+      preview.alt = "";
+      preview.loading = "lazy";
+    } else {
+      preview = document.createElement("div");
+      preview.classList.add("news-row-placeholder");
+      preview.textContent = "ОБЪЯВЛЕНИЕ";
+    }
 
     const content = document.createElement("div");
     content.classList.add("news-row-content");
@@ -359,6 +379,8 @@ loadNewsButton.addEventListener("click", async function () {
     editButton.addEventListener("click", function () {
       editingNewsId = item.id;
       editingNewsImagePaths = imagePaths;
+      newsType.value = imagePaths.length ? "story" : "announcement";
+      updateNewsTypeFields();
       newsTitle.value = item.title || "";
       newsBody.value = item.body || "";
       newsImage.value = "";
@@ -403,23 +425,32 @@ loadNewsButton.addEventListener("click", async function () {
     const actions = document.createElement("div");
     actions.classList.add("news-actions");
     actions.append(editButton, deleteButton);
-    row.append(image, content, actions);
+    row.append(preview, content, actions);
     newsList.append(row);
   });
 });
 
 addNewsButton.addEventListener("click", async function () {
   const title = newsTitle.value.trim();
+  const isAnnouncement = newsType.value === "announcement";
   const body = newsBody.value.trim();
   const files = Array.from(newsImage.files);
   const linkUrl = newsLink.value.trim();
   const qrText = newsQrText.value.trim();
   const activeDays = Number(newsActiveDays.value);
 
-  if (!title || !body || (!editingNewsId && !files.length)) {
-    newsMessage.textContent = editingNewsId
-      ? "Заполните заголовок и текст"
-      : "Заполните заголовок, текст и выберите фотографии";
+  if (!title || !body) {
+    newsMessage.textContent = "Заполните заголовок и текст";
+    return;
+  }
+
+  if (!isAnnouncement && !files.length && !editingNewsImagePaths.length) {
+    newsMessage.textContent = "Для материала выберите хотя бы одну фотографию";
+    return;
+  }
+
+  if (isAnnouncement && !linkUrl) {
+    newsMessage.textContent = "Для объявления укажите ссылку для QR-кода";
     return;
   }
 
@@ -494,7 +525,10 @@ addNewsButton.addEventListener("click", async function () {
       expires_at: new Date(Date.now() + activeDays * 24 * 60 * 60 * 1000).toISOString()
     };
 
-    if (uploadedPaths.length) {
+    if (isAnnouncement) {
+      publicationData.image_path = null;
+      publicationData.image_paths = [];
+    } else if (uploadedPaths.length) {
       publicationData.image_path = uploadedPaths[0];
       publicationData.image_paths = uploadedPaths;
     }
@@ -514,7 +548,7 @@ addNewsButton.addEventListener("click", async function () {
 
     if (saveError) throw saveError;
 
-    if (editingNewsId && uploadedPaths.length && editingNewsImagePaths.length) {
+    if (editingNewsId && (uploadedPaths.length || isAnnouncement) && editingNewsImagePaths.length) {
       const { error: oldImagesError } = await supabaseClient.storage
         .from("news-images")
         .remove(editingNewsImagePaths);

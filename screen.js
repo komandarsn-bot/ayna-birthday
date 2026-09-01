@@ -147,6 +147,22 @@ function fillNewsContent(content, item, slide) {
     return { body };
   }
 
+  if (slide.type === "announcement") {
+    content.classList.add("news-announcement-content");
+    const textPane = document.createElement("div");
+    textPane.classList.add("news-announcement-text");
+    const body = document.createElement("div");
+    body.classList.add("news-body");
+    setNewsBodyContent(body, slide.text);
+    textPane.append(body);
+
+    const qrPane = document.createElement("div");
+    qrPane.classList.add("news-announcement-qr");
+    const qrTarget = fillQrContent(qrPane, item);
+    content.append(textPane, qrPane);
+    return { body, qrTarget, textContainer: textPane };
+  }
+
   const qrTarget = fillQrContent(content, item);
   return { qrTarget };
 }
@@ -177,11 +193,12 @@ function refitCurrentNewsText() {
   if (activeKind !== "news") return;
   const currentNews = newsItems[activeIndex];
   const currentSlide = currentNews && currentNews.slides[activeNewsSlide];
-  if (!currentSlide || currentSlide.type !== "text") return;
+  if (!currentSlide || !["text", "announcement"].includes(currentSlide.type)) return;
   requestAnimationFrame(function () {
     fitNewsText(
       tvBirthdayList.querySelector(".news-body"),
-      tvBirthdayList.querySelector(".news-info-content")
+      tvBirthdayList.querySelector(".news-announcement-text") ||
+        tvBirthdayList.querySelector(".news-info-content")
     );
   });
 }
@@ -217,7 +234,7 @@ function renderNews(item) {
   tvBirthdayList.replaceChildren(card);
 
   drawQrCode(renderedContent.qrTarget, item.link_url);
-  if (renderedContent.body) fitNewsText(renderedContent.body, content);
+  if (renderedContent.body) fitNewsText(renderedContent.body, renderedContent.textContainer || content);
 }
 
 function renderCurrentSlide() {
@@ -231,6 +248,7 @@ function scheduleNextSlide() {
   const currentSlide = currentNews ? currentNews.slides[activeNewsSlide] : null;
   let duration = 5000;
   if (currentSlide && currentSlide.type === "text") duration = 15000;
+  if (currentSlide && currentSlide.type === "announcement") duration = 15000;
   if (currentSlide && currentSlide.type === "qr") duration = 10000;
   slideTimer = setTimeout(transitionToNextSlide, duration);
 }
@@ -363,8 +381,12 @@ function updateNews(data) {
       : (item.news_image_path ? [item.news_image_path] : []);
     const textParts = [String(item.news_body || "").trim()];
     const slides = imagePaths.map(path => ({ type: "photo", path }));
-    textParts.filter(Boolean).forEach(text => slides.push({ type: "text", text }));
-    if (item.news_link_url) slides.push({ type: "qr" });
+    if (!imagePaths.length && item.news_link_url) {
+      slides.push({ type: "announcement", text: textParts[0] || "" });
+    } else {
+      textParts.filter(Boolean).forEach(text => slides.push({ type: "text", text }));
+      if (item.news_link_url) slides.push({ type: "qr" });
+    }
     if (!slides.length) slides.push({ type: "text", text: "" });
     return {
       id: item.news_id,

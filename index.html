@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
   </head>
 
   <body>
@@ -143,6 +143,14 @@
 
       <div class="news-form">
         <label>
+          Вид публикации
+          <select id="news-type">
+            <option value="story">Материал с фотографиями</option>
+            <option value="announcement">Объявление: текст и QR-код</option>
+          </select>
+          <small>В объявлении текст и QR-код показываются одновременно на одном слайде.</small>
+        </label>
+        <label>
           Заголовок
           <input type="text" id="news-title" maxlength="160" placeholder="Например: Победа на олимпиаде">
         </label>
@@ -151,7 +159,7 @@
           <textarea id="news-body" maxlength="6000" rows="7" placeholder="Расскажите о событии — длинный текст автоматически разделится на слайды"></textarea>
           <small>Чтобы выделить текст жирным, поставьте звёздочки: *важный текст*</small>
         </label>
-        <label>
+        <label id="news-image-field">
           Фотографии (до 8; при редактировании можно оставить пустым)
           <input type="file" id="news-image" accept="image/jpeg,image/png,image/webp" multiple>
         </label>
@@ -195,6 +203,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=10"></script>
+    <script src="script.js?v=11"></script>
   </body>
 </html>

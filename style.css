@@ -184,6 +184,7 @@ input[type="file"] {
 .news-form input[type="text"],
 .news-form input[type="url"],
 .news-form input[type="number"],
+.news-form select,
 .news-form textarea {
   padding: 12px;
   border: 1px solid #c7d8d3;
@@ -191,6 +192,24 @@ input[type="file"] {
   font: inherit;
   color: #173a35;
   resize: vertical;
+}
+
+.news-form select {
+  background: #ffffff;
+}
+
+.news-row-placeholder {
+  width: 120px;
+  height: 80px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #f2f1ed;
+  color: #687873;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
 }
 
 #news-message { min-height: 20px; }
@@ -223,5 +242,6 @@ input[type="file"] {
 @media (max-width: 600px) {
   .news-row { align-items: flex-start; flex-wrap: wrap; }
   .news-row img { width: 100%; height: 180px; }
+  .news-row-placeholder { width: 100%; height: 100px; }
   .news-actions { width: 100%; flex-direction: row; flex-wrap: wrap; }
 }
