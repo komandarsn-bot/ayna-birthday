@@ -4,32 +4,7 @@ const screenDate = document.querySelector("#screen-date");
 const screenClock = document.querySelector("#screen-clock");
 const birthdayTitle = document.querySelector("#birthday-title");
 const birthdayStage = document.querySelector(".birthday-stage");
-const birthdayConfettiBursts = document.querySelector(".birthday-confetti-bursts");
 const screenKey = new URLSearchParams(window.location.search).get("key");
-
-const confettiColors = ["#f36a16", "#e9ad35", "#86b6d1", "#ffffff"];
-
-function prepareConfettiBurst() {
-  birthdayConfettiBursts.querySelectorAll(".confetti-burst").forEach(function (burst) {
-    while (burst.children.length < 10) burst.append(document.createElement("i"));
-    while (burst.children.length > 10) burst.lastElementChild.remove();
-    burst.querySelectorAll("i").forEach(function (piece) {
-      const x = 80 + Math.random() * 230;
-      const y = -(120 + Math.random() * 220);
-      piece.style.setProperty("--x", x.toFixed(0) + "px");
-      piece.style.setProperty("--y", y.toFixed(0) + "px");
-      piece.style.setProperty("--end-x", (x + 15 + Math.random() * 45).toFixed(0) + "px");
-      piece.style.setProperty("--end-y", (y + 45 + Math.random() * 80).toFixed(0) + "px");
-      piece.style.setProperty("--spin", (240 + Math.random() * 480).toFixed(0) + "deg");
-      piece.style.width = (4 + Math.random() * 4).toFixed(0) + "px";
-      piece.style.height = (8 + Math.random() * 7).toFixed(0) + "px";
-      piece.style.borderRadius = "2px";
-      piece.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
-      piece.style.animationDelay = (Math.random() * 0.16).toFixed(2) + "s";
-      piece.style.animationDuration = (1.35 + Math.random() * 0.35).toFixed(2) + "s";
-    });
-  });
-}
 
 let birthdays = [], newsItems = [];
 let activeKind = null, activeIndex = 0;
@@ -72,10 +47,9 @@ function showScreenState(title, description) {
 function renderBirthday(person) {
   birthdayStage.classList.add("is-birthday");
   birthdayTitle.hidden = false;
-  prepareConfettiBurst();
-  birthdayConfettiBursts.classList.remove("is-bursting");
-  void birthdayConfettiBursts.offsetWidth;
-  birthdayConfettiBursts.classList.add("is-bursting");
+  birthdayTitle.classList.remove("is-appearing");
+  void birthdayTitle.offsetWidth;
+  birthdayTitle.classList.add("is-appearing");
   const card = document.createElement("article");
   card.classList.add("tv-person");
   const name = document.createElement("h2");
