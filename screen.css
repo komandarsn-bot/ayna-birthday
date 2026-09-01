@@ -437,8 +437,8 @@ body {
   --x: 120px;
   --y: -250px;
   position: absolute;
-  width: 10px;
-  height: 18px;
+  width: 6px;
+  height: 12px;
   border-radius: 2px;
   background: #ff7417;
   opacity: 0;
@@ -526,9 +526,9 @@ body {
 
 @keyframes confetti-cannon {
   0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.7); }
-  4% { opacity: 1; }
-  58% { opacity: 1; transform: translate(var(--x), var(--y)) rotate(var(--spin)) scale(1); }
-  100% { opacity: 0; transform: translate(var(--end-x), var(--end-y)) rotate(var(--spin)) scale(0.78); }
+  7% { opacity: 0.88; }
+  55% { opacity: 0.82; transform: translate(var(--x), var(--y)) rotate(var(--spin)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--end-x), var(--end-y)) rotate(var(--spin)) scale(0.82); }
 }
 
 @media (prefers-reduced-motion: reduce) {
