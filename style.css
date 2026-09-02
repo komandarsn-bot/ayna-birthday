@@ -37,6 +37,7 @@ main {
 }
 
 button {
+  max-width: 100%;
   background-color: #e4c455;
   color: #173a35;
   border: none;
@@ -52,9 +53,28 @@ button:hover {
 }
 
 input[type="file"] {
-  margin-right: 12px;
-  margin-bottom: 10px;
+  max-width: 100%;
+  min-width: 0;
 }
+
+.action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.cabinet-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cabinet-header h2 { margin-top: 0; }
+.cabinet-header p { margin-bottom: 0; }
 
 .birthday-person {
   background-color: #f4f1e8;
@@ -134,7 +154,6 @@ input[type="file"] {
 }
 
 #delete-all-button {
-  margin-left: 10px;
   background-color: #b94b4b;
   color: white;
 }
@@ -222,7 +241,7 @@ input[type="file"] {
   gap: 18px;
 }
 
-.news-list-header { margin-top: 28px; }
+.news-list-header { margin-top: 28px; flex-wrap: wrap; }
 .news-row { padding: 16px 0; border-bottom: 1px solid #e4e4e4; }
 .news-row img {
   width: 120px;
@@ -237,7 +256,7 @@ input[type="file"] {
 .news-row-content span { margin-top: 6px; color: #687873; white-space: pre-wrap; }
 .news-image-count, .news-link-preview { font-size: 14px; color: #687873; }
 .news-link-preview { overflow-wrap: anywhere; }
-.news-actions { display: flex; flex-direction: column; gap: 10px; }
+.news-actions { display: flex; flex-direction: column; gap: 12px; }
 
 @media (max-width: 600px) {
   .news-row { align-items: flex-start; flex-wrap: wrap; }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
   </head>
 
   <body>
@@ -76,6 +76,7 @@
         и класс или должность.
       </p>
 
+      <div class="action-group">
       <input
         type="file"
         id="excel-file"
@@ -85,6 +86,7 @@
       <button type="button" id="upload-button">
         Загрузить файл
       </button>
+      </div>
     </section>
 
     <section class="card">
@@ -125,6 +127,7 @@
     <section class="card">
       <h2>Список людей</h2>
 
+      <div class="action-group">
       <button type="button" id="load-people-button">
         Показать список
       </button>
@@ -132,6 +135,7 @@
       <button type="button" id="delete-all-button">
         Удалить всех
       </button>
+      </div>
 
       <div id="people-list">
         <p>Нажмите кнопку, чтобы загрузить данные.</p>
@@ -178,8 +182,10 @@
         </label>
       </div>
 
+      <div class="action-group">
       <button type="button" id="add-news-button">Опубликовать</button>
       <button type="button" id="cancel-news-edit-button" hidden>Отменить редактирование</button>
+      </div>
       <p id="news-message"></p>
 
       <div class="news-list-header">
