@@ -64,6 +64,32 @@ input[type="file"] {
   gap: 12px;
 }
 
+.admin-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-tabs button {
+  flex: 1;
+  padding: 16px 20px;
+  background: #ffffff;
+  border: 1px solid #c7d8d3;
+}
+
+.admin-tabs button[aria-selected="true"] {
+  background: #173a35;
+  border-color: #173a35;
+  color: #ffffff;
+}
+
+.admin-tabs button:focus-visible {
+  outline: 3px solid #e4c455;
+  outline-offset: 3px;
+}
+
+[role="tabpanel"][hidden] { display: none; }
+
 .cabinet-header {
   display: flex;
   flex-wrap: wrap;

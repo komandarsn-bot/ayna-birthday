@@ -17,6 +17,32 @@ const authSection =
 const appContent =
   document.querySelector("#app-content");
 
+const adminTabs = Array.from(document.querySelectorAll('.admin-tabs [role="tab"]'));
+
+function selectAdminTab(selectedTab) {
+  adminTabs.forEach(function (tab) {
+    const selected = tab === selectedTab;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    document.getElementById(tab.getAttribute("aria-controls")).hidden = !selected;
+  });
+}
+
+adminTabs.forEach(function (tab, index) {
+  tab.addEventListener("click", function () { selectAdminTab(tab); });
+  tab.addEventListener("keydown", function (event) {
+    let nextIndex;
+    if (event.key === "ArrowRight") nextIndex = (index + 1) % adminTabs.length;
+    if (event.key === "ArrowLeft") nextIndex = (index + adminTabs.length - 1) % adminTabs.length;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = adminTabs.length - 1;
+    if (nextIndex === undefined) return;
+    event.preventDefault();
+    selectAdminTab(adminTabs[nextIndex]);
+    adminTabs[nextIndex].focus();
+  });
+});
+
 const currentUserEmail =
   document.querySelector("#current-user-email");
 

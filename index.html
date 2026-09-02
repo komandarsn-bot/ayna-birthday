@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
   </head>
 
   <body>
@@ -68,6 +68,12 @@
       </p>
     </section>
 
+    <div class="admin-tabs" role="tablist" aria-label="Разделы личного кабинета">
+      <button type="button" id="birthdays-tab" role="tab" aria-selected="true" aria-controls="birthdays-panel">Дни рождения</button>
+      <button type="button" id="publications-tab" role="tab" aria-selected="false" aria-controls="publications-panel" tabindex="-1">Публикации</button>
+    </div>
+
+    <div id="birthdays-panel" role="tabpanel" aria-labelledby="birthdays-tab">
     <section class="card">
       <h2>Загрузка Excel</h2>
 
@@ -142,6 +148,9 @@
       </div>
     </section>
 
+    </div>
+
+    <div id="publications-panel" role="tabpanel" aria-labelledby="publications-tab" hidden>
     <section class="card">
       <h2>Публикации</h2>
       <p>Добавьте фотографии, текст и при необходимости ссылку. Публикация сразу появится в ТВ-цикле.</p>
@@ -194,6 +203,7 @@
       </div>
       <div id="news-list"><p>Загрузка публикаций…</p></div>
     </section>
+    </div>
 
   </div>
 </main>
@@ -201,6 +211,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=13"></script>
+    <script src="script.js?v=14"></script>
   </body>
 </html>
