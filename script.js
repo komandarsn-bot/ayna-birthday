@@ -4,7 +4,6 @@ const supabaseClient = window.supabase.createClient(
 );
 const uploadButton = document.querySelector("#upload-button");
 const excelFile = document.querySelector("#excel-file");
-const birthdayList = document.querySelector("#birthday-list");
 const emailInput = document.querySelector("#email");
 const passwordInput = document.querySelector("#password");
 const signupButton = document.querySelector("#signup-button");
@@ -778,9 +777,6 @@ deleteAllButton.disabled = true;
     peopleList.textContent =
       "Список полностью удалён";
 
-    birthdayList.textContent =
-      "Сегодня именинников нет";
-
     deleteAllButton.textContent = "Удалить всех";
 deleteAllButton.disabled = false;
   }
@@ -840,37 +836,6 @@ if (saveError) {
 
 alert(`В базу сохранено записей: ${databaseRows.length}`);
 
-const today = new Date();
-
-const birthdaysToday = validPeople.filter(function (person) {
-  const birthday = person["Дата рождения"];
-
-  const sameDay = birthday.getDate() === today.getDate();
-  const sameMonth = birthday.getMonth() === today.getMonth();
-
-  return sameDay && sameMonth;
-});
-
-birthdayList.innerHTML = "";
-
-if (birthdaysToday.length === 0) {
-  birthdayList.textContent = "Сегодня именинников нет";
-  return;
-}
-
-birthdaysToday.forEach(function (person) {
-  const personCard = document.createElement("div");
-  personCard.classList.add("birthday-person");
-
-  const personName = document.createElement("h3");
-  personName.textContent = person["Имя"];
-
-  const personPosition = document.createElement("p");
-  personPosition.textContent = person["Класс/должность"];
-
-  personCard.append(personName, personPosition);
-  birthdayList.append(personCard);
-});
 });
 
 async function restoreSession() {
