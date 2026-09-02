@@ -6,7 +6,8 @@ const uploadButton = document.querySelector("#upload-button");
 const excelFile = document.querySelector("#excel-file");
 const emailInput = document.querySelector("#email");
 const passwordInput = document.querySelector("#password");
-const signupButton = document.querySelector("#signup-button");
+// Login alias only: Supabase still verifies the existing account's password.
+const ADMIN_EMAIL = "rus11999944@gmail.com";
 const loginButton = document.querySelector("#login-button");
 const authMessage = document.querySelector("#auth-message");
 
@@ -119,7 +120,7 @@ function updateAuthView(session) {
 
   if (isLoggedIn) {
     currentUserEmail.textContent =
-      session.user.email;
+      session.user.email === ADMIN_EMAIL ? "admin" : "Вы вошли в аккаунт";
     loadNewsButton.click();
   } else {
     currentUserEmail.textContent = "";
@@ -128,43 +129,17 @@ function updateAuthView(session) {
   }
 }
 
-signupButton.addEventListener("click", async function () {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
-
-  if (email === "" || password === "") {
-    authMessage.textContent = "Введите почту и пароль";
-    return;
-  }
-
-  authMessage.textContent = "Создаём аккаунт...";
-
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password
-  });
-
-  if (error) {
-    authMessage.textContent = "Ошибка: " + error.message;
-    return;
-  }
-
-  if (data.session) {
-    authMessage.textContent = "Регистрация выполнена. Вы вошли в аккаунт.";
-    updateAuthView(data.session);
-  } else {
-    authMessage.textContent =
-      "Регистрация выполнена. Проверьте письмо для подтверждения почты.";
-  }
-});
-
-
 loginButton.addEventListener("click", async function () {
-  const email = emailInput.value.trim();
+  const login = emailInput.value.trim().toLowerCase();
   const password = passwordInput.value;
 
-  if (email === "" || password === "") {
-    authMessage.textContent = "Введите почту и пароль";
+  if (login === "" || password === "") {
+    authMessage.textContent = "Введите логин и пароль";
+    return;
+  }
+
+  if (login !== "admin") {
+    authMessage.textContent = "Неверный логин или пароль";
     return;
   }
 
@@ -172,7 +147,7 @@ loginButton.addEventListener("click", async function () {
 
   const { data, error } =
     await supabaseClient.auth.signInWithPassword({
-      email: email,
+      email: ADMIN_EMAIL,
       password: password
     });
 
@@ -182,7 +157,7 @@ loginButton.addEventListener("click", async function () {
   }
 
   authMessage.textContent =
-    "Вы вошли как " + data.user.email;
+    "Вы вошли как admin";
     updateAuthView(data.session);
 });
 

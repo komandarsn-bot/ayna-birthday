@@ -14,25 +14,26 @@
     </header>
 <main>
   <section class="card" id="auth-section">
-    <h2>Регистрация и вход</h2>
+    <h2>Вход в личный кабинет</h2>
 
     <div class="auth-fields">
       <input
-        type="email"
+        type="text"
         id="email"
-        placeholder="Электронная почта"
+        placeholder="Логин"
+        aria-label="Логин"
+        autocomplete="username"
+        autocapitalize="none"
+        spellcheck="false"
       >
 
       <input
         type="password"
         id="password"
         placeholder="Пароль"
+        autocomplete="current-password"
       >
     </div>
-
-    <button type="button" id="signup-button">
-      Зарегистрироваться
-    </button>
 
     <button type="button" id="login-button">
       Войти
@@ -194,6 +195,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=12"></script>
+    <script src="script.js?v=13"></script>
   </body>
 </html>
