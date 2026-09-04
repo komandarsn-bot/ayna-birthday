@@ -2,8 +2,6 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
-const uploadButton = document.querySelector("#upload-button");
-const excelFile = document.querySelector("#excel-file");
 const emailInput = document.querySelector("#email");
 const passwordInput = document.querySelector("#password");
 // Login alias only: Supabase still verifies the existing account's password.
@@ -64,21 +62,6 @@ const deleteAllButton =
 const peopleList =
   document.querySelector("#people-list");
 
-const manualFullName =
-  document.querySelector("#manual-full-name");
-
-const manualBirthDate =
-  document.querySelector("#manual-birth-date");
-
-const manualPosition =
-  document.querySelector("#manual-position");
-
-const addPersonButton =
-  document.querySelector("#add-person-button");
-
-const manualPersonMessage =
-  document.querySelector("#manual-person-message");
-
 const newsTitle = document.querySelector("#news-title");
 const newsType = document.querySelector("#news-type");
 const newsBody = document.querySelector("#news-body");
@@ -97,6 +80,20 @@ const saveAchievementButton = document.querySelector("#save-achievement-button")
 const achievementMessage = document.querySelector("#achievement-message");
 const loadAchievementsButton = document.querySelector("#load-achievements-button");
 const achievementsList = document.querySelector("#achievements-list");
+const studentsExcelFile = document.querySelector("#students-excel-file");
+const uploadStudentsButton = document.querySelector("#upload-students-button");
+const studentsUploadMessage = document.querySelector("#students-upload-message");
+const studentForm = document.querySelector("#student-form");
+const studentMessage = document.querySelector("#student-message");
+const loadStudentsButton = document.querySelector("#load-students-button");
+const studentsList = document.querySelector("#students-list");
+const teachersExcelFile = document.querySelector("#teachers-excel-file");
+const uploadTeachersButton = document.querySelector("#upload-teachers-button");
+const teachersUploadMessage = document.querySelector("#teachers-upload-message");
+const teacherForm = document.querySelector("#teacher-form");
+const teacherMessage = document.querySelector("#teacher-message");
+const loadTeachersButton = document.querySelector("#load-teachers-button");
+const teachersList = document.querySelector("#teachers-list");
 
 let editingNewsId = null;
 let editingNewsImagePaths = [];
@@ -154,6 +151,8 @@ function updateAuthView(session) {
       session.user.email === ADMIN_EMAIL ? "admin" : "Вы вошли в аккаунт";
     loadNewsButton.click();
     loadAchievementsButton.click();
+    loadStudentsButton.click();
+    loadTeachersButton.click();
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -666,70 +665,6 @@ peopleList.append(row);
   }
 );
 
-addPersonButton.addEventListener(
-  "click",
-  async function () {
-    const fullName = manualFullName.value.trim();
-    const birthDate = manualBirthDate.value;
-    const position = manualPosition.value.trim();
-
-    if (fullName === "" || birthDate === "") {
-      manualPersonMessage.textContent =
-        "Заполните имя и дату рождения";
-      return;
-    }
-
-    const { data: sessionData } =
-      await supabaseClient.auth.getSession();
-
-    if (!sessionData.session) {
-      manualPersonMessage.textContent =
-        "Сначала войдите в аккаунт";
-      return;
-    }
-
-    addPersonButton.disabled = true;
-    manualPersonMessage.textContent = "Сохраняем...";
-
-    try {
-    const { error } = await supabaseClient
-      .from("people")
-      .upsert(
-        {
-          user_id: sessionData.session.user.id,
-          full_name: fullName,
-          birth_date: birthDate,
-          position: position
-        },
-        {
-          onConflict: "user_id,full_name,birth_date"
-        }
-      );
-
-    addPersonButton.disabled = false;
-
-    if (error) {
-      manualPersonMessage.textContent =
-        "Ошибка: " + error.message;
-      return;
-    }
-
-    manualFullName.value = "";
-    manualBirthDate.value = "";
-    manualPosition.value = "";
-    manualPersonMessage.textContent =
-      "Человек успешно добавлен";
-
-    loadPeopleButton.click();
-    } catch (error) {
-      manualPersonMessage.textContent =
-        "Не удалось сохранить запись. Проверьте интернет и повторите попытку.";
-    } finally {
-      addPersonButton.disabled = false;
-    }
-  }
-);
-
 let deleteAllIsArmed = false;
 let deleteAllTimer;
 
@@ -789,60 +724,225 @@ deleteAllButton.disabled = false;
   }
 );
 
-uploadButton.addEventListener("click", async function () {
-  if (excelFile.files.length === 0) {
-    alert("Сначала выберите Excel-файл");
+async function getCurrentUserId(messageElement) {
+  const { data } = await supabaseClient.auth.getSession();
+  if (!data.session) {
+    messageElement.textContent = "Сначала войдите в аккаунт";
+    return null;
+  }
+  return data.session.user.id;
+}
+
+function createSchoolPersonRow(person, detail, tableName, reload) {
+  const row = document.createElement("div");
+  row.className = "person-row";
+  const information = document.createElement("div");
+  const name = document.createElement("strong");
+  name.textContent = person.last_name + " " + person.first_name;
+  const description = document.createElement("span");
+  description.textContent = detail;
+  information.append(name, description);
+
+  const deleteButton = document.createElement("button");
+  deleteButton.type = "button";
+  deleteButton.className = "delete-button compact-button";
+  deleteButton.textContent = "Удалить";
+  deleteButton.addEventListener("click", async function () {
+    if (!confirm("Удалить запись: " + name.textContent + "?")) return;
+    deleteButton.disabled = true;
+    const { error } = await supabaseClient.from(tableName).delete().eq("id", person.id);
+    if (error) {
+      alert("Ошибка удаления: " + error.message);
+      deleteButton.disabled = false;
+      return;
+    }
+    reload();
+  });
+
+  row.append(information, deleteButton);
+  return row;
+}
+
+async function loadStudents() {
+  studentsList.textContent = "Загрузка...";
+  const { data, error } = await supabaseClient
+    .from("students")
+    .select("id,last_name,first_name,class_name")
+    .order("last_name")
+    .order("first_name");
+  if (error) {
+    studentsList.textContent = "Ошибка: " + error.message;
     return;
   }
-
-  const selectedFile = excelFile.files[0];
-  const fileData = await selectedFile.arrayBuffer();
-
-  const workbook = XLSX.read(fileData, {
-  cellDates: true
-});
-  const firstSheetName = workbook.SheetNames[0];
-  const firstSheet = workbook.Sheets[firstSheetName];
-
-  const people = XLSX.utils.sheet_to_json(firstSheet);
-
-  const { data: sessionData } =
-  await supabaseClient.auth.getSession();
-
-if (!sessionData.session) {
-  alert("Сначала войдите в аккаунт");
-  return;
+  if (!data.length) {
+    studentsList.textContent = "Ученики пока не добавлены";
+    return;
+  }
+  studentsList.replaceChildren(...data.map(function (student) {
+    return createSchoolPersonRow(student, student.class_name, "students", loadStudents);
+  }));
 }
 
-const validPeople = people.filter(function (person) {
-  const hasName = Boolean(person["Имя"]);
-  const hasDate = person["Дата рождения"] instanceof Date;
+async function loadTeachers() {
+  teachersList.textContent = "Загрузка...";
+  const { data, error } = await supabaseClient
+    .from("teachers")
+    .select("id,last_name,first_name,position")
+    .order("last_name")
+    .order("first_name");
+  if (error) {
+    teachersList.textContent = "Ошибка: " + error.message;
+    return;
+  }
+  if (!data.length) {
+    teachersList.textContent = "Учителя пока не добавлены";
+    return;
+  }
+  teachersList.replaceChildren(...data.map(function (teacher) {
+    return createSchoolPersonRow(teacher, teacher.position, "teachers", loadTeachers);
+  }));
+}
 
-  return hasName && hasDate;
-});
+loadStudentsButton.addEventListener("click", loadStudents);
+loadTeachersButton.addEventListener("click", loadTeachers);
 
-const databaseRows = validPeople.map(function (person) {
-  return {
-    user_id: sessionData.session.user.id,
-    full_name: person["Имя"],
-    birth_date: formatDateForDatabase(person["Дата рождения"]),
-    position: person["Класс/должность"] || ""
+studentForm.addEventListener("submit", async function (event) {
+  event.preventDefault();
+  const userId = await getCurrentUserId(studentMessage);
+  if (!userId) return;
+  const row = {
+    user_id: userId,
+    last_name: document.querySelector("#student-last-name").value.trim(),
+    first_name: document.querySelector("#student-first-name").value.trim(),
+    class_name: document.querySelector("#student-class").value.trim()
   };
+  const button = document.querySelector("#add-student-button");
+  button.disabled = true;
+  studentMessage.textContent = "Сохраняем...";
+  const { error } = await supabaseClient
+    .from("students")
+    .upsert(row, { onConflict: "user_id,last_name,first_name,class_name" });
+  button.disabled = false;
+  if (error) {
+    studentMessage.textContent = "Ошибка: " + error.message;
+    return;
+  }
+  studentForm.reset();
+  studentMessage.textContent = "Ученик добавлен";
+  loadStudents();
 });
 
-const { error: saveError } = await supabaseClient
-  .from("people")
-  .upsert(databaseRows, {
-  onConflict: "user_id,full_name,birth_date"
+teacherForm.addEventListener("submit", async function (event) {
+  event.preventDefault();
+  const userId = await getCurrentUserId(teacherMessage);
+  if (!userId) return;
+  const row = {
+    user_id: userId,
+    last_name: document.querySelector("#teacher-last-name").value.trim(),
+    first_name: document.querySelector("#teacher-first-name").value.trim(),
+    position: document.querySelector("#teacher-position").value.trim()
+  };
+  const button = document.querySelector("#add-teacher-button");
+  button.disabled = true;
+  teacherMessage.textContent = "Сохраняем...";
+  const { error } = await supabaseClient
+    .from("teachers")
+    .upsert(row, { onConflict: "user_id,last_name,first_name,position" });
+  button.disabled = false;
+  if (error) {
+    teacherMessage.textContent = "Ошибка: " + error.message;
+    return;
+  }
+  teacherForm.reset();
+  teacherMessage.textContent = "Учитель добавлен";
+  loadTeachers();
 });
 
-if (saveError) {
-  alert("Ошибка сохранения: " + saveError.message);
-  return;
+async function readExcelRows(file) {
+  const workbook = XLSX.read(await file.arrayBuffer());
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(sheet, { defval: "" });
 }
 
-alert(`В базу сохранено записей: ${databaseRows.length}`);
+function excelText(row, heading) {
+  const key = Object.keys(row).find(function (item) {
+    return item.trim().toLocaleLowerCase("ru") === heading.toLocaleLowerCase("ru");
+  });
+  return key ? String(row[key]).trim() : "";
+}
 
+async function uploadSchoolPeople(options) {
+  const file = options.fileInput.files[0];
+  if (!file) {
+    options.message.textContent = "Сначала выберите Excel-файл";
+    return;
+  }
+  const userId = await getCurrentUserId(options.message);
+  if (!userId) return;
+  options.button.disabled = true;
+  options.message.textContent = "Читаем файл...";
+  try {
+    const excelRows = await readExcelRows(file);
+    const rows = excelRows.map(function (row) {
+      return options.mapRow(row, userId);
+    }).filter(options.isValid);
+    if (!rows.length) {
+      options.message.textContent = "Подходящие строки не найдены. Проверьте названия столбцов.";
+      return;
+    }
+    options.message.textContent = "Сохраняем записи...";
+    const { error } = await supabaseClient
+      .from(options.tableName)
+      .upsert(rows, { onConflict: options.onConflict });
+    if (error) throw error;
+    options.fileInput.value = "";
+    options.message.textContent = "Загружено записей: " + rows.length;
+    options.reload();
+  } catch (error) {
+    options.message.textContent = "Ошибка: " + error.message;
+  } finally {
+    options.button.disabled = false;
+  }
+}
+
+uploadStudentsButton.addEventListener("click", function () {
+  uploadSchoolPeople({
+    fileInput: studentsExcelFile,
+    button: uploadStudentsButton,
+    message: studentsUploadMessage,
+    tableName: "students",
+    onConflict: "user_id,last_name,first_name,class_name",
+    mapRow: function (row, userId) {
+      return {
+        user_id: userId,
+        last_name: excelText(row, "Фамилия"),
+        first_name: excelText(row, "Имя"),
+        class_name: excelText(row, "Класс")
+      };
+    },
+    isValid: row => Boolean(row.last_name && row.first_name && row.class_name),
+    reload: loadStudents
+  });
+});
+
+uploadTeachersButton.addEventListener("click", function () {
+  uploadSchoolPeople({
+    fileInput: teachersExcelFile,
+    button: uploadTeachersButton,
+    message: teachersUploadMessage,
+    tableName: "teachers",
+    onConflict: "user_id,last_name,first_name,position",
+    mapRow: function (row, userId) {
+      return {
+        user_id: userId,
+        last_name: excelText(row, "Фамилия"),
+        first_name: excelText(row, "Имя"),
+        position: excelText(row, "Должность")
+      };
+    },
+    isValid: row => Boolean(row.last_name && row.first_name && row.position),
+    reload: loadTeachers
+  });
 });
 
 const achievementColumns = [

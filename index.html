@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=13">
   </head>
 
   <body>
@@ -73,6 +73,57 @@
       </p>
     </section>
 
+    <section class="card school-base-card">
+      <div class="school-base-heading">
+        <div>
+          <h2>База школы</h2>
+          <p>Общий список учеников и учителей для всех разделов системы.</p>
+        </div>
+      </div>
+
+      <div class="school-base-columns">
+        <section class="school-base-section" aria-labelledby="students-heading">
+          <h3 id="students-heading">Ученики</h3>
+          <p class="form-hint">Excel: столбцы «Фамилия», «Имя», «Класс».</p>
+          <div class="action-group school-upload-row">
+            <input type="file" id="students-excel-file" accept=".xlsx,.xls">
+            <button type="button" id="upload-students-button">Загрузить учеников</button>
+          </div>
+          <p id="students-upload-message" class="form-message"></p>
+
+          <form id="student-form" class="school-person-form">
+            <label>Фамилия<input type="text" id="student-last-name" required></label>
+            <label>Имя<input type="text" id="student-first-name" required></label>
+            <label>Класс<input type="text" id="student-class" required placeholder="Например: 7А"></label>
+            <button type="submit" id="add-student-button">Добавить ученика</button>
+          </form>
+          <p id="student-message" class="form-message" aria-live="polite"></p>
+          <button type="button" id="load-students-button" class="secondary-button">Показать список учеников</button>
+          <div id="students-list" class="school-person-list"></div>
+        </section>
+
+        <section class="school-base-section" aria-labelledby="teachers-heading">
+          <h3 id="teachers-heading">Учителя</h3>
+          <p class="form-hint">Excel: столбцы «Фамилия», «Имя», «Должность».</p>
+          <div class="action-group school-upload-row">
+            <input type="file" id="teachers-excel-file" accept=".xlsx,.xls">
+            <button type="button" id="upload-teachers-button">Загрузить учителей</button>
+          </div>
+          <p id="teachers-upload-message" class="form-message"></p>
+
+          <form id="teacher-form" class="school-person-form">
+            <label>Фамилия<input type="text" id="teacher-last-name" required></label>
+            <label>Имя<input type="text" id="teacher-first-name" required></label>
+            <label>Должность<input type="text" id="teacher-position" required placeholder="Например: учитель информатики"></label>
+            <button type="submit" id="add-teacher-button">Добавить учителя</button>
+          </form>
+          <p id="teacher-message" class="form-message" aria-live="polite"></p>
+          <button type="button" id="load-teachers-button" class="secondary-button">Показать список учителей</button>
+          <div id="teachers-list" class="school-person-list"></div>
+        </section>
+      </div>
+    </section>
+
     <div class="admin-tabs" role="tablist" aria-label="Разделы личного кабинета">
       <button type="button" id="birthdays-tab" role="tab" aria-selected="true" aria-controls="birthdays-panel">Дни рождения</button>
       <button type="button" id="publications-tab" role="tab" aria-selected="false" aria-controls="publications-panel" tabindex="-1">Публикации</button>
@@ -81,63 +132,7 @@
 
     <div id="birthdays-panel" role="tabpanel" aria-labelledby="birthdays-tab">
     <section class="card">
-      <h2>Загрузка Excel</h2>
-
-      <p>
-        Файл должен содержать ФИО, дату рождения
-        и класс или должность.
-      </p>
-
-      <div class="action-group">
-      <input
-        type="file"
-        id="excel-file"
-        accept=".xlsx,.xls"
-      >
-
-      <button type="button" id="upload-button">
-        Загрузить файл
-      </button>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Добавить человека вручную</h2>
-
-      <div class="manual-person-form">
-        <label>
-          Фамилия и имя
-          <input
-            type="text"
-            id="manual-full-name"
-            placeholder="Например: Сериков Айдар"
-          >
-        </label>
-
-        <label>
-          Дата рождения
-          <input type="date" id="manual-birth-date">
-        </label>
-
-        <label>
-          Класс или должность
-          <input
-            type="text"
-            id="manual-position"
-            placeholder="Например: 10А"
-          >
-        </label>
-      </div>
-
-      <button type="button" id="add-person-button">
-        Добавить человека
-      </button>
-
-      <p id="manual-person-message"></p>
-    </section>
-
-    <section class="card">
-      <h2>Список людей</h2>
+      <h2>Дни рождения</h2>
 
       <div class="action-group">
       <button type="button" id="load-people-button">
@@ -266,6 +261,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=15"></script>
+    <script src="script.js?v=16"></script>
   </body>
 </html>

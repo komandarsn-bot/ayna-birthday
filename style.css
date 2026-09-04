@@ -88,6 +88,100 @@ input[type="file"] {
 
 [role="tabpanel"][hidden] { display: none; }
 
+.school-base-heading h2,
+.school-base-heading p {
+  margin-top: 0;
+}
+
+.school-base-heading p {
+  margin-bottom: 20px;
+  color: #687873;
+}
+
+.school-base-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.school-base-section {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #dbe4e1;
+  border-radius: 14px;
+  background: #f8faf9;
+}
+
+.school-base-section h3 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.form-hint {
+  min-height: 42px;
+  margin: 0 0 14px;
+  color: #687873;
+}
+
+.school-upload-row {
+  align-items: stretch;
+}
+
+.school-upload-row input {
+  width: 100%;
+}
+
+.school-person-form {
+  display: grid;
+  gap: 12px;
+  padding-top: 18px;
+  margin-top: 16px;
+  border-top: 1px solid #dbe4e1;
+}
+
+.school-person-form label {
+  display: grid;
+  gap: 7px;
+  font-weight: 700;
+}
+
+.school-person-form input {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #c7d8d3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #173a35;
+  font: inherit;
+}
+
+.form-message {
+  min-height: 20px;
+  margin: 10px 0;
+  color: #52645f;
+}
+
+.secondary-button {
+  width: 100%;
+  margin-top: 4px;
+  background: #ffffff;
+  border: 1px solid #b9cbc6;
+}
+
+.secondary-button:hover {
+  background: #eef3f1;
+}
+
+.school-person-list {
+  max-height: 360px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.school-person-list:empty {
+  display: none;
+}
+
 .cabinet-header {
   display: flex;
   flex-wrap: wrap;
@@ -391,4 +485,6 @@ input[type="file"] {
   .news-actions { width: 100%; flex-direction: row; flex-wrap: wrap; }
   .achievement-form { grid-template-columns: 1fr; }
   .achievement-form .wide-field { grid-column: auto; }
+  .school-base-columns { grid-template-columns: 1fr; }
+  .form-hint { min-height: 0; }
 }
