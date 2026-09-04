@@ -90,9 +90,19 @@ const achievementFirstName = document.querySelector("#achievement-first-name");
 const achievementClass = document.querySelector("#achievement-class");
 const achievementLastNames = document.querySelector("#achievement-last-names");
 const achievementFirstNames = document.querySelector("#achievement-first-names");
+const achievementEventName = document.querySelector("#achievement-event-name");
+const achievementEventNames = document.querySelector("#achievement-event-names");
+const eventsExcelFile = document.querySelector("#events-excel-file");
+const uploadEventsButton = document.querySelector("#upload-events-button");
+const eventForm = document.querySelector("#event-form");
+const newEventName = document.querySelector("#new-event-name");
+const addEventButton = document.querySelector("#add-event-button");
+const eventManagerMessage = document.querySelector("#event-manager-message");
 
 let achievementStudents = [];
 let selectedAchievementStudent = null;
+let achievementEvents = [];
+let selectedAchievementEvent = null;
 
 let editingNewsId = null;
 let editingNewsImagePaths = [];
@@ -152,6 +162,7 @@ function updateAuthView(session) {
     loadAchievementsButton.click();
     loadStudentsButton.click();
     loadTeachersButton.click();
+    loadAchievementEvents();
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -1142,6 +1153,114 @@ uploadTeachersButton.addEventListener("click", function () {
   });
 });
 
+async function loadAchievementEvents() {
+  const { data, error } = await supabaseClient
+    .from("achievement_events")
+    .select("id,name")
+    .order("name");
+  if (error) {
+    eventManagerMessage.textContent = "Ошибка загрузки мероприятий: " + error.message;
+    return;
+  }
+  achievementEvents = data || [];
+  if (document.activeElement === achievementEventName) showEventSuggestions();
+}
+
+function showEventSuggestions() {
+  const query = achievementEventName.value.trim().toLocaleLowerCase("ru");
+  const matches = achievementEvents
+    .filter(item => item.name.toLocaleLowerCase("ru").includes(query))
+    .slice(0, 7);
+  renderSuggestionMenu(
+    achievementEventName,
+    achievementEventNames,
+    matches.map(item => ({ label: item.name, event: item })),
+    item => {
+      achievementEventName.value = item.event.name;
+      selectedAchievementEvent = item.event;
+    }
+  );
+}
+
+function chooseAchievementEvent() {
+  const value = achievementEventName.value.trim().toLocaleLowerCase("ru");
+  selectedAchievementEvent = achievementEvents.find(function (item) {
+    return item.name.toLocaleLowerCase("ru") === value;
+  }) || null;
+}
+
+achievementEventName.addEventListener("input", function () {
+  chooseAchievementEvent();
+  showEventSuggestions();
+});
+achievementEventName.addEventListener("focus", showEventSuggestions);
+achievementEventName.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") closeSuggestionMenu(achievementEventName, achievementEventNames);
+  if (event.key === "ArrowDown" && !achievementEventNames.hidden) {
+    const firstOption = achievementEventNames.querySelector("button");
+    if (firstOption) {
+      event.preventDefault();
+      firstOption.focus();
+    }
+  }
+});
+achievementEventName.addEventListener("blur", function () {
+  setTimeout(() => closeSuggestionMenu(achievementEventName, achievementEventNames), 120);
+});
+
+eventForm.addEventListener("submit", async function (event) {
+  event.preventDefault();
+  const userId = await getCurrentUserId(eventManagerMessage);
+  if (!userId) return;
+  const name = newEventName.value.trim();
+  addEventButton.disabled = true;
+  eventManagerMessage.textContent = "Сохраняем мероприятие...";
+  const { error } = await supabaseClient
+    .from("achievement_events")
+    .upsert({ user_id: userId, name: name }, { onConflict: "user_id,name" });
+  addEventButton.disabled = false;
+  if (error) {
+    eventManagerMessage.textContent = "Ошибка: " + error.message;
+    return;
+  }
+  eventForm.reset();
+  eventManagerMessage.textContent = "Мероприятие добавлено";
+  loadAchievementEvents();
+});
+
+uploadEventsButton.addEventListener("click", async function () {
+  const file = eventsExcelFile.files[0];
+  if (!file) {
+    eventManagerMessage.textContent = "Сначала выберите Excel-файл";
+    return;
+  }
+  const userId = await getCurrentUserId(eventManagerMessage);
+  if (!userId) return;
+  uploadEventsButton.disabled = true;
+  eventManagerMessage.textContent = "Читаем список мероприятий...";
+  try {
+    const names = [...new Set((await readExcelRows(file))
+      .map(row => excelText(row, "Наименование мероприятия"))
+      .filter(Boolean))];
+    const rows = names.map(name => ({ user_id: userId, name: name }));
+    if (!rows.length) {
+      eventManagerMessage.textContent = "Не найден столбец «Наименование мероприятия» или он пустой";
+      return;
+    }
+    const { error } = await supabaseClient
+      .from("achievement_events")
+      .upsert(rows, { onConflict: "user_id,name" });
+    if (error) throw error;
+    eventsExcelFile.value = "";
+    eventManagerMessage.textContent = "Загружено мероприятий: " + rows.length;
+    loadAchievementEvents();
+  } catch (error) {
+    eventManagerMessage.textContent = "Ошибка: " + error.message;
+  } finally {
+    uploadEventsButton.disabled = false;
+  }
+});
+
 const achievementColumns = [
   ["last_name", "Ф"],
   ["first_name", "И"],
@@ -1278,15 +1397,23 @@ achievementForm.addEventListener("submit", async function (event) {
     achievementFirstName.focus();
     return;
   }
+  chooseAchievementEvent();
+  if (!selectedAchievementEvent) {
+    achievementMessage.textContent = "Выберите мероприятие из справочника";
+    achievementEventName.focus();
+    showEventSuggestions();
+    return;
+  }
 
   const costValue = document.querySelector("#achievement-cost").value;
   const achievement = {
     user_id: sessionData.session.user.id,
     student_id: selectedAchievementStudent.id,
+    event_id: selectedAchievementEvent.id,
     last_name: selectedAchievementStudent.last_name,
     first_name: selectedAchievementStudent.first_name,
     class_name: selectedAchievementStudent.class_name,
-    event_name: achievementValue("#achievement-event-name"),
+    event_name: selectedAchievementEvent.name,
     order_reference: achievementValue("#achievement-order"),
     cost: costValue === "" ? null : Number(costValue),
     subject: achievementValue("#achievement-subject"),
@@ -1315,6 +1442,8 @@ achievementForm.addEventListener("submit", async function (event) {
 
   achievementForm.reset();
   resetAchievementStudentSelection();
+  selectedAchievementEvent = null;
+  closeSuggestionMenu(achievementEventName, achievementEventNames);
   achievementMessage.textContent = "Достижение сохранено";
   loadAchievements();
 });

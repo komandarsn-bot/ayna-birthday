@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=16">
+    <link rel="stylesheet" href="style.css?v=17">
   </head>
 
   <body>
@@ -210,7 +210,23 @@
     <div id="achievements-panel" role="tabpanel" aria-labelledby="achievements-tab" hidden>
       <section class="card">
         <h2>База достижений</h2>
-        <p>Заполните сведения об участии ученика в мероприятии.</p>
+        <p>Сначала выберите ученика и мероприятие из подготовленных справочников.</p>
+
+        <section class="achievement-event-manager" aria-labelledby="event-manager-heading">
+          <div>
+            <h3 id="event-manager-heading">Справочник мероприятий</h3>
+            <p>Excel должен содержать столбец «Наименование мероприятия».</p>
+          </div>
+          <div class="achievement-event-actions">
+            <input type="file" id="events-excel-file" accept=".xlsx,.xls">
+            <button type="button" id="upload-events-button">Загрузить Excel</button>
+          </div>
+          <form id="event-form" class="achievement-event-actions">
+            <input type="text" id="new-event-name" required maxlength="300" placeholder="Введите название олимпиады или мероприятия" aria-label="Название нового мероприятия">
+            <button type="submit" id="add-event-button">Добавить вручную</button>
+          </form>
+          <p id="event-manager-message" class="form-message" aria-live="polite"></p>
+        </section>
 
         <form id="achievement-form" class="achievement-form">
           <label>Фамилия
@@ -226,7 +242,12 @@
             </span>
           </label>
           <label>Класс<input type="text" id="achievement-class" required readonly placeholder="Заполнится автоматически"></label>
-          <label class="wide-field">Наименование мероприятия<input type="text" id="achievement-event-name" required></label>
+          <label class="wide-field">Наименование мероприятия
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-event-name" required autocomplete="off" placeholder="Начните вводить название" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-event-names">
+              <span id="achievement-event-names" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+          </label>
           <label>Приказ<input type="text" id="achievement-order"></label>
           <label>Стоимость<input type="number" id="achievement-cost" min="0" step="0.01" inputmode="decimal"></label>
           <label>Предмет<input type="text" id="achievement-subject"></label>
@@ -272,6 +293,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=19"></script>
+    <script src="script.js?v=20"></script>
   </body>
 </html>

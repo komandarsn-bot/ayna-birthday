@@ -1,8 +1,17 @@
 -- Выполните этот файл один раз в Supabase: SQL Editor -> New query -> Run.
+create table if not exists public.achievement_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
+  name text not null check (char_length(name) between 1 and 300),
+  created_at timestamptz not null default now(),
+  unique (user_id, name)
+);
+
 create table if not exists public.achievements (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
   student_id uuid references public.students(id) on delete set null,
+  event_id uuid references public.achievement_events(id) on delete set null,
   last_name text not null,
   first_name text not null,
   class_name text not null,
@@ -27,14 +36,25 @@ create table if not exists public.achievements (
 -- Связь с общей базой учеников для уже созданной таблицы достижений.
 alter table public.achievements
   add column if not exists student_id uuid references public.students(id) on delete set null;
+alter table public.achievements
+  add column if not exists event_id uuid references public.achievement_events(id) on delete set null;
 
 create index if not exists achievements_student_id_idx
   on public.achievements (student_id);
+create index if not exists achievements_event_id_idx
+  on public.achievements (event_id);
 
 create index if not exists achievements_user_event_date_idx
   on public.achievements (user_id, event_date desc);
 
 alter table public.achievements enable row level security;
+alter table public.achievement_events enable row level security;
+
+drop policy if exists "achievement_events_owner_all" on public.achievement_events;
+create policy "achievement_events_owner_all" on public.achievement_events
+  for all to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
 
 drop policy if exists "achievements_owner_select" on public.achievements;
 create policy "achievements_owner_select" on public.achievements

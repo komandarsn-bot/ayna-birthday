@@ -414,6 +414,43 @@ input[type="file"] {
   margin-top: 20px;
 }
 
+.achievement-event-manager {
+  display: grid;
+  gap: 14px;
+  margin: 22px 0 28px;
+  padding: 20px;
+  border: 1px solid #dbe4e1;
+  border-radius: 14px;
+  background: #f8faf9;
+}
+
+.achievement-event-manager h3,
+.achievement-event-manager p {
+  margin: 0;
+}
+
+.achievement-event-manager > div > p {
+  margin-top: 6px;
+  color: #687873;
+}
+
+.achievement-event-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.achievement-event-actions input {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #c7d8d3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #173a35;
+  font: inherit;
+}
+
 .achievement-form label {
   display: grid;
   align-content: start;
@@ -595,6 +632,7 @@ input[type="file"] {
   .news-actions { width: 100%; flex-direction: row; flex-wrap: wrap; }
   .achievement-form { grid-template-columns: 1fr; }
   .achievement-form .wide-field { grid-column: auto; }
+  .achievement-event-actions { grid-template-columns: 1fr; }
   .school-base-columns { grid-template-columns: 1fr; }
   .birthday-database-columns { grid-template-columns: 1fr; }
   .form-hint { min-height: 0; }
