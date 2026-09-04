@@ -85,6 +85,14 @@ const teacherForm = document.querySelector("#teacher-form");
 const teacherMessage = document.querySelector("#teacher-message");
 const loadTeachersButton = document.querySelector("#load-teachers-button");
 const teachersList = document.querySelector("#teachers-list");
+const achievementLastName = document.querySelector("#achievement-last-name");
+const achievementFirstName = document.querySelector("#achievement-first-name");
+const achievementClass = document.querySelector("#achievement-class");
+const achievementLastNames = document.querySelector("#achievement-last-names");
+const achievementFirstNames = document.querySelector("#achievement-first-names");
+
+let achievementStudents = [];
+let selectedAchievementStudent = null;
 
 let editingNewsId = null;
 let editingNewsImagePaths = [];
@@ -768,6 +776,8 @@ async function loadStudents() {
     studentsList.textContent = "Ошибка: " + error.message;
     return;
   }
+  achievementStudents = data;
+  updateAchievementLastNameSuggestions();
   if (!data.length) {
     studentsList.textContent = "Ученики пока не добавлены";
     return;
@@ -781,6 +791,68 @@ async function loadStudents() {
     );
   }));
 }
+
+function replaceDatalistOptions(datalist, values, getLabel) {
+  const uniqueValues = [...new Set(values)];
+  datalist.replaceChildren(...uniqueValues.map(function (value) {
+    const option = document.createElement("option");
+    option.value = value;
+    if (getLabel) option.label = getLabel(value);
+    return option;
+  }));
+}
+
+function updateAchievementLastNameSuggestions() {
+  replaceDatalistOptions(
+    achievementLastNames,
+    achievementStudents.map(student => student.last_name).filter(Boolean)
+  );
+}
+
+function resetAchievementStudentSelection(clearLastName = false) {
+  selectedAchievementStudent = null;
+  if (clearLastName) achievementLastName.value = "";
+  achievementFirstName.value = "";
+  achievementFirstName.disabled = true;
+  achievementFirstName.placeholder = "Сначала выберите фамилию";
+  achievementFirstNames.replaceChildren();
+  achievementClass.value = "";
+}
+
+function chooseAchievementLastName() {
+  selectedAchievementStudent = null;
+  achievementClass.value = "";
+  achievementFirstName.value = "";
+  const lastName = achievementLastName.value.trim().toLocaleLowerCase("ru");
+  const matches = achievementStudents.filter(function (student) {
+    return student.last_name.toLocaleLowerCase("ru") === lastName;
+  });
+  achievementFirstName.disabled = matches.length === 0;
+  achievementFirstName.placeholder = matches.length ? "Выберите имя" : "Сначала выберите фамилию";
+  replaceDatalistOptions(
+    achievementFirstNames,
+    matches.map(student => student.first_name),
+    firstName => {
+      const student = matches.find(item => item.first_name === firstName);
+      return student ? student.class_name : "";
+    }
+  );
+}
+
+function chooseAchievementFirstName() {
+  const lastName = achievementLastName.value.trim().toLocaleLowerCase("ru");
+  const firstName = achievementFirstName.value.trim().toLocaleLowerCase("ru");
+  selectedAchievementStudent = achievementStudents.find(function (student) {
+    return student.last_name.toLocaleLowerCase("ru") === lastName &&
+      student.first_name.toLocaleLowerCase("ru") === firstName;
+  }) || null;
+  achievementClass.value = selectedAchievementStudent
+    ? selectedAchievementStudent.class_name
+    : "";
+}
+
+achievementLastName.addEventListener("input", chooseAchievementLastName);
+achievementFirstName.addEventListener("input", chooseAchievementFirstName);
 
 async function loadTeachers() {
   teachersList.textContent = "Загрузка...";
@@ -1112,12 +1184,20 @@ achievementForm.addEventListener("submit", async function (event) {
     return;
   }
 
+  chooseAchievementFirstName();
+  if (!selectedAchievementStudent) {
+    achievementMessage.textContent = "Выберите существующего ученика из подсказок";
+    achievementFirstName.focus();
+    return;
+  }
+
   const costValue = document.querySelector("#achievement-cost").value;
   const achievement = {
     user_id: sessionData.session.user.id,
-    last_name: achievementValue("#achievement-last-name"),
-    first_name: achievementValue("#achievement-first-name"),
-    class_name: achievementValue("#achievement-class"),
+    student_id: selectedAchievementStudent.id,
+    last_name: selectedAchievementStudent.last_name,
+    first_name: selectedAchievementStudent.first_name,
+    class_name: selectedAchievementStudent.class_name,
     event_name: achievementValue("#achievement-event-name"),
     order_reference: achievementValue("#achievement-order"),
     cost: costValue === "" ? null : Number(costValue),
@@ -1146,6 +1226,7 @@ achievementForm.addEventListener("submit", async function (event) {
   }
 
   achievementForm.reset();
+  resetAchievementStudentSelection();
   achievementMessage.textContent = "Достижение сохранено";
   loadAchievements();
 });

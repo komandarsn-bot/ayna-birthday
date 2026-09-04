@@ -2,6 +2,7 @@
 create table if not exists public.achievements (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
+  student_id uuid references public.students(id) on delete set null,
   last_name text not null,
   first_name text not null,
   class_name text not null,
@@ -22,6 +23,13 @@ create table if not exists public.achievements (
   city text,
   created_at timestamptz not null default now()
 );
+
+-- Связь с общей базой учеников для уже созданной таблицы достижений.
+alter table public.achievements
+  add column if not exists student_id uuid references public.students(id) on delete set null;
+
+create index if not exists achievements_student_id_idx
+  on public.achievements (student_id);
 
 create index if not exists achievements_user_event_date_idx
   on public.achievements (user_id, event_date desc);
