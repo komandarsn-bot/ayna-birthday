@@ -6,20 +6,18 @@ body {
 }
 
 header {
-  background-color: #173a35;
-  color: white;
-  padding: 40px 20px;
+  background-color: #ffffff;
+  padding: 24px 20px;
   text-align: center;
+  border-bottom: 1px solid rgba(23, 58, 53, 0.1);
+  box-shadow: 0 4px 18px rgba(23, 58, 53, 0.05);
 }
 
-header h1 {
-  margin: 0;
-  font-size: 36px;
-}
-
-header p {
-  margin-top: 10px;
-  color: #c7d8d3;
+.admin-site-logo {
+  display: block;
+  width: clamp(170px, 24vw, 280px);
+  height: auto;
+  margin: 0 auto;
 }
 
 main {
