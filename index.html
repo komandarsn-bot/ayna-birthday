@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=17">
+    <link rel="stylesheet" href="style.css?v=18">
   </head>
 
   <body>
@@ -228,6 +228,22 @@
           <p id="event-manager-message" class="form-message" aria-live="polite"></p>
         </section>
 
+        <section class="achievement-event-manager" aria-labelledby="subject-manager-heading">
+          <div>
+            <h3 id="subject-manager-heading">Справочник предметов</h3>
+            <p>Excel должен содержать столбец «Предмет».</p>
+          </div>
+          <div class="achievement-event-actions">
+            <input type="file" id="subjects-excel-file" accept=".xlsx,.xls">
+            <button type="button" id="upload-subjects-button">Загрузить Excel</button>
+          </div>
+          <form id="subject-form" class="achievement-event-actions">
+            <input type="text" id="new-subject-name" required maxlength="160" placeholder="Введите название предмета" aria-label="Название нового предмета">
+            <button type="submit" id="add-subject-button">Добавить вручную</button>
+          </form>
+          <p id="subject-manager-message" class="form-message" aria-live="polite"></p>
+        </section>
+
         <form id="achievement-form" class="achievement-form">
           <label>Фамилия
             <span class="student-autocomplete">
@@ -250,7 +266,12 @@
           </label>
           <label>Приказ<input type="text" id="achievement-order"></label>
           <label>Стоимость<input type="number" id="achievement-cost" min="0" step="0.01" inputmode="decimal"></label>
-          <label>Предмет<input type="text" id="achievement-subject"></label>
+          <label>Предмет
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-subject" required autocomplete="off" placeholder="Начните вводить предмет" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-subject-names">
+              <span id="achievement-subject-names" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+          </label>
           <label>Уровень<input type="text" id="achievement-level"></label>
           <label>Этап<input type="text" id="achievement-stage"></label>
           <label class="wide-field">Название проекта<input type="text" id="achievement-project-name"></label>
@@ -293,6 +314,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=20"></script>
+    <script src="script.js?v=21"></script>
   </body>
 </html>

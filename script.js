@@ -98,11 +98,21 @@ const eventForm = document.querySelector("#event-form");
 const newEventName = document.querySelector("#new-event-name");
 const addEventButton = document.querySelector("#add-event-button");
 const eventManagerMessage = document.querySelector("#event-manager-message");
+const achievementSubject = document.querySelector("#achievement-subject");
+const achievementSubjectNames = document.querySelector("#achievement-subject-names");
+const subjectsExcelFile = document.querySelector("#subjects-excel-file");
+const uploadSubjectsButton = document.querySelector("#upload-subjects-button");
+const subjectForm = document.querySelector("#subject-form");
+const newSubjectName = document.querySelector("#new-subject-name");
+const addSubjectButton = document.querySelector("#add-subject-button");
+const subjectManagerMessage = document.querySelector("#subject-manager-message");
 
 let achievementStudents = [];
 let selectedAchievementStudent = null;
 let achievementEvents = [];
 let selectedAchievementEvent = null;
+let achievementSubjects = [];
+let selectedAchievementSubject = null;
 
 let editingNewsId = null;
 let editingNewsImagePaths = [];
@@ -163,6 +173,7 @@ function updateAuthView(session) {
     loadStudentsButton.click();
     loadTeachersButton.click();
     loadAchievementEvents();
+    loadAchievementSubjects();
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -1261,6 +1272,114 @@ uploadEventsButton.addEventListener("click", async function () {
   }
 });
 
+async function loadAchievementSubjects() {
+  const { data, error } = await supabaseClient
+    .from("achievement_subjects")
+    .select("id,name")
+    .order("name");
+  if (error) {
+    subjectManagerMessage.textContent = "Ошибка загрузки предметов: " + error.message;
+    return;
+  }
+  achievementSubjects = data || [];
+  if (document.activeElement === achievementSubject) showSubjectSuggestions();
+}
+
+function showSubjectSuggestions() {
+  const query = achievementSubject.value.trim().toLocaleLowerCase("ru");
+  const matches = achievementSubjects
+    .filter(item => item.name.toLocaleLowerCase("ru").includes(query))
+    .slice(0, 7);
+  renderSuggestionMenu(
+    achievementSubject,
+    achievementSubjectNames,
+    matches.map(item => ({ label: item.name, subject: item })),
+    item => {
+      achievementSubject.value = item.subject.name;
+      selectedAchievementSubject = item.subject;
+    }
+  );
+}
+
+function chooseAchievementSubject() {
+  const value = achievementSubject.value.trim().toLocaleLowerCase("ru");
+  selectedAchievementSubject = achievementSubjects.find(function (item) {
+    return item.name.toLocaleLowerCase("ru") === value;
+  }) || null;
+}
+
+achievementSubject.addEventListener("input", function () {
+  chooseAchievementSubject();
+  showSubjectSuggestions();
+});
+achievementSubject.addEventListener("focus", showSubjectSuggestions);
+achievementSubject.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") closeSuggestionMenu(achievementSubject, achievementSubjectNames);
+  if (event.key === "ArrowDown" && !achievementSubjectNames.hidden) {
+    const firstOption = achievementSubjectNames.querySelector("button");
+    if (firstOption) {
+      event.preventDefault();
+      firstOption.focus();
+    }
+  }
+});
+achievementSubject.addEventListener("blur", function () {
+  setTimeout(() => closeSuggestionMenu(achievementSubject, achievementSubjectNames), 120);
+});
+
+subjectForm.addEventListener("submit", async function (event) {
+  event.preventDefault();
+  const userId = await getCurrentUserId(subjectManagerMessage);
+  if (!userId) return;
+  const name = newSubjectName.value.trim();
+  addSubjectButton.disabled = true;
+  subjectManagerMessage.textContent = "Сохраняем предмет...";
+  const { error } = await supabaseClient
+    .from("achievement_subjects")
+    .upsert({ user_id: userId, name: name }, { onConflict: "user_id,name" });
+  addSubjectButton.disabled = false;
+  if (error) {
+    subjectManagerMessage.textContent = "Ошибка: " + error.message;
+    return;
+  }
+  subjectForm.reset();
+  subjectManagerMessage.textContent = "Предмет добавлен";
+  loadAchievementSubjects();
+});
+
+uploadSubjectsButton.addEventListener("click", async function () {
+  const file = subjectsExcelFile.files[0];
+  if (!file) {
+    subjectManagerMessage.textContent = "Сначала выберите Excel-файл";
+    return;
+  }
+  const userId = await getCurrentUserId(subjectManagerMessage);
+  if (!userId) return;
+  uploadSubjectsButton.disabled = true;
+  subjectManagerMessage.textContent = "Читаем список предметов...";
+  try {
+    const names = [...new Set((await readExcelRows(file))
+      .map(row => excelText(row, "Предмет"))
+      .filter(Boolean))];
+    const rows = names.map(name => ({ user_id: userId, name: name }));
+    if (!rows.length) {
+      subjectManagerMessage.textContent = "Не найден столбец «Предмет» или он пустой";
+      return;
+    }
+    const { error } = await supabaseClient
+      .from("achievement_subjects")
+      .upsert(rows, { onConflict: "user_id,name" });
+    if (error) throw error;
+    subjectsExcelFile.value = "";
+    subjectManagerMessage.textContent = "Загружено предметов: " + rows.length;
+    loadAchievementSubjects();
+  } catch (error) {
+    subjectManagerMessage.textContent = "Ошибка: " + error.message;
+  } finally {
+    uploadSubjectsButton.disabled = false;
+  }
+});
+
 const achievementColumns = [
   ["last_name", "Ф"],
   ["first_name", "И"],
@@ -1404,19 +1523,27 @@ achievementForm.addEventListener("submit", async function (event) {
     showEventSuggestions();
     return;
   }
+  chooseAchievementSubject();
+  if (!selectedAchievementSubject) {
+    achievementMessage.textContent = "Выберите предмет из справочника";
+    achievementSubject.focus();
+    showSubjectSuggestions();
+    return;
+  }
 
   const costValue = document.querySelector("#achievement-cost").value;
   const achievement = {
     user_id: sessionData.session.user.id,
     student_id: selectedAchievementStudent.id,
     event_id: selectedAchievementEvent.id,
+    subject_id: selectedAchievementSubject.id,
     last_name: selectedAchievementStudent.last_name,
     first_name: selectedAchievementStudent.first_name,
     class_name: selectedAchievementStudent.class_name,
     event_name: selectedAchievementEvent.name,
     order_reference: achievementValue("#achievement-order"),
     cost: costValue === "" ? null : Number(costValue),
-    subject: achievementValue("#achievement-subject"),
+    subject: selectedAchievementSubject.name,
     achievement_level: achievementValue("#achievement-level"),
     event_stage: achievementValue("#achievement-stage"),
     project_name: achievementValue("#achievement-project-name"),
@@ -1444,6 +1571,8 @@ achievementForm.addEventListener("submit", async function (event) {
   resetAchievementStudentSelection();
   selectedAchievementEvent = null;
   closeSuggestionMenu(achievementEventName, achievementEventNames);
+  selectedAchievementSubject = null;
+  closeSuggestionMenu(achievementSubject, achievementSubjectNames);
   achievementMessage.textContent = "Достижение сохранено";
   loadAchievements();
 });
