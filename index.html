@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=14">
   </head>
 
   <body>
@@ -84,7 +84,7 @@
       <div class="school-base-columns">
         <section class="school-base-section" aria-labelledby="students-heading">
           <h3 id="students-heading">Ученики</h3>
-          <p class="form-hint">Excel: столбцы «Фамилия», «Имя», «Класс».</p>
+          <p class="form-hint">Excel: «Фамилия», «Имя», «Класс», «Дата рождения».</p>
           <div class="action-group school-upload-row">
             <input type="file" id="students-excel-file" accept=".xlsx,.xls">
             <button type="button" id="upload-students-button">Загрузить учеников</button>
@@ -95,16 +95,15 @@
             <label>Фамилия<input type="text" id="student-last-name" required></label>
             <label>Имя<input type="text" id="student-first-name" required></label>
             <label>Класс<input type="text" id="student-class" required placeholder="Например: 7А"></label>
+            <label>Дата рождения<input type="date" id="student-birth-date" required></label>
             <button type="submit" id="add-student-button">Добавить ученика</button>
           </form>
           <p id="student-message" class="form-message" aria-live="polite"></p>
-          <button type="button" id="load-students-button" class="secondary-button">Показать список учеников</button>
-          <div id="students-list" class="school-person-list"></div>
         </section>
 
         <section class="school-base-section" aria-labelledby="teachers-heading">
           <h3 id="teachers-heading">Учителя</h3>
-          <p class="form-hint">Excel: столбцы «Фамилия», «Имя», «Должность».</p>
+          <p class="form-hint">Excel: «Фамилия», «Имя», «Должность», «Дата рождения».</p>
           <div class="action-group school-upload-row">
             <input type="file" id="teachers-excel-file" accept=".xlsx,.xls">
             <button type="button" id="upload-teachers-button">Загрузить учителей</button>
@@ -115,11 +114,10 @@
             <label>Фамилия<input type="text" id="teacher-last-name" required></label>
             <label>Имя<input type="text" id="teacher-first-name" required></label>
             <label>Должность<input type="text" id="teacher-position" required placeholder="Например: учитель информатики"></label>
+            <label>Дата рождения<input type="date" id="teacher-birth-date" required></label>
             <button type="submit" id="add-teacher-button">Добавить учителя</button>
           </form>
           <p id="teacher-message" class="form-message" aria-live="polite"></p>
-          <button type="button" id="load-teachers-button" class="secondary-button">Показать список учителей</button>
-          <div id="teachers-list" class="school-person-list"></div>
         </section>
       </div>
     </section>
@@ -133,19 +131,22 @@
     <div id="birthdays-panel" role="tabpanel" aria-labelledby="birthdays-tab">
     <section class="card">
       <h2>Дни рождения</h2>
+      <div class="birthday-database-columns">
+        <section class="birthday-database-group">
+          <div class="birthday-list-heading">
+            <h3>Ученики</h3>
+            <button type="button" id="load-students-button" class="secondary-button compact-button">Обновить</button>
+          </div>
+          <div id="students-list" class="school-person-list"><p>Загрузка…</p></div>
+        </section>
 
-      <div class="action-group">
-      <button type="button" id="load-people-button">
-        Показать список
-      </button>
-
-      <button type="button" id="delete-all-button">
-        Удалить всех
-      </button>
-      </div>
-
-      <div id="people-list">
-        <p>Нажмите кнопку, чтобы загрузить данные.</p>
+        <section class="birthday-database-group">
+          <div class="birthday-list-heading">
+            <h3>Учителя</h3>
+            <button type="button" id="load-teachers-button" class="secondary-button compact-button">Обновить</button>
+          </div>
+          <div id="teachers-list" class="school-person-list"><p>Загрузка…</p></div>
+        </section>
       </div>
     </section>
 
@@ -261,6 +262,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=16"></script>
+    <script src="script.js?v=17"></script>
   </body>
 </html>

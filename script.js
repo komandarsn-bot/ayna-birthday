@@ -53,15 +53,6 @@ const createScreenButton =
 const screenUrl =
   document.querySelector("#screen-url");
 
-const loadPeopleButton =
-  document.querySelector("#load-people-button");
-
-const deleteAllButton =
-  document.querySelector("#delete-all-button");
-
-const peopleList =
-  document.querySelector("#people-list");
-
 const newsTitle = document.querySelector("#news-title");
 const newsType = document.querySelector("#news-type");
 const newsBody = document.querySelector("#news-body");
@@ -305,7 +296,8 @@ function sortPeopleByUpcomingBirthday(people, today = new Date()) {
 
   return [...people].sort((a, b) =>
     birthdayOrder(a) - birthdayOrder(b) ||
-    (a.full_name || "").localeCompare(b.full_name || "", "ru")
+    ((a.last_name || "") + (a.first_name || "") + (a.full_name || ""))
+      .localeCompare((b.last_name || "") + (b.first_name || "") + (b.full_name || ""), "ru")
   );
 }
 
@@ -574,6 +566,9 @@ addNewsButton.addEventListener("click", async function () {
   }
 });
 
+/* Старый общий список people сохранён в базе для совместимости,
+   но больше не используется в интерфейсе. */
+if (false) {
 loadPeopleButton.addEventListener(
   "click",
   async function () {
@@ -723,6 +718,7 @@ deleteAllButton.disabled = true;
 deleteAllButton.disabled = false;
   }
 );
+}
 
 async function getCurrentUserId(messageElement) {
   const { data } = await supabaseClient.auth.getSession();
@@ -767,9 +763,7 @@ async function loadStudents() {
   studentsList.textContent = "Загрузка...";
   const { data, error } = await supabaseClient
     .from("students")
-    .select("id,last_name,first_name,class_name")
-    .order("last_name")
-    .order("first_name");
+    .select("id,last_name,first_name,class_name,birth_date");
   if (error) {
     studentsList.textContent = "Ошибка: " + error.message;
     return;
@@ -778,8 +772,13 @@ async function loadStudents() {
     studentsList.textContent = "Ученики пока не добавлены";
     return;
   }
-  studentsList.replaceChildren(...data.map(function (student) {
-    return createSchoolPersonRow(student, student.class_name, "students", loadStudents);
+  studentsList.replaceChildren(...sortPeopleByUpcomingBirthday(data).map(function (student) {
+    return createSchoolPersonRow(
+      student,
+      student.class_name + " · " + formatBirthdayDate(student.birth_date),
+      "students",
+      loadStudents
+    );
   }));
 }
 
@@ -787,9 +786,7 @@ async function loadTeachers() {
   teachersList.textContent = "Загрузка...";
   const { data, error } = await supabaseClient
     .from("teachers")
-    .select("id,last_name,first_name,position")
-    .order("last_name")
-    .order("first_name");
+    .select("id,last_name,first_name,position,birth_date");
   if (error) {
     teachersList.textContent = "Ошибка: " + error.message;
     return;
@@ -798,9 +795,23 @@ async function loadTeachers() {
     teachersList.textContent = "Учителя пока не добавлены";
     return;
   }
-  teachersList.replaceChildren(...data.map(function (teacher) {
-    return createSchoolPersonRow(teacher, teacher.position, "teachers", loadTeachers);
+  teachersList.replaceChildren(...sortPeopleByUpcomingBirthday(data).map(function (teacher) {
+    return createSchoolPersonRow(
+      teacher,
+      teacher.position + " · " + formatBirthdayDate(teacher.birth_date),
+      "teachers",
+      loadTeachers
+    );
   }));
+}
+
+function formatBirthdayDate(value) {
+  if (!value) return "дата рождения не указана";
+  return new Date(value + "T00:00:00").toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
 }
 
 loadStudentsButton.addEventListener("click", loadStudents);
@@ -814,7 +825,8 @@ studentForm.addEventListener("submit", async function (event) {
     user_id: userId,
     last_name: document.querySelector("#student-last-name").value.trim(),
     first_name: document.querySelector("#student-first-name").value.trim(),
-    class_name: document.querySelector("#student-class").value.trim()
+    class_name: document.querySelector("#student-class").value.trim(),
+    birth_date: document.querySelector("#student-birth-date").value
   };
   const button = document.querySelector("#add-student-button");
   button.disabled = true;
@@ -840,7 +852,8 @@ teacherForm.addEventListener("submit", async function (event) {
     user_id: userId,
     last_name: document.querySelector("#teacher-last-name").value.trim(),
     first_name: document.querySelector("#teacher-first-name").value.trim(),
-    position: document.querySelector("#teacher-position").value.trim()
+    position: document.querySelector("#teacher-position").value.trim(),
+    birth_date: document.querySelector("#teacher-birth-date").value
   };
   const button = document.querySelector("#add-teacher-button");
   button.disabled = true;
@@ -859,16 +872,38 @@ teacherForm.addEventListener("submit", async function (event) {
 });
 
 async function readExcelRows(file) {
-  const workbook = XLSX.read(await file.arrayBuffer());
+  const workbook = XLSX.read(await file.arrayBuffer(), { cellDates: true });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   return XLSX.utils.sheet_to_json(sheet, { defval: "" });
 }
 
-function excelText(row, heading) {
+function excelRawValue(row, heading) {
   const key = Object.keys(row).find(function (item) {
     return item.trim().toLocaleLowerCase("ru") === heading.toLocaleLowerCase("ru");
   });
-  return key ? String(row[key]).trim() : "";
+  return key ? row[key] : "";
+}
+
+function excelText(row, heading) {
+  return String(excelRawValue(row, heading) || "").trim();
+}
+
+function excelDate(row, heading) {
+  const value = excelRawValue(row, heading);
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return formatDateForDatabase(value);
+  }
+  if (typeof value === "number") {
+    const parsed = XLSX.SSF.parse_date_code(value);
+    if (parsed) {
+      return [parsed.y, String(parsed.m).padStart(2, "0"), String(parsed.d).padStart(2, "0")].join("-");
+    }
+  }
+  const text = String(value || "").trim();
+  const match = /^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/.exec(text);
+  if (match) return [match[3], match[2].padStart(2, "0"), match[1].padStart(2, "0")].join("-");
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  return "";
 }
 
 async function uploadSchoolPeople(options) {
@@ -917,10 +952,11 @@ uploadStudentsButton.addEventListener("click", function () {
         user_id: userId,
         last_name: excelText(row, "Фамилия"),
         first_name: excelText(row, "Имя"),
-        class_name: excelText(row, "Класс")
+        class_name: excelText(row, "Класс"),
+        birth_date: excelDate(row, "Дата рождения")
       };
     },
-    isValid: row => Boolean(row.last_name && row.first_name && row.class_name),
+    isValid: row => Boolean(row.last_name && row.first_name && row.class_name && row.birth_date),
     reload: loadStudents
   });
 });
@@ -937,10 +973,11 @@ uploadTeachersButton.addEventListener("click", function () {
         user_id: userId,
         last_name: excelText(row, "Фамилия"),
         first_name: excelText(row, "Имя"),
-        position: excelText(row, "Должность")
+        position: excelText(row, "Должность"),
+        birth_date: excelDate(row, "Дата рождения")
       };
     },
-    isValid: row => Boolean(row.last_name && row.first_name && row.position),
+    isValid: row => Boolean(row.last_name && row.first_name && row.position && row.birth_date),
     reload: loadTeachers
   });
 });
