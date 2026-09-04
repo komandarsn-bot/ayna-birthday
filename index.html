@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=18">
+    <link rel="stylesheet" href="style.css?v=19">
   </head>
 
   <body>
@@ -212,7 +212,14 @@
         <h2>База достижений</h2>
         <p>Сначала выберите ученика и мероприятие из подготовленных справочников.</p>
 
-        <section class="achievement-event-manager" aria-labelledby="event-manager-heading">
+        <section class="achievement-reference-manager" aria-labelledby="reference-manager-heading">
+          <div class="achievement-reference-heading">
+            <h3 id="reference-manager-heading">Справочники</h3>
+            <p>Загрузите данные из отдельных файлов или добавьте значения вручную.</p>
+          </div>
+
+          <div class="achievement-reference-grid">
+        <section class="achievement-reference-block" aria-labelledby="event-manager-heading">
           <div>
             <h3 id="event-manager-heading">Справочник мероприятий</h3>
             <p>Excel должен содержать столбец «Наименование мероприятия».</p>
@@ -228,7 +235,7 @@
           <p id="event-manager-message" class="form-message" aria-live="polite"></p>
         </section>
 
-        <section class="achievement-event-manager" aria-labelledby="subject-manager-heading">
+        <section class="achievement-reference-block" aria-labelledby="subject-manager-heading">
           <div>
             <h3 id="subject-manager-heading">Справочник предметов</h3>
             <p>Excel должен содержать столбец «Предмет».</p>
@@ -242,6 +249,8 @@
             <button type="submit" id="add-subject-button">Добавить вручную</button>
           </form>
           <p id="subject-manager-message" class="form-message" aria-live="polite"></p>
+        </section>
+          </div>
         </section>
 
         <form id="achievement-form" class="achievement-form">

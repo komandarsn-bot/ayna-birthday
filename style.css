@@ -414,9 +414,9 @@ input[type="file"] {
   margin-top: 20px;
 }
 
-.achievement-event-manager {
+.achievement-reference-manager {
   display: grid;
-  gap: 14px;
+  gap: 18px;
   margin: 22px 0 28px;
   padding: 20px;
   border: 1px solid #dbe4e1;
@@ -424,14 +424,32 @@ input[type="file"] {
   background: #f8faf9;
 }
 
-.achievement-event-manager h3,
-.achievement-event-manager p {
+.achievement-reference-manager h3,
+.achievement-reference-manager p {
   margin: 0;
 }
 
-.achievement-event-manager > div > p {
+.achievement-reference-heading > p,
+.achievement-reference-block > div > p {
   margin-top: 6px;
   color: #687873;
+}
+
+.achievement-reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.achievement-reference-block {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #d7e2df;
+  border-radius: 11px;
+  background: #ffffff;
 }
 
 .achievement-event-actions {
@@ -633,6 +651,7 @@ input[type="file"] {
   .achievement-form { grid-template-columns: 1fr; }
   .achievement-form .wide-field { grid-column: auto; }
   .achievement-event-actions { grid-template-columns: 1fr; }
+  .achievement-reference-grid { grid-template-columns: 1fr; }
   .school-base-columns { grid-template-columns: 1fr; }
   .birthday-database-columns { grid-template-columns: 1fr; }
   .form-hint { min-height: 0; }
