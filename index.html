@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="stylesheet" href="style.css?v=12">
   </head>
 
   <body>
@@ -76,6 +76,7 @@
     <div class="admin-tabs" role="tablist" aria-label="Разделы личного кабинета">
       <button type="button" id="birthdays-tab" role="tab" aria-selected="true" aria-controls="birthdays-panel">Дни рождения</button>
       <button type="button" id="publications-tab" role="tab" aria-selected="false" aria-controls="publications-panel" tabindex="-1">Публикации</button>
+      <button type="button" id="achievements-tab" role="tab" aria-selected="false" aria-controls="achievements-panel" tabindex="-1">База достижений</button>
     </div>
 
     <div id="birthdays-panel" role="tabpanel" aria-labelledby="birthdays-tab">
@@ -210,12 +211,61 @@
     </section>
     </div>
 
+    <div id="achievements-panel" role="tabpanel" aria-labelledby="achievements-tab" hidden>
+      <section class="card">
+        <h2>База достижений</h2>
+        <p>Заполните сведения об участии ученика в мероприятии.</p>
+
+        <form id="achievement-form" class="achievement-form">
+          <label>Фамилия<input type="text" id="achievement-last-name" required></label>
+          <label>Имя<input type="text" id="achievement-first-name" required></label>
+          <label>Класс<input type="text" id="achievement-class" required placeholder="Например: 8А"></label>
+          <label class="wide-field">Наименование мероприятия<input type="text" id="achievement-event-name" required></label>
+          <label>Приказ<input type="text" id="achievement-order"></label>
+          <label>Стоимость<input type="number" id="achievement-cost" min="0" step="0.01" inputmode="decimal"></label>
+          <label>Предмет<input type="text" id="achievement-subject"></label>
+          <label>Уровень<input type="text" id="achievement-level"></label>
+          <label>Этап<input type="text" id="achievement-stage"></label>
+          <label class="wide-field">Название проекта<input type="text" id="achievement-project-name"></label>
+          <label>Academic / Non Academic
+            <select id="achievement-academic-type">
+              <option value="">Не выбрано</option>
+              <option value="ACADEMIC">Academic</option>
+              <option value="NON ACADEMIC">Non Academic</option>
+            </select>
+          </label>
+          <label>Формат<input type="text" id="achievement-format" placeholder="Очно / онлайн"></label>
+          <label>Место / результат<input type="text" id="achievement-result"></label>
+          <label>ФИО руководителя<input type="text" id="achievement-supervisor"></label>
+          <label>Организаторы<input type="text" id="achievement-organizers"></label>
+          <label>Дата проведения<input type="date" id="achievement-date"></label>
+          <label>Ссылка<input type="url" id="achievement-link" placeholder="https://..."></label>
+          <label>Город<input type="text" id="achievement-city"></label>
+
+          <div class="achievement-form-actions wide-field">
+            <button type="submit" id="save-achievement-button">Сохранить достижение</button>
+            <p id="achievement-message" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="achievement-list-header">
+          <h2>Сохранённые достижения</h2>
+          <button type="button" id="load-achievements-button">Обновить список</button>
+        </div>
+        <div id="achievements-list" class="achievement-table-wrap">
+          <p>Загрузка данных…</p>
+        </div>
+      </section>
+    </div>
+
   </div>
 </main>
   
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=14"></script>
+    <script src="script.js?v=15"></script>
   </body>
 </html>

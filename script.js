@@ -92,6 +92,11 @@ const addNewsButton = document.querySelector("#add-news-button");
 const loadNewsButton = document.querySelector("#load-news-button");
 const newsMessage = document.querySelector("#news-message");
 const newsList = document.querySelector("#news-list");
+const achievementForm = document.querySelector("#achievement-form");
+const saveAchievementButton = document.querySelector("#save-achievement-button");
+const achievementMessage = document.querySelector("#achievement-message");
+const loadAchievementsButton = document.querySelector("#load-achievements-button");
+const achievementsList = document.querySelector("#achievements-list");
 
 let editingNewsId = null;
 let editingNewsImagePaths = [];
@@ -148,6 +153,7 @@ function updateAuthView(session) {
     currentUserEmail.textContent =
       session.user.email === ADMIN_EMAIL ? "admin" : "Вы вошли в аккаунт";
     loadNewsButton.click();
+    loadAchievementsButton.click();
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -837,6 +843,174 @@ if (saveError) {
 
 alert(`В базу сохранено записей: ${databaseRows.length}`);
 
+});
+
+const achievementColumns = [
+  ["last_name", "Ф"],
+  ["first_name", "И"],
+  ["class_name", "Класс"],
+  ["event_name", "Наименование мероприятия"],
+  ["order_reference", "Приказ"],
+  ["cost", "Стоимость"],
+  ["subject", "Предмет"],
+  ["achievement_level", "Уровень"],
+  ["event_stage", "Этап"],
+  ["project_name", "Название проекта"],
+  ["academic_type", "Academic / Non Academic"],
+  ["event_format", "Формат"],
+  ["result", "Место / результат"],
+  ["supervisor_name", "ФИО руководителя"],
+  ["organizers", "Организаторы"],
+  ["event_date", "Дата проведения"],
+  ["link_url", "Ссылка"],
+  ["city", "Город"]
+];
+
+function achievementValue(id) {
+  const value = document.querySelector(id).value.trim();
+  return value || null;
+}
+
+function formatAchievementCell(key, value) {
+  if (value === null || value === undefined || value === "") return "—";
+  if (key === "cost") {
+    return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
+  }
+  if (key === "event_date") {
+    return new Date(value + "T00:00:00").toLocaleDateString("ru-RU");
+  }
+  return String(value);
+}
+
+async function loadAchievements() {
+  achievementsList.textContent = "Загрузка...";
+
+  const { data: achievements, error } = await supabaseClient
+    .from("achievements")
+    .select("*")
+    .order("event_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    achievementsList.textContent = "Ошибка: " + error.message;
+    return;
+  }
+
+  if (!achievements.length) {
+    achievementsList.textContent = "Достижений пока нет";
+    return;
+  }
+
+  const table = document.createElement("table");
+  table.className = "achievement-table";
+  const head = document.createElement("thead");
+  const headRow = document.createElement("tr");
+
+  achievementColumns.forEach(function ([, label]) {
+    const cell = document.createElement("th");
+    cell.scope = "col";
+    cell.textContent = label;
+    headRow.append(cell);
+  });
+  const actionsHead = document.createElement("th");
+  actionsHead.scope = "col";
+  actionsHead.textContent = "Действия";
+  headRow.append(actionsHead);
+  head.append(headRow);
+
+  const body = document.createElement("tbody");
+  achievements.forEach(function (achievement) {
+    const row = document.createElement("tr");
+    achievementColumns.forEach(function ([key]) {
+      const cell = document.createElement("td");
+      if (key === "link_url" && achievement[key]) {
+        const link = document.createElement("a");
+        link.href = achievement[key];
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Открыть";
+        cell.append(link);
+      } else {
+        cell.textContent = formatAchievementCell(key, achievement[key]);
+      }
+      row.append(cell);
+    });
+
+    const actionsCell = document.createElement("td");
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "delete-button compact-button";
+    deleteButton.textContent = "Удалить";
+    deleteButton.addEventListener("click", async function () {
+      if (!confirm("Удалить это достижение?")) return;
+      deleteButton.disabled = true;
+      const { error: deleteError } = await supabaseClient
+        .from("achievements")
+        .delete()
+        .eq("id", achievement.id);
+      if (deleteError) {
+        alert("Ошибка удаления: " + deleteError.message);
+        deleteButton.disabled = false;
+        return;
+      }
+      row.remove();
+    });
+    actionsCell.append(deleteButton);
+    row.append(actionsCell);
+    body.append(row);
+  });
+
+  table.append(head, body);
+  achievementsList.replaceChildren(table);
+}
+
+loadAchievementsButton.addEventListener("click", loadAchievements);
+
+achievementForm.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) {
+    achievementMessage.textContent = "Сначала войдите в аккаунт";
+    return;
+  }
+
+  const costValue = document.querySelector("#achievement-cost").value;
+  const achievement = {
+    user_id: sessionData.session.user.id,
+    last_name: achievementValue("#achievement-last-name"),
+    first_name: achievementValue("#achievement-first-name"),
+    class_name: achievementValue("#achievement-class"),
+    event_name: achievementValue("#achievement-event-name"),
+    order_reference: achievementValue("#achievement-order"),
+    cost: costValue === "" ? null : Number(costValue),
+    subject: achievementValue("#achievement-subject"),
+    achievement_level: achievementValue("#achievement-level"),
+    event_stage: achievementValue("#achievement-stage"),
+    project_name: achievementValue("#achievement-project-name"),
+    academic_type: achievementValue("#achievement-academic-type"),
+    event_format: achievementValue("#achievement-format"),
+    result: achievementValue("#achievement-result"),
+    supervisor_name: achievementValue("#achievement-supervisor"),
+    organizers: achievementValue("#achievement-organizers"),
+    event_date: achievementValue("#achievement-date"),
+    link_url: achievementValue("#achievement-link"),
+    city: achievementValue("#achievement-city")
+  };
+
+  saveAchievementButton.disabled = true;
+  achievementMessage.textContent = "Сохраняем...";
+  const { error } = await supabaseClient.from("achievements").insert(achievement);
+  saveAchievementButton.disabled = false;
+
+  if (error) {
+    achievementMessage.textContent = "Ошибка: " + error.message;
+    return;
+  }
+
+  achievementForm.reset();
+  achievementMessage.textContent = "Достижение сохранено";
+  loadAchievements();
 });
 
 async function restoreSession() {
