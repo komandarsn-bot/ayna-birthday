@@ -792,20 +792,88 @@ async function loadStudents() {
   }));
 }
 
-function replaceDatalistOptions(datalist, values, getLabel) {
-  const uniqueValues = [...new Set(values)];
-  datalist.replaceChildren(...uniqueValues.map(function (value) {
-    const option = document.createElement("option");
-    option.value = value;
-    if (getLabel) option.label = getLabel(value);
-    return option;
-  }));
+function updateAchievementLastNameSuggestions() {
+  if (document.activeElement === achievementLastName) showLastNameSuggestions();
 }
 
-function updateAchievementLastNameSuggestions() {
-  replaceDatalistOptions(
+function closeSuggestionMenu(input, menu) {
+  menu.hidden = true;
+  menu.replaceChildren();
+  input.setAttribute("aria-expanded", "false");
+}
+
+function renderSuggestionMenu(input, menu, items, onSelect) {
+  menu.replaceChildren();
+  if (!items.length) {
+    const empty = document.createElement("span");
+    empty.className = "student-suggestion-empty";
+    empty.textContent = "Совпадений не найдено";
+    menu.append(empty);
+  } else {
+    items.slice(0, 7).forEach(function (item) {
+      const option = document.createElement("button");
+      option.type = "button";
+      option.className = "student-suggestion-option";
+      option.setAttribute("role", "option");
+      const primary = document.createElement("strong");
+      primary.textContent = item.label;
+      option.append(primary);
+      if (item.detail) {
+        const detail = document.createElement("span");
+        detail.textContent = item.detail;
+        option.append(detail);
+      }
+      option.addEventListener("mousedown", event => event.preventDefault());
+      option.addEventListener("click", function () {
+        onSelect(item);
+        closeSuggestionMenu(input, menu);
+      });
+      menu.append(option);
+    });
+  }
+  menu.hidden = false;
+  input.setAttribute("aria-expanded", "true");
+}
+
+function showLastNameSuggestions() {
+  const query = achievementLastName.value.trim().toLocaleLowerCase("ru");
+  const lastNames = [...new Set(achievementStudents.map(student => student.last_name))]
+    .filter(Boolean)
+    .filter(lastName => lastName.toLocaleLowerCase("ru").includes(query))
+    .sort((a, b) => a.localeCompare(b, "ru"));
+  renderSuggestionMenu(
+    achievementLastName,
     achievementLastNames,
-    achievementStudents.map(student => student.last_name).filter(Boolean)
+    lastNames.map(lastName => ({ label: lastName })),
+    item => {
+      achievementLastName.value = item.label;
+      chooseAchievementLastName(false);
+      achievementFirstName.focus();
+      showFirstNameSuggestions();
+    }
+  );
+}
+
+function showFirstNameSuggestions() {
+  const lastName = achievementLastName.value.trim().toLocaleLowerCase("ru");
+  const query = achievementFirstName.value.trim().toLocaleLowerCase("ru");
+  const matches = achievementStudents
+    .filter(student => student.last_name.toLocaleLowerCase("ru") === lastName)
+    .filter(student => student.first_name.toLocaleLowerCase("ru").includes(query))
+    .sort((a, b) => a.first_name.localeCompare(b.first_name, "ru"));
+  renderSuggestionMenu(
+    achievementFirstName,
+    achievementFirstNames,
+    matches.map(student => ({
+      label: student.first_name,
+      detail: student.class_name,
+      student: student
+    })),
+    item => {
+      achievementFirstName.value = item.student.first_name;
+      selectedAchievementStudent = item.student;
+      achievementClass.value = item.student.class_name;
+    }
   );
 }
 
@@ -815,11 +883,12 @@ function resetAchievementStudentSelection(clearLastName = false) {
   achievementFirstName.value = "";
   achievementFirstName.disabled = true;
   achievementFirstName.placeholder = "Сначала выберите фамилию";
-  achievementFirstNames.replaceChildren();
+  closeSuggestionMenu(achievementLastName, achievementLastNames);
+  closeSuggestionMenu(achievementFirstName, achievementFirstNames);
   achievementClass.value = "";
 }
 
-function chooseAchievementLastName() {
+function chooseAchievementLastName(showSuggestions = true) {
   selectedAchievementStudent = null;
   achievementClass.value = "";
   achievementFirstName.value = "";
@@ -829,14 +898,8 @@ function chooseAchievementLastName() {
   });
   achievementFirstName.disabled = matches.length === 0;
   achievementFirstName.placeholder = matches.length ? "Выберите имя" : "Сначала выберите фамилию";
-  replaceDatalistOptions(
-    achievementFirstNames,
-    matches.map(student => student.first_name),
-    firstName => {
-      const student = matches.find(item => item.first_name === firstName);
-      return student ? student.class_name : "";
-    }
-  );
+  closeSuggestionMenu(achievementFirstName, achievementFirstNames);
+  if (showSuggestions) showLastNameSuggestions();
 }
 
 function chooseAchievementFirstName() {
@@ -851,8 +914,33 @@ function chooseAchievementFirstName() {
     : "";
 }
 
-achievementLastName.addEventListener("input", chooseAchievementLastName);
-achievementFirstName.addEventListener("input", chooseAchievementFirstName);
+achievementLastName.addEventListener("input", () => chooseAchievementLastName(true));
+achievementLastName.addEventListener("focus", showLastNameSuggestions);
+achievementFirstName.addEventListener("input", function () {
+  chooseAchievementFirstName();
+  showFirstNameSuggestions();
+});
+achievementFirstName.addEventListener("focus", showFirstNameSuggestions);
+
+[achievementLastName, achievementFirstName].forEach(function (input) {
+  input.addEventListener("keydown", function (event) {
+    const menu = input === achievementLastName ? achievementLastNames : achievementFirstNames;
+    if (event.key === "Escape") closeSuggestionMenu(input, menu);
+    if (event.key === "ArrowDown" && !menu.hidden) {
+      const firstOption = menu.querySelector("button");
+      if (firstOption) {
+        event.preventDefault();
+        firstOption.focus();
+      }
+    }
+  });
+  input.addEventListener("blur", function () {
+    setTimeout(() => closeSuggestionMenu(
+      input,
+      input === achievementLastName ? achievementLastNames : achievementFirstNames
+    ), 120);
+  });
+});
 
 async function loadTeachers() {
   teachersList.textContent = "Загрузка...";

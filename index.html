@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=15">
+    <link rel="stylesheet" href="style.css?v=16">
   </head>
 
   <body>
@@ -214,12 +214,16 @@
 
         <form id="achievement-form" class="achievement-form">
           <label>Фамилия
-            <input type="text" id="achievement-last-name" list="achievement-last-names" required autocomplete="off" placeholder="Начните вводить фамилию">
-            <datalist id="achievement-last-names"></datalist>
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-last-name" required autocomplete="off" placeholder="Начните вводить фамилию" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-last-names">
+              <span id="achievement-last-names" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
           </label>
           <label>Имя
-            <input type="text" id="achievement-first-name" list="achievement-first-names" required autocomplete="off" disabled placeholder="Сначала выберите фамилию">
-            <datalist id="achievement-first-names"></datalist>
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-first-name" required autocomplete="off" disabled placeholder="Сначала выберите фамилию" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-first-names">
+              <span id="achievement-first-names" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
           </label>
           <label>Класс<input type="text" id="achievement-class" required readonly placeholder="Заполнится автоматически"></label>
           <label class="wide-field">Наименование мероприятия<input type="text" id="achievement-event-name" required></label>
@@ -268,6 +272,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=18"></script>
+    <script src="script.js?v=19"></script>
   </body>
 </html>
