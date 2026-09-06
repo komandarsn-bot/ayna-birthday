@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=22">
+    <link rel="stylesheet" href="style.css?v=23">
   </head>
 
   <body>
@@ -290,15 +290,38 @@
             </span>
           </label>
           <label>Приказ<input type="text" id="achievement-order"></label>
-          <label>Стоимость<input type="number" id="achievement-cost" min="0" step="0.01" inputmode="decimal"></label>
+          <label>Стоимость
+            <span class="achievement-currency-input">
+              <input type="number" id="achievement-cost" min="0" step="0.01" inputmode="decimal" aria-label="Стоимость в тенге">
+              <span aria-hidden="true">₸</span>
+            </span>
+          </label>
           <label>Предмет
             <span class="student-autocomplete">
               <input type="text" id="achievement-subject" required autocomplete="off" placeholder="Начните вводить предмет" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-subject-names">
               <span id="achievement-subject-names" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
-          <label>Уровень<input type="text" id="achievement-level"></label>
-          <label>Этап<input type="text" id="achievement-stage"></label>
+          <label>Уровень
+            <select id="achievement-level">
+              <option value="">Не выбрано</option>
+              <option value="Международный">Международный</option>
+              <option value="Республиканский">Республиканский</option>
+              <option value="Городской">Городской</option>
+              <option value="Районный">Районный</option>
+              <option value="Школьный">Школьный</option>
+            </select>
+          </label>
+          <label>Этап
+            <select id="achievement-stage">
+              <option value="">Не выбрано</option>
+              <option value="Международный">Международный</option>
+              <option value="Республиканский">Республиканский</option>
+              <option value="Городской">Городской</option>
+              <option value="Районный">Районный</option>
+              <option value="Школьный">Школьный</option>
+            </select>
+          </label>
           <label class="wide-field">Название проекта<input type="text" id="achievement-project-name"></label>
           <label>Academic / Non Academic
             <select id="achievement-academic-type">
@@ -344,6 +367,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=22"></script>
+    <script src="script.js?v=23"></script>
   </body>
 </html>

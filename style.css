@@ -656,6 +656,26 @@ input[type="file"] {
   cursor: not-allowed;
 }
 
+.achievement-currency-input {
+  position: relative;
+  display: block;
+}
+
+.achievement-currency-input input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.achievement-currency-input > span {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  color: #40534e;
+  font-weight: 800;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
 .student-autocomplete {
   position: relative;
   display: block;

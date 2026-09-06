@@ -1470,7 +1470,7 @@ const achievementColumns = [
   ["class_name", "Класс"],
   ["event_name", "Наименование мероприятия"],
   ["order_reference", "Приказ"],
-  ["cost", "Стоимость"],
+  ["cost", "Стоимость, ₸"],
   ["subject", "Предмет"],
   ["achievement_level", "Уровень"],
   ["event_stage", "Этап"],
@@ -1493,7 +1493,12 @@ function achievementValue(id) {
 function formatAchievementCell(key, value) {
   if (value === null || value === undefined || value === "") return "—";
   if (key === "cost") {
-    return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
+    return new Intl.NumberFormat("ru-RU", {
+      style: "currency",
+      currency: "KZT",
+      currencyDisplay: "narrowSymbol",
+      maximumFractionDigits: 2
+    }).format(value);
   }
   if (key === "event_date") {
     return new Date(value + "T00:00:00").toLocaleDateString("ru-RU");
