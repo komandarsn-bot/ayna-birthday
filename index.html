@@ -232,7 +232,7 @@
           </summary>
 
           <div class="achievement-reference-content">
-            <p>Загрузите мероприятия из Excel или добавьте нужное название вручную.</p>
+            <p>Загрузите список мероприятий из Excel.</p>
             <div class="achievement-reference-grid">
         <section class="achievement-reference-block" aria-labelledby="event-manager-heading">
           <div>
@@ -243,10 +243,6 @@
             <input type="file" id="events-excel-file" accept=".xlsx,.xls">
             <button type="button" id="upload-events-button">Загрузить Excel</button>
           </div>
-          <form id="event-form" class="achievement-event-actions">
-            <textarea id="new-event-name" required maxlength="300" rows="3" placeholder="Введите название олимпиады или мероприятия" aria-label="Название нового мероприятия"></textarea>
-            <button type="submit" id="add-event-button">Добавить вручную</button>
-          </form>
           <p id="event-manager-message" class="form-message" aria-live="polite"></p>
         </section>
             </div>
@@ -272,6 +268,7 @@
               <input type="text" id="achievement-event-name" required autocomplete="off" placeholder="Начните вводить название" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-event-names">
               <span id="achievement-event-names" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
+            <small>Если нужного мероприятия нет, его можно сразу добавить в список.</small>
           </label>
           <label>Приказ<input type="text" id="achievement-order"></label>
           <label>Стоимость
@@ -307,7 +304,7 @@
               <option value="Школьный">Школьный</option>
             </select>
           </label>
-          <label class="wide-field">Вид достижения
+          <label>Вид достижения
             <span class="student-autocomplete">
               <input type="text" id="achievement-type" required autocomplete="off" placeholder="Например: олимпиада или конкурс" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-types">
               <span id="achievement-types" class="student-suggestion-menu" role="listbox" hidden></span>
@@ -374,6 +371,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=28"></script>
+    <script src="script.js?v=29"></script>
   </body>
 </html>

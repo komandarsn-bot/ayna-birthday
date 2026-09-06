@@ -96,9 +96,6 @@ const achievementEventName = document.querySelector("#achievement-event-name");
 const achievementEventNames = document.querySelector("#achievement-event-names");
 const eventsExcelFile = document.querySelector("#events-excel-file");
 const uploadEventsButton = document.querySelector("#upload-events-button");
-const eventForm = document.querySelector("#event-form");
-const newEventName = document.querySelector("#new-event-name");
-const addEventButton = document.querySelector("#add-event-button");
 const eventManagerMessage = document.querySelector("#event-manager-message");
 const achievementSubject = document.querySelector("#achievement-subject");
 const achievementSubjectNames = document.querySelector("#achievement-subject-names");
@@ -1417,6 +1414,20 @@ function showEventSuggestions() {
       });
     }
   );
+
+  const value = achievementEventName.value.trim();
+  const exactMatch = achievementEvents.some(function (item) {
+    return item.name.toLocaleLowerCase("ru") === query;
+  });
+  if (value && !exactMatch) {
+    const addOption = document.createElement("button");
+    addOption.type = "button";
+    addOption.className = "student-suggestion-option suggestion-add-option";
+    addOption.textContent = "+ Добавить «" + value + "» в список";
+    addOption.addEventListener("mousedown", event => event.preventDefault());
+    addOption.addEventListener("click", () => addAchievementEvent(value, addOption));
+    achievementEventNames.append(addOption);
+  }
 }
 
 function chooseAchievementEvent() {
@@ -1445,25 +1456,25 @@ achievementEventName.addEventListener("blur", function () {
   setTimeout(() => closeSuggestionMenu(achievementEventName, achievementEventNames), 120);
 });
 
-eventForm.addEventListener("submit", async function (event) {
-  event.preventDefault();
-  const userId = await getCurrentUserId(eventManagerMessage);
+async function addAchievementEvent(name, button) {
+  const userId = await getCurrentUserId(achievementMessage);
   if (!userId) return;
-  const name = newEventName.value.trim();
-  addEventButton.disabled = true;
-  eventManagerMessage.textContent = "Сохраняем мероприятие...";
+  button.disabled = true;
+  achievementMessage.textContent = "Добавляем новое мероприятие...";
   const { error } = await supabaseClient
     .from("achievement_events")
     .upsert({ user_id: userId, name: name }, { onConflict: "user_id,name" });
-  addEventButton.disabled = false;
   if (error) {
-    eventManagerMessage.textContent = "Ошибка: " + error.message;
+    achievementMessage.textContent = "Ошибка: " + error.message;
+    button.disabled = false;
     return;
   }
-  eventForm.reset();
-  eventManagerMessage.textContent = "Мероприятие добавлено";
-  loadAchievementEvents();
-});
+  await loadAchievementEvents();
+  achievementEventName.value = name;
+  chooseAchievementEvent();
+  closeSuggestionMenu(achievementEventName, achievementEventNames);
+  achievementMessage.textContent = "Новое мероприятие добавлено в список";
+}
 
 uploadEventsButton.addEventListener("click", async function () {
   const file = eventsExcelFile.files[0];
