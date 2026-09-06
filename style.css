@@ -515,7 +515,7 @@ input[type="file"] {
   top: 10px;
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(130px, 0.6fr);
   gap: 16px;
   margin: -8px -10px 0;
   padding: 10px;
