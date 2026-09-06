@@ -110,12 +110,6 @@ const achievementResult = document.querySelector("#achievement-result");
 const achievementResultsMenu = document.querySelector("#achievement-results");
 const achievementStartDate = document.querySelector("#achievement-date");
 const achievementEndDate = document.querySelector("#achievement-end-date");
-const subjectsExcelFile = document.querySelector("#subjects-excel-file");
-const uploadSubjectsButton = document.querySelector("#upload-subjects-button");
-const subjectForm = document.querySelector("#subject-form");
-const newSubjectName = document.querySelector("#new-subject-name");
-const addSubjectButton = document.querySelector("#add-subject-button");
-const subjectManagerMessage = document.querySelector("#subject-manager-message");
 
 let achievementStudents = [];
 let selectedAchievementStudent = null;
@@ -129,6 +123,38 @@ let achievementTypes = [];
 let selectedAchievementType = null;
 let achievementResults = [];
 let selectedAchievementResult = null;
+
+const defaultAchievementSubjectNames = [
+  "Әліппе",
+  "Ана тілі",
+  "Әдебиеттік оқу",
+  "Казахский язык",
+  "Казахская литература",
+  "Казахский язык и литература",
+  "Русский язык",
+  "Русская литература",
+  "Русский язык и литература",
+  "Английский язык",
+  "Иностранный язык",
+  "Математика",
+  "Алгебра",
+  "Геометрия",
+  "Естествознание",
+  "Физика",
+  "Химия",
+  "Биология",
+  "География",
+  "Познание мира",
+  "История Казахстана",
+  "Всемирная история",
+  "Основы права",
+  "Цифровая грамотность и искусственный интеллект",
+  "Информатика и искусственный интеллект",
+  "Художественный труд",
+  "Музыка",
+  "Физическая культура",
+  "Начальная военная и технологическая подготовка"
+];
 
 const defaultAchievementTypeNames = [
   "Олимпиада",
@@ -1472,16 +1498,41 @@ uploadEventsButton.addEventListener("click", async function () {
   }
 });
 
-async function loadAchievementSubjects() {
-  const { data, error } = await supabaseClient
+async function loadAchievementSubjects(selectedName = "") {
+  const { data: loadedSubjects, error } = await supabaseClient
     .from("achievement_subjects")
     .select("id,name")
     .order("name");
-  if (error) {
-    subjectManagerMessage.textContent = "Ошибка загрузки предметов: " + error.message;
-    return;
+
+  let storedSubjects = error ? [] : (loadedSubjects || []);
+  if (!error && !storedSubjects.length) {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const userId = sessionData.session?.user?.id;
+    if (userId) {
+      const { data: addedSubjects, error: seedError } = await supabaseClient
+        .from("achievement_subjects")
+        .upsert(
+          defaultAchievementSubjectNames.map(name => ({ user_id: userId, name: name })),
+          { onConflict: "user_id,name" }
+        )
+        .select("id,name");
+      if (!seedError && addedSubjects) storedSubjects = addedSubjects;
+    }
   }
-  achievementSubjects = data || [];
+
+  if (error) {
+    achievementSubjects = defaultAchievementSubjectNames.map(function (name) {
+      return { id: null, name: name, builtIn: true };
+    });
+  } else {
+    achievementSubjects = storedSubjects;
+  }
+  achievementSubjects.sort((a, b) => a.name.localeCompare(b.name, "ru"));
+
+  if (selectedName) {
+    achievementSubject.value = selectedName;
+    chooseAchievementSubject();
+  }
   if (document.activeElement === achievementSubject) showSubjectSuggestions();
 }
 
@@ -1511,6 +1562,22 @@ function showSubjectSuggestions() {
       });
     }
   );
+
+  const value = achievementSubject.value.trim();
+  const exactMatch = achievementSubjects.some(function (item) {
+    return item.name.toLocaleLowerCase("ru") === query;
+  });
+  if (value && !exactMatch) {
+    const addOption = document.createElement("button");
+    addOption.type = "button";
+    addOption.className = "student-suggestion-option suggestion-add-option";
+    addOption.textContent = "+ Добавить «" + value + "» в список";
+    addOption.addEventListener("mousedown", event => event.preventDefault());
+    addOption.addEventListener("click", function () {
+      addAchievementSubject(value, addOption);
+    });
+    achievementSubjectNames.append(addOption);
+  }
 }
 
 function chooseAchievementSubject() {
@@ -1539,58 +1606,23 @@ achievementSubject.addEventListener("blur", function () {
   setTimeout(() => closeSuggestionMenu(achievementSubject, achievementSubjectNames), 120);
 });
 
-subjectForm.addEventListener("submit", async function (event) {
-  event.preventDefault();
-  const userId = await getCurrentUserId(subjectManagerMessage);
+async function addAchievementSubject(name, button) {
+  const userId = await getCurrentUserId(achievementMessage);
   if (!userId) return;
-  const name = newSubjectName.value.trim();
-  addSubjectButton.disabled = true;
-  subjectManagerMessage.textContent = "Сохраняем предмет...";
+  button.disabled = true;
+  achievementMessage.textContent = "Добавляем новый предмет...";
   const { error } = await supabaseClient
     .from("achievement_subjects")
     .upsert({ user_id: userId, name: name }, { onConflict: "user_id,name" });
-  addSubjectButton.disabled = false;
   if (error) {
-    subjectManagerMessage.textContent = "Ошибка: " + error.message;
+    achievementMessage.textContent = "Не удалось сохранить предмет: " + error.message;
+    button.disabled = false;
     return;
   }
-  subjectForm.reset();
-  subjectManagerMessage.textContent = "Предмет добавлен";
-  loadAchievementSubjects();
-});
-
-uploadSubjectsButton.addEventListener("click", async function () {
-  const file = subjectsExcelFile.files[0];
-  if (!file) {
-    subjectManagerMessage.textContent = "Сначала выберите Excel-файл";
-    return;
-  }
-  const userId = await getCurrentUserId(subjectManagerMessage);
-  if (!userId) return;
-  uploadSubjectsButton.disabled = true;
-  subjectManagerMessage.textContent = "Читаем список предметов...";
-  try {
-    const names = [...new Set((await readExcelRows(file))
-      .map(row => excelText(row, "Предмет"))
-      .filter(Boolean))];
-    const rows = names.map(name => ({ user_id: userId, name: name }));
-    if (!rows.length) {
-      subjectManagerMessage.textContent = "Не найден столбец «Предмет» или он пустой";
-      return;
-    }
-    const { error } = await supabaseClient
-      .from("achievement_subjects")
-      .upsert(rows, { onConflict: "user_id,name" });
-    if (error) throw error;
-    subjectsExcelFile.value = "";
-    subjectManagerMessage.textContent = "Загружено предметов: " + rows.length;
-    loadAchievementSubjects();
-  } catch (error) {
-    subjectManagerMessage.textContent = "Ошибка: " + error.message;
-  } finally {
-    uploadSubjectsButton.disabled = false;
-  }
-});
+  await loadAchievementSubjects(name);
+  closeSuggestionMenu(achievementSubject, achievementSubjectNames);
+  achievementMessage.textContent = "Новый предмет добавлен в список";
+}
 
 async function loadAchievementTypes(selectedName = "") {
   const { data: loadedTypes, error } = await supabaseClient

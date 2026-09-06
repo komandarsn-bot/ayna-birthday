@@ -107,6 +107,22 @@ create policy "achievement_subjects_owner_all" on public.achievement_subjects
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+insert into public.achievement_subjects (user_id, name)
+select users.id, subjects.name
+from auth.users as users
+cross join (values
+  ('Әліппе'), ('Ана тілі'), ('Әдебиеттік оқу'),
+  ('Казахский язык'), ('Казахская литература'), ('Казахский язык и литература'),
+  ('Русский язык'), ('Русская литература'), ('Русский язык и литература'),
+  ('Английский язык'), ('Иностранный язык'), ('Математика'), ('Алгебра'),
+  ('Геометрия'), ('Естествознание'), ('Физика'), ('Химия'), ('Биология'),
+  ('География'), ('Познание мира'), ('История Казахстана'), ('Всемирная история'),
+  ('Основы права'), ('Цифровая грамотность и искусственный интеллект'),
+  ('Информатика и искусственный интеллект'), ('Художественный труд'), ('Музыка'),
+  ('Физическая культура'), ('Начальная военная и технологическая подготовка')
+) as subjects(name)
+on conflict (user_id, name) do nothing;
+
 drop policy if exists "achievement_types_owner_all" on public.achievement_types;
 create policy "achievement_types_owner_all" on public.achievement_types
   for all to authenticated
