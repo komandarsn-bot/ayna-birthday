@@ -483,9 +483,21 @@ input[type="file"] {
 
 .achievement-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
   margin-top: 20px;
+}
+
+.achievement-form > label {
+  grid-column: 1 / -1;
+}
+
+.achievement-form > .third-field {
+  grid-column: span 2;
+}
+
+.achievement-form > .half-field {
+  grid-column: span 3;
 }
 
 .achievement-reference-manager {
@@ -877,6 +889,9 @@ input[type="file"] {
   .news-row-placeholder { width: 100%; height: 100px; }
   .news-actions { width: 100%; flex-direction: row; flex-wrap: wrap; }
   .achievement-form { grid-template-columns: 1fr; }
+  .achievement-form > label,
+  .achievement-form > .third-field,
+  .achievement-form > .half-field,
   .achievement-form .wide-field { grid-column: auto; }
   .achievement-date-range { grid-template-columns: 1fr; }
   .achievement-event-actions { grid-template-columns: 1fr; }
