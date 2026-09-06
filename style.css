@@ -500,6 +500,30 @@ input[type="file"] {
   grid-column: span 3;
 }
 
+.achievement-student-row {
+  position: sticky;
+  z-index: 12;
+  top: 10px;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: -8px -10px 0;
+  padding: 10px;
+  border: 1px solid #dbe4e1;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 8px 22px rgba(23, 58, 53, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.achievement-student-row > label {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  font-weight: 700;
+}
+
 .achievement-reference-manager {
   margin: 22px 0 28px;
   border: 1px solid #dbe4e1;
@@ -893,6 +917,17 @@ input[type="file"] {
   .achievement-form > .third-field,
   .achievement-form > .half-field,
   .achievement-form .wide-field { grid-column: auto; }
+  .achievement-student-row {
+    position: static;
+    grid-column: auto;
+    grid-template-columns: 1fr;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
   .achievement-date-range { grid-template-columns: 1fr; }
   .achievement-event-actions { grid-template-columns: 1fr; }
   .achievement-reference-grid { grid-template-columns: 1fr; }

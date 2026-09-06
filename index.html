@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=28">
+    <link rel="stylesheet" href="style.css?v=29">
   </head>
 
   <body>
@@ -250,19 +250,21 @@
         </details>
 
         <form id="achievement-form" class="achievement-form">
-          <label class="third-field">Фамилия
-            <span class="student-autocomplete">
-              <input type="text" id="achievement-last-name" required autocomplete="off" placeholder="Начните вводить фамилию" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-last-names">
-              <span id="achievement-last-names" class="student-suggestion-menu" role="listbox" hidden></span>
-            </span>
-          </label>
-          <label class="third-field">Имя
-            <span class="student-autocomplete">
-              <input type="text" id="achievement-first-name" required autocomplete="off" placeholder="Начните вводить имя" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-first-names">
-              <span id="achievement-first-names" class="student-suggestion-menu" role="listbox" hidden></span>
-            </span>
-          </label>
-          <label class="third-field">Класс<input type="text" id="achievement-class" required readonly placeholder="Заполнится автоматически"></label>
+          <div class="achievement-student-row">
+            <label>Фамилия
+              <span class="student-autocomplete">
+                <input type="text" id="achievement-last-name" required autocomplete="off" placeholder="Начните вводить фамилию" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-last-names">
+                <span id="achievement-last-names" class="student-suggestion-menu" role="listbox" hidden></span>
+              </span>
+            </label>
+            <label>Имя
+              <span class="student-autocomplete">
+                <input type="text" id="achievement-first-name" required autocomplete="off" placeholder="Начните вводить имя" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-first-names">
+                <span id="achievement-first-names" class="student-suggestion-menu" role="listbox" hidden></span>
+              </span>
+            </label>
+            <label>Класс<input type="text" id="achievement-class" required readonly placeholder="Заполнится автоматически"></label>
+          </div>
           <label class="wide-field">Наименование мероприятия
             <span class="student-autocomplete">
               <input type="text" id="achievement-event-name" required autocomplete="off" placeholder="Начните вводить название" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-event-names">
