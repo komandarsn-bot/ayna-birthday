@@ -500,16 +500,10 @@ input[type="file"] {
   grid-column: span 3;
 }
 
-.achievement-section-title {
-  margin-top: 10px;
-  padding: 11px 14px;
-  border-left: 4px solid #e8bd3f;
-  border-radius: 0 8px 8px 0;
-  background: #f5f8f7;
-  color: #174a42;
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
+.achievement-group-divider {
+  height: 1px;
+  margin: 8px 0 2px;
+  background: linear-gradient(90deg, transparent, #d7e2df 8%, #d7e2df 92%, transparent);
 }
 
 .achievement-student-row {
@@ -929,7 +923,7 @@ input[type="file"] {
   .achievement-form > .third-field,
   .achievement-form > .half-field,
   .achievement-form .wide-field { grid-column: auto; }
-  .achievement-section-title { grid-column: auto; }
+  .achievement-group-divider { grid-column: auto; }
   .achievement-student-row {
     position: static;
     grid-column: auto;
