@@ -88,19 +88,93 @@ input[type="file"] {
 
 [role="tabpanel"][hidden] { display: none; }
 
-.school-base-heading h2,
-.school-base-heading p {
-  margin-top: 0;
+.school-base-manager {
+  padding: 0;
+  overflow: hidden;
 }
 
-.school-base-heading p {
-  margin-bottom: 20px;
+.school-base-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 30px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.school-base-summary::-webkit-details-marker {
+  display: none;
+}
+
+.school-base-summary::marker {
+  content: "";
+}
+
+.school-base-summary > span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.school-base-summary strong {
+  font-size: 1.35rem;
+}
+
+.school-base-summary small,
+.school-base-content > p {
   color: #687873;
+}
+
+.school-base-summary-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #174a42;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.school-base-summary-action::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 180ms ease;
+}
+
+.school-base-close-label {
+  display: none;
+}
+
+.school-base-manager[open] .school-base-open-label {
+  display: none;
+}
+
+.school-base-manager[open] .school-base-close-label {
+  display: inline;
+}
+
+.school-base-manager[open] .school-base-summary-action::after {
+  transform: rotate(225deg) translate(-2px, -2px);
+}
+
+.school-base-content {
+  display: grid;
+  gap: 18px;
+  padding: 22px 30px 30px;
+  border-top: 1px solid #dbe4e1;
+}
+
+.school-base-content > p {
+  margin: 0;
 }
 
 .school-base-columns {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
 }
 

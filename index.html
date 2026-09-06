@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=20">
+    <link rel="stylesheet" href="style.css?v=21">
   </head>
 
   <body>
@@ -73,15 +73,21 @@
       </p>
     </section>
 
-    <section class="card school-base-card">
-      <div class="school-base-heading">
-        <div>
-          <h2>База школы</h2>
-          <p>Общий список учеников и учителей для всех разделов системы.</p>
-        </div>
-      </div>
+    <details class="card school-base-card school-base-manager">
+      <summary class="school-base-summary">
+        <span>
+          <strong>База школы</strong>
+          <small>Ученики и учителя</small>
+        </span>
+        <span class="school-base-summary-action" aria-hidden="true">
+          <span class="school-base-open-label">Настроить</span>
+          <span class="school-base-close-label">Скрыть</span>
+        </span>
+      </summary>
 
-      <div class="school-base-columns">
+      <div class="school-base-content">
+        <p>Общий список учеников и учителей для всех разделов системы.</p>
+        <div class="school-base-columns">
         <section class="school-base-section" aria-labelledby="students-heading">
           <h3 id="students-heading">Ученики</h3>
           <p class="form-hint">Excel: «Фамилия», «Имя», «Класс», «Дата рождения».</p>
@@ -119,8 +125,9 @@
           </form>
           <p id="teacher-message" class="form-message" aria-live="polite"></p>
         </section>
+        </div>
       </div>
-    </section>
+    </details>
 
     <div class="admin-tabs" role="tablist" aria-label="Разделы личного кабинета">
       <button type="button" id="birthdays-tab" role="tab" aria-selected="true" aria-controls="birthdays-panel">Дни рождения</button>
