@@ -90,6 +90,8 @@ const achievementFirstName = document.querySelector("#achievement-first-name");
 const achievementClass = document.querySelector("#achievement-class");
 const achievementLastNames = document.querySelector("#achievement-last-names");
 const achievementFirstNames = document.querySelector("#achievement-first-names");
+const achievementSupervisor = document.querySelector("#achievement-supervisor");
+const achievementSupervisors = document.querySelector("#achievement-supervisors");
 const achievementEventName = document.querySelector("#achievement-event-name");
 const achievementEventNames = document.querySelector("#achievement-event-names");
 const eventsExcelFile = document.querySelector("#events-excel-file");
@@ -109,6 +111,8 @@ const subjectManagerMessage = document.querySelector("#subject-manager-message")
 
 let achievementStudents = [];
 let selectedAchievementStudent = null;
+let achievementTeachers = [];
+let selectedAchievementSupervisor = null;
 let achievementEvents = [];
 let selectedAchievementEvent = null;
 let achievementSubjects = [];
@@ -799,7 +803,7 @@ async function loadStudents() {
     return;
   }
   achievementStudents = data;
-  updateAchievementLastNameSuggestions();
+  updateAchievementStudentSuggestions();
   if (!data.length) {
     studentsList.textContent = "Ученики пока не добавлены";
     return;
@@ -814,8 +818,9 @@ async function loadStudents() {
   }));
 }
 
-function updateAchievementLastNameSuggestions() {
+function updateAchievementStudentSuggestions() {
   if (document.activeElement === achievementLastName) showLastNameSuggestions();
+  if (document.activeElement === achievementFirstName) showFirstNameSuggestions();
 }
 
 function closeSuggestionMenu(input, menu) {
@@ -859,89 +864,114 @@ function renderSuggestionMenu(input, menu, items, onSelect) {
 
 function showLastNameSuggestions() {
   const query = achievementLastName.value.trim().toLocaleLowerCase("ru");
-  const lastNames = [...new Set(achievementStudents.map(student => student.last_name))]
-    .filter(Boolean)
-    .filter(lastName => lastName.toLocaleLowerCase("ru").includes(query))
-    .sort((a, b) => a.localeCompare(b, "ru"));
+  const chosenFirstName = achievementFirstName.value.trim().toLocaleLowerCase("ru");
+  const matches = achievementStudents
+    .filter(student => !chosenFirstName || student.first_name.toLocaleLowerCase("ru") === chosenFirstName)
+    .filter(student => student.last_name.toLocaleLowerCase("ru").includes(query))
+    .sort((a, b) => a.last_name.localeCompare(b.last_name, "ru"));
+  const items = [];
+  const usedNames = new Set();
+  matches.forEach(function (student) {
+    const key = student.last_name.toLocaleLowerCase("ru");
+    if (usedNames.has(key)) return;
+    usedNames.add(key);
+    items.push({
+      label: student.last_name,
+      detail: chosenFirstName ? student.class_name : "",
+      student: chosenFirstName ? student : null
+    });
+  });
   renderSuggestionMenu(
     achievementLastName,
     achievementLastNames,
-    lastNames.map(lastName => ({ label: lastName })),
+    items,
     item => {
       achievementLastName.value = item.label;
-      chooseAchievementLastName(false);
-      achievementFirstName.focus();
-      showFirstNameSuggestions();
+      if (item.student) {
+        selectAchievementStudent(item.student);
+      } else {
+        chooseAchievementStudent();
+        achievementFirstName.focus();
+        showFirstNameSuggestions();
+      }
     }
   );
 }
 
 function showFirstNameSuggestions() {
-  const lastName = achievementLastName.value.trim().toLocaleLowerCase("ru");
+  const chosenLastName = achievementLastName.value.trim().toLocaleLowerCase("ru");
   const query = achievementFirstName.value.trim().toLocaleLowerCase("ru");
   const matches = achievementStudents
-    .filter(student => student.last_name.toLocaleLowerCase("ru") === lastName)
+    .filter(student => !chosenLastName || student.last_name.toLocaleLowerCase("ru") === chosenLastName)
     .filter(student => student.first_name.toLocaleLowerCase("ru").includes(query))
     .sort((a, b) => a.first_name.localeCompare(b.first_name, "ru"));
+  const items = [];
+  const usedNames = new Set();
+  matches.forEach(function (student) {
+    const key = student.first_name.toLocaleLowerCase("ru");
+    if (usedNames.has(key)) return;
+    usedNames.add(key);
+    items.push({
+      label: student.first_name,
+      detail: chosenLastName ? student.class_name : "",
+      student: chosenLastName ? student : null
+    });
+  });
   renderSuggestionMenu(
     achievementFirstName,
     achievementFirstNames,
-    matches.map(student => ({
-      label: student.first_name,
-      detail: student.class_name,
-      student: student
-    })),
+    items,
     item => {
-      achievementFirstName.value = item.student.first_name;
-      selectedAchievementStudent = item.student;
-      achievementClass.value = item.student.class_name;
+      achievementFirstName.value = item.label;
+      if (item.student) {
+        selectAchievementStudent(item.student);
+      } else {
+        chooseAchievementStudent();
+        achievementLastName.focus();
+        showLastNameSuggestions();
+      }
     }
   );
 }
 
-function resetAchievementStudentSelection(clearLastName = false) {
-  selectedAchievementStudent = null;
-  if (clearLastName) achievementLastName.value = "";
-  achievementFirstName.value = "";
-  achievementFirstName.disabled = true;
-  achievementFirstName.placeholder = "Сначала выберите фамилию";
-  closeSuggestionMenu(achievementLastName, achievementLastNames);
-  closeSuggestionMenu(achievementFirstName, achievementFirstNames);
-  achievementClass.value = "";
+function selectAchievementStudent(student) {
+  selectedAchievementStudent = student;
+  achievementLastName.value = student.last_name;
+  achievementFirstName.value = student.first_name;
+  achievementClass.value = student.class_name;
 }
 
-function chooseAchievementLastName(showSuggestions = true) {
-  selectedAchievementStudent = null;
-  achievementClass.value = "";
-  achievementFirstName.value = "";
-  const lastName = achievementLastName.value.trim().toLocaleLowerCase("ru");
-  const matches = achievementStudents.filter(function (student) {
-    return student.last_name.toLocaleLowerCase("ru") === lastName;
-  });
-  achievementFirstName.disabled = matches.length === 0;
-  achievementFirstName.placeholder = matches.length ? "Выберите имя" : "Сначала выберите фамилию";
-  closeSuggestionMenu(achievementFirstName, achievementFirstNames);
-  if (showSuggestions) showLastNameSuggestions();
-}
-
-function chooseAchievementFirstName() {
+function chooseAchievementStudent() {
   const lastName = achievementLastName.value.trim().toLocaleLowerCase("ru");
   const firstName = achievementFirstName.value.trim().toLocaleLowerCase("ru");
   selectedAchievementStudent = achievementStudents.find(function (student) {
     return student.last_name.toLocaleLowerCase("ru") === lastName &&
       student.first_name.toLocaleLowerCase("ru") === firstName;
   }) || null;
-  achievementClass.value = selectedAchievementStudent
-    ? selectedAchievementStudent.class_name
-    : "";
+  achievementClass.value = selectedAchievementStudent ? selectedAchievementStudent.class_name : "";
 }
 
-achievementLastName.addEventListener("input", () => chooseAchievementLastName(true));
+function resetAchievementStudentSelection() {
+  selectedAchievementStudent = null;
+  achievementLastName.value = "";
+  achievementFirstName.value = "";
+  achievementLastName.placeholder = "Начните вводить фамилию";
+  achievementFirstName.placeholder = "Начните вводить имя";
+  closeSuggestionMenu(achievementLastName, achievementLastNames);
+  closeSuggestionMenu(achievementFirstName, achievementFirstNames);
+  achievementClass.value = "";
+}
+
+function handleAchievementStudentInput(input, showSuggestions) {
+  selectedAchievementStudent = null;
+  achievementClass.value = "";
+  chooseAchievementStudent();
+  showSuggestions();
+}
+
+achievementLastName.addEventListener("input", () => handleAchievementStudentInput(achievementLastName, showLastNameSuggestions));
 achievementLastName.addEventListener("focus", showLastNameSuggestions);
-achievementFirstName.addEventListener("input", function () {
-  chooseAchievementFirstName();
-  showFirstNameSuggestions();
-});
+achievementFirstName.addEventListener("input", () => handleAchievementStudentInput(achievementFirstName, showFirstNameSuggestions));
 achievementFirstName.addEventListener("focus", showFirstNameSuggestions);
 
 [achievementLastName, achievementFirstName].forEach(function (input) {
@@ -973,6 +1003,8 @@ async function loadTeachers() {
     teachersList.textContent = "Ошибка: " + error.message;
     return;
   }
+  achievementTeachers = data;
+  if (document.activeElement === achievementSupervisor) showSupervisorSuggestions();
   if (!data.length) {
     teachersList.textContent = "Учителя пока не добавлены";
     return;
@@ -986,6 +1018,58 @@ async function loadTeachers() {
     );
   }));
 }
+
+function showSupervisorSuggestions() {
+  const query = achievementSupervisor.value.trim().toLocaleLowerCase("ru");
+  const matches = achievementTeachers
+    .filter(function (teacher) {
+      const fullName = teacher.last_name + " " + teacher.first_name;
+      const reverseName = teacher.first_name + " " + teacher.last_name;
+      return fullName.toLocaleLowerCase("ru").includes(query) ||
+        reverseName.toLocaleLowerCase("ru").includes(query);
+    })
+    .sort(function (a, b) {
+      return (a.last_name + " " + a.first_name).localeCompare(
+        b.last_name + " " + b.first_name,
+        "ru"
+      );
+    });
+
+  renderSuggestionMenu(
+    achievementSupervisor,
+    achievementSupervisors,
+    matches.map(function (teacher) {
+      return {
+        label: teacher.last_name + " " + teacher.first_name,
+        detail: teacher.position,
+        teacher: teacher
+      };
+    }),
+    function (item) {
+      selectedAchievementSupervisor = item.teacher;
+      achievementSupervisor.value = item.label;
+    }
+  );
+}
+
+achievementSupervisor.addEventListener("input", function () {
+  selectedAchievementSupervisor = null;
+  showSupervisorSuggestions();
+});
+achievementSupervisor.addEventListener("focus", showSupervisorSuggestions);
+achievementSupervisor.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") closeSuggestionMenu(achievementSupervisor, achievementSupervisors);
+  if (event.key === "ArrowDown" && !achievementSupervisors.hidden) {
+    const firstOption = achievementSupervisors.querySelector("button");
+    if (firstOption) {
+      event.preventDefault();
+      firstOption.focus();
+    }
+  }
+});
+achievementSupervisor.addEventListener("blur", function () {
+  setTimeout(() => closeSuggestionMenu(achievementSupervisor, achievementSupervisors), 120);
+});
 
 function formatBirthdayDate(value) {
   if (!value) return "дата рождения не указана";
@@ -1510,10 +1594,10 @@ achievementForm.addEventListener("submit", async function (event) {
     return;
   }
 
-  chooseAchievementFirstName();
+  chooseAchievementStudent();
   if (!selectedAchievementStudent) {
     achievementMessage.textContent = "Выберите существующего ученика из подсказок";
-    achievementFirstName.focus();
+    (achievementLastName.value.trim() ? achievementFirstName : achievementLastName).focus();
     return;
   }
   chooseAchievementEvent();
@@ -1528,6 +1612,12 @@ achievementForm.addEventListener("submit", async function (event) {
     achievementMessage.textContent = "Выберите предмет из справочника";
     achievementSubject.focus();
     showSubjectSuggestions();
+    return;
+  }
+  if (achievementSupervisor.value.trim() && !selectedAchievementSupervisor) {
+    achievementMessage.textContent = "Выберите руководителя из списка учителей";
+    achievementSupervisor.focus();
+    showSupervisorSuggestions();
     return;
   }
 
@@ -1550,7 +1640,9 @@ achievementForm.addEventListener("submit", async function (event) {
     academic_type: achievementValue("#achievement-academic-type"),
     event_format: achievementValue("#achievement-format"),
     result: achievementValue("#achievement-result"),
-    supervisor_name: achievementValue("#achievement-supervisor"),
+    supervisor_name: selectedAchievementSupervisor
+      ? selectedAchievementSupervisor.last_name + " " + selectedAchievementSupervisor.first_name
+      : null,
     organizers: achievementValue("#achievement-organizers"),
     event_date: achievementValue("#achievement-date"),
     link_url: achievementValue("#achievement-link"),
@@ -1573,6 +1665,8 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementEventName, achievementEventNames);
   selectedAchievementSubject = null;
   closeSuggestionMenu(achievementSubject, achievementSubjectNames);
+  selectedAchievementSupervisor = null;
+  closeSuggestionMenu(achievementSupervisor, achievementSupervisors);
   achievementMessage.textContent = "Достижение сохранено";
   loadAchievements();
 });

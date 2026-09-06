@@ -278,7 +278,7 @@
           </label>
           <label>Имя
             <span class="student-autocomplete">
-              <input type="text" id="achievement-first-name" required autocomplete="off" disabled placeholder="Сначала выберите фамилию" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-first-names">
+              <input type="text" id="achievement-first-name" required autocomplete="off" placeholder="Начните вводить имя" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-first-names">
               <span id="achievement-first-names" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
@@ -309,7 +309,12 @@
           </label>
           <label>Формат<input type="text" id="achievement-format" placeholder="Очно / онлайн"></label>
           <label>Место / результат<input type="text" id="achievement-result"></label>
-          <label>ФИО руководителя<input type="text" id="achievement-supervisor"></label>
+          <label>ФИО руководителя
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-supervisor" autocomplete="off" placeholder="Начните вводить фамилию или имя" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-supervisors">
+              <span id="achievement-supervisors" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+          </label>
           <label>Организаторы<input type="text" id="achievement-organizers"></label>
           <label>Дата проведения<input type="date" id="achievement-date"></label>
           <label>Ссылка<input type="url" id="achievement-link" placeholder="https://..."></label>
@@ -339,6 +344,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=21"></script>
+    <script src="script.js?v=22"></script>
   </body>
 </html>
