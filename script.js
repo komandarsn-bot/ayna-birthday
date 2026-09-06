@@ -104,6 +104,8 @@ const achievementSubject = document.querySelector("#achievement-subject");
 const achievementSubjectNames = document.querySelector("#achievement-subject-names");
 const achievementLevel = document.querySelector("#achievement-level");
 const achievementStage = document.querySelector("#achievement-stage");
+const achievementType = document.querySelector("#achievement-type");
+const achievementTypesMenu = document.querySelector("#achievement-types");
 const subjectsExcelFile = document.querySelector("#subjects-excel-file");
 const uploadSubjectsButton = document.querySelector("#upload-subjects-button");
 const subjectForm = document.querySelector("#subject-form");
@@ -119,6 +121,18 @@ let achievementEvents = [];
 let selectedAchievementEvent = null;
 let achievementSubjects = [];
 let selectedAchievementSubject = null;
+let achievementTypes = [];
+let selectedAchievementType = null;
+
+const defaultAchievementTypeNames = [
+  "Олимпиада",
+  "Конкурс",
+  "Турнир",
+  "Ярмарка",
+  "Благотворительное мероприятие",
+  "Хакатон",
+  "Вручение"
+];
 
 const achievementScopeOrder = [
   "Школьный",
@@ -206,6 +220,7 @@ function updateAuthView(session) {
     loadTeachersButton.click();
     loadAchievementEvents();
     loadAchievementSubjects();
+    loadAchievementTypes();
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -1492,6 +1507,128 @@ uploadSubjectsButton.addEventListener("click", async function () {
   }
 });
 
+async function loadAchievementTypes(selectedName = "") {
+  const { data: loadedTypes, error } = await supabaseClient
+    .from("achievement_types")
+    .select("id,name")
+    .order("name");
+
+  let customTypes = error ? [] : (loadedTypes || []);
+  if (!error) {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const userId = sessionData.session?.user?.id;
+    const storedNames = new Set(customTypes.map(item => item.name.toLocaleLowerCase("ru")));
+    const missingNames = defaultAchievementTypeNames.filter(function (name) {
+      return !storedNames.has(name.toLocaleLowerCase("ru"));
+    });
+    if (userId && missingNames.length) {
+      const { data: addedTypes, error: seedError } = await supabaseClient
+        .from("achievement_types")
+        .upsert(
+          missingNames.map(name => ({ user_id: userId, name: name })),
+          { onConflict: "user_id,name" }
+        )
+        .select("id,name");
+      if (!seedError && addedTypes) customTypes = customTypes.concat(addedTypes);
+    }
+  }
+  const byName = new Map();
+  defaultAchievementTypeNames.forEach(function (name) {
+    byName.set(name.toLocaleLowerCase("ru"), { id: null, name: name, builtIn: true });
+  });
+  customTypes.forEach(function (item) {
+    byName.set(item.name.toLocaleLowerCase("ru"), item);
+  });
+  achievementTypes = Array.from(byName.values()).sort(function (a, b) {
+    return a.name.localeCompare(b.name, "ru");
+  });
+
+  if (selectedName) {
+    achievementType.value = selectedName;
+    chooseAchievementType();
+  }
+  if (document.activeElement === achievementType) showAchievementTypeSuggestions();
+}
+
+function chooseAchievementType() {
+  const value = achievementType.value.trim().toLocaleLowerCase("ru");
+  selectedAchievementType = achievementTypes.find(function (item) {
+    return item.name.toLocaleLowerCase("ru") === value;
+  }) || null;
+}
+
+function showAchievementTypeSuggestions() {
+  const value = achievementType.value.trim();
+  const query = value.toLocaleLowerCase("ru");
+  const matches = achievementTypes
+    .filter(item => item.name.toLocaleLowerCase("ru").includes(query))
+    .slice(0, 7);
+
+  renderSuggestionMenu(
+    achievementType,
+    achievementTypesMenu,
+    matches.map(item => ({ label: item.name, type: item })),
+    function (item) {
+      achievementType.value = item.type.name;
+      selectedAchievementType = item.type;
+    }
+  );
+
+  const exactMatch = achievementTypes.some(function (item) {
+    return item.name.toLocaleLowerCase("ru") === query;
+  });
+  if (value && !exactMatch) {
+    const addOption = document.createElement("button");
+    addOption.type = "button";
+    addOption.className = "student-suggestion-option suggestion-add-option";
+    addOption.textContent = "+ Добавить «" + value + "» в список";
+    addOption.addEventListener("mousedown", event => event.preventDefault());
+    addOption.addEventListener("click", function () {
+      addAchievementType(value, addOption);
+    });
+    achievementTypesMenu.append(addOption);
+  }
+}
+
+async function addAchievementType(name, button) {
+  const userId = await getCurrentUserId(achievementMessage);
+  if (!userId) return;
+  button.disabled = true;
+  achievementMessage.textContent = "Добавляем новый вид достижения...";
+  const { error } = await supabaseClient
+    .from("achievement_types")
+    .upsert({ user_id: userId, name: name }, { onConflict: "user_id,name" });
+
+  if (error) {
+    achievementMessage.textContent = "Не удалось сохранить новый вид. Сначала обновите таблицы Supabase.";
+    button.disabled = false;
+    return;
+  }
+
+  await loadAchievementTypes(name);
+  closeSuggestionMenu(achievementType, achievementTypesMenu);
+  achievementMessage.textContent = "Новый вид достижения добавлен в список";
+}
+
+achievementType.addEventListener("input", function () {
+  chooseAchievementType();
+  showAchievementTypeSuggestions();
+});
+achievementType.addEventListener("focus", showAchievementTypeSuggestions);
+achievementType.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") closeSuggestionMenu(achievementType, achievementTypesMenu);
+  if (event.key === "ArrowDown" && !achievementTypesMenu.hidden) {
+    const firstOption = achievementTypesMenu.querySelector("button");
+    if (firstOption) {
+      event.preventDefault();
+      firstOption.focus();
+    }
+  }
+});
+achievementType.addEventListener("blur", function () {
+  setTimeout(() => closeSuggestionMenu(achievementType, achievementTypesMenu), 120);
+});
+
 const achievementColumns = [
   ["last_name", "Ф"],
   ["first_name", "И"],
@@ -1502,7 +1639,7 @@ const achievementColumns = [
   ["subject", "Предмет"],
   ["achievement_level", "Уровень"],
   ["event_stage", "Этап"],
-  ["project_name", "Название проекта"],
+  ["project_name", "Вид достижения"],
   ["academic_type", "Academic / Non Academic"],
   ["event_format", "Формат"],
   ["result", "Место / результат"],
@@ -1654,6 +1791,13 @@ achievementForm.addEventListener("submit", async function (event) {
     achievementStage.focus();
     return;
   }
+  chooseAchievementType();
+  if (!selectedAchievementType) {
+    achievementMessage.textContent = "Выберите вид достижения из списка или добавьте новый";
+    achievementType.focus();
+    showAchievementTypeSuggestions();
+    return;
+  }
   if (achievementSupervisor.value.trim() && !selectedAchievementSupervisor) {
     achievementMessage.textContent = "Выберите руководителя из списка учителей";
     achievementSupervisor.focus();
@@ -1676,7 +1820,7 @@ achievementForm.addEventListener("submit", async function (event) {
     subject: selectedAchievementSubject.name,
     achievement_level: achievementValue("#achievement-level"),
     event_stage: achievementValue("#achievement-stage"),
-    project_name: achievementValue("#achievement-project-name"),
+    project_name: selectedAchievementType.name,
     academic_type: achievementValue("#achievement-academic-type"),
     event_format: achievementValue("#achievement-format"),
     result: achievementValue("#achievement-result"),
@@ -1706,6 +1850,8 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementEventName, achievementEventNames);
   selectedAchievementSubject = null;
   closeSuggestionMenu(achievementSubject, achievementSubjectNames);
+  selectedAchievementType = null;
+  closeSuggestionMenu(achievementType, achievementTypesMenu);
   selectedAchievementSupervisor = null;
   closeSuggestionMenu(achievementSupervisor, achievementSupervisors);
   achievementMessage.textContent = "Достижение сохранено";

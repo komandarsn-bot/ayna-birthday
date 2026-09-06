@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=24">
+    <link rel="stylesheet" href="style.css?v=25">
   </head>
 
   <body>
@@ -322,7 +322,13 @@
               <option value="Школьный">Школьный</option>
             </select>
           </label>
-          <label class="wide-field">Название проекта<input type="text" id="achievement-project-name"></label>
+          <label class="wide-field">Вид достижения
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-type" required autocomplete="off" placeholder="Например: олимпиада или конкурс" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-types">
+              <span id="achievement-types" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+            <small>Если нужного варианта нет, его можно сразу добавить в список.</small>
+          </label>
           <label>Academic / Non Academic
             <select id="achievement-academic-type">
               <option value="">Не выбрано</option>
@@ -367,6 +373,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=24"></script>
+    <script src="script.js?v=25"></script>
   </body>
 </html>
