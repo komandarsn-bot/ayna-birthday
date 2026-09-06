@@ -415,13 +415,11 @@ input[type="file"] {
 }
 
 .achievement-reference-manager {
-  display: grid;
-  gap: 18px;
   margin: 22px 0 28px;
-  padding: 20px;
   border: 1px solid #dbe4e1;
   border-radius: 14px;
   background: #f8faf9;
+  overflow: hidden;
 }
 
 .achievement-reference-manager h3,
@@ -429,15 +427,93 @@ input[type="file"] {
   margin: 0;
 }
 
-.achievement-reference-heading > p,
+.achievement-reference-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.achievement-reference-summary::-webkit-details-marker {
+  display: none;
+}
+
+.achievement-reference-summary::marker {
+  content: "";
+}
+
+.achievement-reference-summary > span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.achievement-reference-summary strong {
+  font-size: 1.08rem;
+}
+
+.achievement-reference-summary small {
+  color: #687873;
+  font-size: 0.9rem;
+}
+
+.reference-summary-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #174a42;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.reference-summary-action::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 180ms ease;
+}
+
+.reference-close-label {
+  display: none;
+}
+
+.achievement-reference-manager[open] .reference-open-label {
+  display: none;
+}
+
+.achievement-reference-manager[open] .reference-close-label {
+  display: inline;
+}
+
+.achievement-reference-manager[open] .reference-summary-action::after {
+  transform: rotate(225deg) translate(-2px, -2px);
+}
+
+.achievement-reference-content {
+  display: grid;
+  gap: 16px;
+  padding: 18px 20px 20px;
+  border-top: 1px solid #dbe4e1;
+}
+
+.achievement-reference-content > p,
+.achievement-reference-block > div > p {
+  color: #687873;
+}
+
 .achievement-reference-block > div > p {
   margin-top: 6px;
-  color: #687873;
 }
 
 .achievement-reference-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 
@@ -459,7 +535,8 @@ input[type="file"] {
   gap: 12px;
 }
 
-.achievement-event-actions input {
+.achievement-event-actions input,
+.achievement-event-actions textarea {
   min-width: 0;
   padding: 12px;
   border: 1px solid #c7d8d3;
@@ -467,6 +544,12 @@ input[type="file"] {
   background: #ffffff;
   color: #173a35;
   font: inherit;
+}
+
+.achievement-event-actions textarea {
+  min-height: calc(3 * 1.45em + 26px);
+  line-height: 1.45;
+  resize: vertical;
 }
 
 .achievement-form label {
