@@ -270,7 +270,13 @@
             </span>
             <small>Если нужного мероприятия нет, его можно сразу добавить в список.</small>
           </label>
-          <label>Приказ<input type="text" id="achievement-order"></label>
+          <label>Приказ
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-order" autocomplete="off" placeholder="Начните вводить приказ" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-orders">
+              <span id="achievement-orders" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+            <small>Если нужного приказа нет, его можно сразу добавить в список.</small>
+          </label>
           <label>Стоимость
             <span class="achievement-currency-input">
               <input type="number" id="achievement-cost" min="0" step="0.01" inputmode="decimal" aria-label="Стоимость в тенге">
@@ -371,6 +377,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=29"></script>
+    <script src="script.js?v=30"></script>
   </body>
 </html>

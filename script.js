@@ -94,6 +94,8 @@ const achievementSupervisor = document.querySelector("#achievement-supervisor");
 const achievementSupervisors = document.querySelector("#achievement-supervisors");
 const achievementEventName = document.querySelector("#achievement-event-name");
 const achievementEventNames = document.querySelector("#achievement-event-names");
+const achievementOrder = document.querySelector("#achievement-order");
+const achievementOrdersMenu = document.querySelector("#achievement-orders");
 const eventsExcelFile = document.querySelector("#events-excel-file");
 const uploadEventsButton = document.querySelector("#upload-events-button");
 const eventManagerMessage = document.querySelector("#event-manager-message");
@@ -114,6 +116,8 @@ let achievementTeachers = [];
 let selectedAchievementSupervisor = null;
 let achievementEvents = [];
 let selectedAchievementEvent = null;
+let achievementOrders = [];
+let selectedAchievementOrder = null;
 let achievementSubjects = [];
 let selectedAchievementSubject = null;
 let achievementTypes = [];
@@ -272,6 +276,7 @@ function updateAuthView(session) {
     loadStudentsButton.click();
     loadTeachersButton.click();
     loadAchievementEvents();
+    loadAchievementOrders();
     loadAchievementSubjects();
     loadAchievementTypes();
     loadAchievementResults();
@@ -1509,6 +1514,109 @@ uploadEventsButton.addEventListener("click", async function () {
   }
 });
 
+async function loadAchievementOrders(selectedName = "") {
+  const { data, error } = await supabaseClient
+    .from("achievement_orders")
+    .select("id,name")
+    .order("name");
+  if (error) {
+    achievementOrders = [];
+    return;
+  }
+  achievementOrders = data || [];
+  if (selectedName) {
+    achievementOrder.value = selectedName;
+    chooseAchievementOrder();
+  }
+  if (document.activeElement === achievementOrder) showAchievementOrderSuggestions();
+}
+
+function chooseAchievementOrder() {
+  const value = achievementOrder.value.trim().toLocaleLowerCase("ru");
+  selectedAchievementOrder = achievementOrders.find(function (item) {
+    return item.name.toLocaleLowerCase("ru") === value;
+  }) || null;
+}
+
+function showAchievementOrderSuggestions() {
+  const query = achievementOrder.value.trim().toLocaleLowerCase("ru");
+  const matches = achievementOrders
+    .filter(item => item.name.toLocaleLowerCase("ru").includes(query))
+    .slice(0, 7);
+  renderSuggestionMenu(
+    achievementOrder,
+    achievementOrdersMenu,
+    matches.map(item => ({ id: item.id, label: item.name, order: item })),
+    item => {
+      achievementOrder.value = item.order.name;
+      selectedAchievementOrder = item.order;
+    },
+    function (item, button) {
+      deleteAchievementReferenceItem("achievement_orders", item.order, button, {
+        selected: () => selectedAchievementOrder,
+        clear: function () {
+          selectedAchievementOrder = null;
+          achievementOrder.value = "";
+        },
+        reload: loadAchievementOrders,
+        reopen: showAchievementOrderSuggestions,
+        label: "Приказ"
+      });
+    }
+  );
+
+  const value = achievementOrder.value.trim();
+  const exactMatch = achievementOrders.some(function (item) {
+    return item.name.toLocaleLowerCase("ru") === query;
+  });
+  if (value && !exactMatch) {
+    const addOption = document.createElement("button");
+    addOption.type = "button";
+    addOption.className = "student-suggestion-option suggestion-add-option";
+    addOption.textContent = "+ Добавить «" + value + "» в список";
+    addOption.addEventListener("mousedown", event => event.preventDefault());
+    addOption.addEventListener("click", () => addAchievementOrder(value, addOption));
+    achievementOrdersMenu.append(addOption);
+  }
+}
+
+async function addAchievementOrder(name, button) {
+  const userId = await getCurrentUserId(achievementMessage);
+  if (!userId) return;
+  button.disabled = true;
+  achievementMessage.textContent = "Добавляем новый приказ...";
+  const { error } = await supabaseClient
+    .from("achievement_orders")
+    .upsert({ user_id: userId, name: name }, { onConflict: "user_id,name" });
+  if (error) {
+    achievementMessage.textContent = "Не удалось сохранить приказ. Сначала обновите таблицы Supabase.";
+    button.disabled = false;
+    return;
+  }
+  await loadAchievementOrders(name);
+  closeSuggestionMenu(achievementOrder, achievementOrdersMenu);
+  achievementMessage.textContent = "Новый приказ добавлен в список";
+}
+
+achievementOrder.addEventListener("input", function () {
+  chooseAchievementOrder();
+  showAchievementOrderSuggestions();
+});
+achievementOrder.addEventListener("focus", showAchievementOrderSuggestions);
+achievementOrder.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") closeSuggestionMenu(achievementOrder, achievementOrdersMenu);
+  if (event.key === "ArrowDown" && !achievementOrdersMenu.hidden) {
+    const firstOption = achievementOrdersMenu.querySelector("button");
+    if (firstOption) {
+      event.preventDefault();
+      firstOption.focus();
+    }
+  }
+});
+achievementOrder.addEventListener("blur", function () {
+  setTimeout(() => closeSuggestionMenu(achievementOrder, achievementOrdersMenu), 120);
+});
+
 async function loadAchievementSubjects(selectedName = "") {
   const { data: loadedSubjects, error } = await supabaseClient
     .from("achievement_subjects")
@@ -2069,6 +2177,13 @@ achievementForm.addEventListener("submit", async function (event) {
     showEventSuggestions();
     return;
   }
+  chooseAchievementOrder();
+  if (achievementOrder.value.trim() && !selectedAchievementOrder) {
+    achievementMessage.textContent = "Выберите приказ из списка или добавьте новый";
+    achievementOrder.focus();
+    showAchievementOrderSuggestions();
+    return;
+  }
   chooseAchievementSubject();
   if (!selectedAchievementSubject) {
     achievementMessage.textContent = "Выберите предмет из справочника";
@@ -2123,7 +2238,7 @@ achievementForm.addEventListener("submit", async function (event) {
     first_name: selectedAchievementStudent.first_name,
     class_name: selectedAchievementStudent.class_name,
     event_name: selectedAchievementEvent.name,
-    order_reference: achievementValue("#achievement-order"),
+    order_reference: selectedAchievementOrder ? selectedAchievementOrder.name : null,
     cost: costValue === "" ? null : Number(costValue),
     subject: selectedAchievementSubject.name,
     achievement_level: achievementValue("#achievement-level"),
@@ -2158,6 +2273,8 @@ achievementForm.addEventListener("submit", async function (event) {
   resetAchievementStudentSelection();
   selectedAchievementEvent = null;
   closeSuggestionMenu(achievementEventName, achievementEventNames);
+  selectedAchievementOrder = null;
+  closeSuggestionMenu(achievementOrder, achievementOrdersMenu);
   selectedAchievementSubject = null;
   closeSuggestionMenu(achievementSubject, achievementSubjectNames);
   selectedAchievementType = null;

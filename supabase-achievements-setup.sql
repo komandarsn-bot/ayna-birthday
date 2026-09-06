@@ -31,6 +31,14 @@ create table if not exists public.achievement_results (
   unique (user_id, name)
 );
 
+create table if not exists public.achievement_orders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
+  name text not null check (char_length(name) between 1 and 160),
+  created_at timestamptz not null default now(),
+  unique (user_id, name)
+);
+
 create table if not exists public.achievements (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
@@ -94,6 +102,7 @@ alter table public.achievement_events enable row level security;
 alter table public.achievement_subjects enable row level security;
 alter table public.achievement_types enable row level security;
 alter table public.achievement_results enable row level security;
+alter table public.achievement_orders enable row level security;
 
 drop policy if exists "achievement_events_owner_all" on public.achievement_events;
 create policy "achievement_events_owner_all" on public.achievement_events
@@ -131,6 +140,12 @@ create policy "achievement_types_owner_all" on public.achievement_types
 
 drop policy if exists "achievement_results_owner_all" on public.achievement_results;
 create policy "achievement_results_owner_all" on public.achievement_results
+  for all to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+drop policy if exists "achievement_orders_owner_all" on public.achievement_orders;
+create policy "achievement_orders_owner_all" on public.achievement_orders
   for all to authenticated
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
