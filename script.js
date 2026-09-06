@@ -107,6 +107,10 @@ const achievementType = document.querySelector("#achievement-type");
 const achievementTypesMenu = document.querySelector("#achievement-types");
 const achievementResult = document.querySelector("#achievement-result");
 const achievementResultsMenu = document.querySelector("#achievement-results");
+const achievementCountry = document.querySelector("#achievement-country");
+const achievementCountriesMenu = document.querySelector("#achievement-countries");
+const achievementCity = document.querySelector("#achievement-city");
+const achievementCitiesMenu = document.querySelector("#achievement-cities");
 const achievementStartDate = document.querySelector("#achievement-date");
 const achievementEndDate = document.querySelector("#achievement-end-date");
 
@@ -124,6 +128,22 @@ let achievementTypes = [];
 let selectedAchievementType = null;
 let achievementResults = [];
 let selectedAchievementResult = null;
+const achievementCountryReference = {
+  input: achievementCountry,
+  menu: achievementCountriesMenu,
+  table: "achievement_countries",
+  label: "Страна",
+  items: [],
+  selected: null
+};
+const achievementCityReference = {
+  input: achievementCity,
+  menu: achievementCitiesMenu,
+  table: "achievement_cities",
+  label: "Город",
+  items: [],
+  selected: null
+};
 
 const defaultAchievementSubjectNames = [
   "Әліппе",
@@ -280,6 +300,8 @@ function updateAuthView(session) {
     loadAchievementSubjects();
     loadAchievementTypes();
     loadAchievementResults();
+    loadLocationReference(achievementCountryReference);
+    loadLocationReference(achievementCityReference);
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -2028,6 +2050,97 @@ achievementResult.addEventListener("blur", function () {
   setTimeout(() => closeSuggestionMenu(achievementResult, achievementResultsMenu), 120);
 });
 
+async function loadLocationReference(reference, selectedName = "") {
+  const { data, error } = await supabaseClient.from(reference.table).select("id,name").order("name");
+  reference.items = error ? [] : (data || []);
+  if (selectedName) {
+    reference.input.value = selectedName;
+    chooseLocationReference(reference);
+  }
+  if (document.activeElement === reference.input) showLocationSuggestions(reference);
+}
+
+function chooseLocationReference(reference) {
+  const value = reference.input.value.trim().toLocaleLowerCase("ru");
+  reference.selected = reference.items.find(item => item.name.toLocaleLowerCase("ru") === value) || null;
+}
+
+function showLocationSuggestions(reference) {
+  const value = reference.input.value.trim();
+  const query = value.toLocaleLowerCase("ru");
+  const matches = reference.items.filter(item => item.name.toLocaleLowerCase("ru").includes(query)).slice(0, 7);
+  renderSuggestionMenu(
+    reference.input,
+    reference.menu,
+    matches.map(item => ({ id: item.id, label: item.name, referenceItem: item })),
+    function (item) {
+      reference.input.value = item.referenceItem.name;
+      reference.selected = item.referenceItem;
+    },
+    function (item, button) {
+      deleteAchievementReferenceItem(reference.table, item.referenceItem, button, {
+        selected: () => reference.selected,
+        clear: function () {
+          reference.selected = null;
+          reference.input.value = "";
+        },
+        reload: () => loadLocationReference(reference),
+        reopen: () => showLocationSuggestions(reference),
+        label: reference.label
+      });
+    }
+  );
+  const exactMatch = reference.items.some(item => item.name.toLocaleLowerCase("ru") === query);
+  if (value && !exactMatch) {
+    const addOption = document.createElement("button");
+    addOption.type = "button";
+    addOption.className = "student-suggestion-option suggestion-add-option";
+    addOption.textContent = "+ Добавить «" + value + "» в список";
+    addOption.addEventListener("mousedown", event => event.preventDefault());
+    addOption.addEventListener("click", () => addLocationReference(reference, value, addOption));
+    reference.menu.append(addOption);
+  }
+}
+
+async function addLocationReference(reference, name, button) {
+  const userId = await getCurrentUserId(achievementMessage);
+  if (!userId) return;
+  button.disabled = true;
+  achievementMessage.textContent = "Добавляем значение в справочник...";
+  const { error } = await supabaseClient
+    .from(reference.table)
+    .upsert({ user_id: userId, name: name }, { onConflict: "user_id,name" });
+  if (error) {
+    achievementMessage.textContent = "Не удалось сохранить значение. Сначала обновите таблицы Supabase.";
+    button.disabled = false;
+    return;
+  }
+  await loadLocationReference(reference, name);
+  closeSuggestionMenu(reference.input, reference.menu);
+  achievementMessage.textContent = reference.label + " добавлен(а) в список";
+}
+
+[achievementCountryReference, achievementCityReference].forEach(function (reference) {
+  reference.input.addEventListener("input", function () {
+    chooseLocationReference(reference);
+    showLocationSuggestions(reference);
+  });
+  reference.input.addEventListener("focus", () => showLocationSuggestions(reference));
+  reference.input.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") closeSuggestionMenu(reference.input, reference.menu);
+    if (event.key === "ArrowDown" && !reference.menu.hidden) {
+      const firstOption = reference.menu.querySelector("button");
+      if (firstOption) {
+        event.preventDefault();
+        firstOption.focus();
+      }
+    }
+  });
+  reference.input.addEventListener("blur", function () {
+    setTimeout(() => closeSuggestionMenu(reference.input, reference.menu), 120);
+  });
+});
+
 const achievementColumns = [
   ["last_name", "Ф"],
   ["first_name", "И"],
@@ -2047,6 +2160,7 @@ const achievementColumns = [
   ["event_date", "Начало"],
   ["event_end_date", "Окончание"],
   ["link_url", "Ссылка"],
+  ["country", "Страна"],
   ["city", "Город"]
 ];
 
@@ -2218,6 +2332,20 @@ achievementForm.addEventListener("submit", async function (event) {
     showSupervisorSuggestions();
     return;
   }
+  chooseLocationReference(achievementCountryReference);
+  if (achievementCountry.value.trim() && !achievementCountryReference.selected) {
+    achievementMessage.textContent = "Выберите страну из списка или добавьте новую";
+    achievementCountry.focus();
+    showLocationSuggestions(achievementCountryReference);
+    return;
+  }
+  chooseLocationReference(achievementCityReference);
+  if (achievementCity.value.trim() && !achievementCityReference.selected) {
+    achievementMessage.textContent = "Выберите город из списка или добавьте новый";
+    achievementCity.focus();
+    showLocationSuggestions(achievementCityReference);
+    return;
+  }
   if (
     achievementStartDate.value &&
     achievementEndDate.value &&
@@ -2254,7 +2382,8 @@ achievementForm.addEventListener("submit", async function (event) {
     event_date: achievementValue("#achievement-date"),
     event_end_date: achievementValue("#achievement-end-date"),
     link_url: achievementValue("#achievement-link"),
-    city: achievementValue("#achievement-city")
+    country: achievementCountryReference.selected ? achievementCountryReference.selected.name : null,
+    city: achievementCityReference.selected ? achievementCityReference.selected.name : null
   };
 
   saveAchievementButton.disabled = true;
@@ -2283,6 +2412,10 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementResult, achievementResultsMenu);
   selectedAchievementSupervisor = null;
   closeSuggestionMenu(achievementSupervisor, achievementSupervisors);
+  achievementCountryReference.selected = null;
+  closeSuggestionMenu(achievementCountry, achievementCountriesMenu);
+  achievementCityReference.selected = null;
+  closeSuggestionMenu(achievementCity, achievementCitiesMenu);
   achievementMessage.textContent = "Достижение сохранено";
   loadAchievements();
 });

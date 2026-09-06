@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=29">
+    <link rel="stylesheet" href="style.css?v=30">
   </head>
 
   <body>
@@ -265,10 +265,17 @@
             </label>
             <label>Класс<input type="text" id="achievement-class" required readonly placeholder="Заполнится автоматически"></label>
           </div>
+          <div class="achievement-section-title wide-field">Мероприятие</div>
           <label class="wide-field">Наименование мероприятия
             <span class="student-autocomplete">
               <input type="text" id="achievement-event-name" required autocomplete="off" placeholder="Начните вводить название" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-event-names">
               <span id="achievement-event-names" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+          </label>
+          <label class="third-field">Предмет
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-subject" required autocomplete="off" placeholder="Начните вводить предмет" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-subject-names">
+              <span id="achievement-subject-names" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <label class="third-field">Приказ
@@ -283,12 +290,7 @@
               <span aria-hidden="true">₸</span>
             </span>
           </label>
-          <label class="third-field">Предмет
-            <span class="student-autocomplete">
-              <input type="text" id="achievement-subject" required autocomplete="off" placeholder="Начните вводить предмет" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-subject-names">
-              <span id="achievement-subject-names" class="student-suggestion-menu" role="listbox" hidden></span>
-            </span>
-          </label>
+          <div class="achievement-section-title wide-field">Классификация</div>
           <label class="half-field">Уровень
             <select id="achievement-level">
               <option value="">Не выбрано</option>
@@ -335,6 +337,7 @@
               <option value="Онлайн">Онлайн</option>
             </select>
           </label>
+          <div class="achievement-section-title wide-field">Участие</div>
           <label>ФИО руководителя
             <span class="student-autocomplete">
               <input type="text" id="achievement-supervisor" autocomplete="off" placeholder="Начните вводить фамилию или имя" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-supervisors">
@@ -342,13 +345,26 @@
             </span>
           </label>
           <label>Организаторы<input type="text" id="achievement-organizers"></label>
+          <div class="achievement-section-title wide-field">Место и период</div>
+          <label class="half-field">Страна
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-country" autocomplete="off" placeholder="Начните вводить страну" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-countries">
+              <span id="achievement-countries" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+          </label>
+          <label class="half-field">Город
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-city" autocomplete="off" placeholder="Начните вводить город" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-cities">
+              <span id="achievement-cities" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+          </label>
           <fieldset class="achievement-date-range wide-field">
             <legend>Период проведения</legend>
             <label>Начало<input type="date" id="achievement-date"></label>
             <label>Окончание<input type="date" id="achievement-end-date"></label>
           </fieldset>
+          <div class="achievement-section-title wide-field">Дополнительно</div>
           <label>Ссылка<input type="url" id="achievement-link" placeholder="https://..."></label>
-          <label>Город<input type="text" id="achievement-city"></label>
 
           <div class="achievement-form-actions wide-field">
             <button type="submit" id="save-achievement-button">Сохранить достижение</button>
