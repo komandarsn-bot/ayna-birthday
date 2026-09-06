@@ -53,6 +53,7 @@ create table if not exists public.achievements (
   supervisor_name text,
   organizers text,
   event_date date,
+  event_end_date date,
   link_url text,
   city text,
   created_at timestamptz not null default now()
@@ -65,6 +66,18 @@ alter table public.achievements
   add column if not exists event_id uuid references public.achievement_events(id) on delete set null;
 alter table public.achievements
   add column if not exists subject_id uuid references public.achievement_subjects(id) on delete set null;
+alter table public.achievements
+  add column if not exists event_end_date date;
+
+alter table public.achievements
+  drop constraint if exists achievements_event_date_range_check;
+alter table public.achievements
+  add constraint achievements_event_date_range_check
+  check (
+    event_end_date is null
+    or event_date is null
+    or event_end_date >= event_date
+  );
 
 create index if not exists achievements_student_id_idx
   on public.achievements (student_id);

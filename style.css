@@ -720,6 +720,32 @@ input[type="file"] {
   font-weight: 400;
 }
 
+.student-suggestion-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+}
+
+.student-suggestion-row .student-suggestion-option {
+  width: auto;
+}
+
+.suggestion-delete-button {
+  min-width: 42px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: #a83f3f;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.suggestion-delete-button:hover,
+.suggestion-delete-button:focus-visible {
+  background: #fff0f0;
+  outline: none;
+}
+
 .student-suggestion-option:hover,
 .student-suggestion-option:focus-visible {
   background: #eef4f2;
@@ -754,6 +780,22 @@ input[type="file"] {
 
 .achievement-form .wide-field {
   grid-column: 1 / -1;
+}
+
+.achievement-date-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.achievement-date-range legend {
+  margin-bottom: 7px;
+  padding: 0;
+  font-weight: 700;
 }
 
 .achievement-form-actions {
@@ -836,6 +878,7 @@ input[type="file"] {
   .news-actions { width: 100%; flex-direction: row; flex-wrap: wrap; }
   .achievement-form { grid-template-columns: 1fr; }
   .achievement-form .wide-field { grid-column: auto; }
+  .achievement-date-range { grid-template-columns: 1fr; }
   .achievement-event-actions { grid-template-columns: 1fr; }
   .achievement-reference-grid { grid-template-columns: 1fr; }
   .school-base-columns { grid-template-columns: 1fr; }

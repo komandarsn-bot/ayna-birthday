@@ -108,6 +108,8 @@ const achievementType = document.querySelector("#achievement-type");
 const achievementTypesMenu = document.querySelector("#achievement-types");
 const achievementResult = document.querySelector("#achievement-result");
 const achievementResultsMenu = document.querySelector("#achievement-results");
+const achievementStartDate = document.querySelector("#achievement-date");
+const achievementEndDate = document.querySelector("#achievement-end-date");
 const subjectsExcelFile = document.querySelector("#subjects-excel-file");
 const uploadSubjectsButton = document.querySelector("#upload-subjects-button");
 const subjectForm = document.querySelector("#subject-form");
@@ -173,6 +175,20 @@ function syncAchievementStageOptions() {
 
 achievementLevel.addEventListener("change", syncAchievementStageOptions);
 syncAchievementStageOptions();
+
+function syncAchievementDateRange() {
+  achievementEndDate.min = achievementStartDate.value;
+  if (
+    achievementStartDate.value &&
+    achievementEndDate.value &&
+    achievementEndDate.value < achievementStartDate.value
+  ) {
+    achievementEndDate.value = achievementStartDate.value;
+  }
+}
+
+achievementStartDate.addEventListener("change", syncAchievementDateRange);
+syncAchievementDateRange();
 
 let editingNewsId = null;
 let editingNewsImagePaths = [];
@@ -887,7 +903,7 @@ function closeSuggestionMenu(input, menu) {
   input.setAttribute("aria-expanded", "false");
 }
 
-function renderSuggestionMenu(input, menu, items, onSelect) {
+function renderSuggestionMenu(input, menu, items, onSelect, onDelete = null) {
   menu.replaceChildren();
   if (!items.length) {
     const empty = document.createElement("span");
@@ -913,11 +929,41 @@ function renderSuggestionMenu(input, menu, items, onSelect) {
         onSelect(item);
         closeSuggestionMenu(input, menu);
       });
-      menu.append(option);
+      if (onDelete && item.id) {
+        const row = document.createElement("span");
+        row.className = "student-suggestion-row";
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "suggestion-delete-button";
+        deleteButton.textContent = "×";
+        deleteButton.title = "Удалить из справочника";
+        deleteButton.setAttribute("aria-label", "Удалить «" + item.label + "» из справочника");
+        deleteButton.addEventListener("mousedown", event => event.preventDefault());
+        deleteButton.addEventListener("click", function () { onDelete(item, deleteButton); });
+        row.append(option, deleteButton);
+        menu.append(row);
+      } else {
+        menu.append(option);
+      }
     });
   }
   menu.hidden = false;
   input.setAttribute("aria-expanded", "true");
+}
+
+async function deleteAchievementReferenceItem(tableName, item, button, options) {
+  if (!confirm("Удалить «" + item.name + "» из справочника?")) return;
+  button.disabled = true;
+  const { error } = await supabaseClient.from(tableName).delete().eq("id", item.id);
+  if (error) {
+    achievementMessage.textContent = "Не удалось удалить значение: " + error.message;
+    button.disabled = false;
+    return;
+  }
+  if (options.selected()?.id === item.id) options.clear();
+  await options.reload();
+  options.reopen();
+  achievementMessage.textContent = options.label + " удалено из справочника";
 }
 
 function showLastNameSuggestions() {
@@ -1327,10 +1373,22 @@ function showEventSuggestions() {
   renderSuggestionMenu(
     achievementEventName,
     achievementEventNames,
-    matches.map(item => ({ label: item.name, event: item })),
+    matches.map(item => ({ id: item.id, label: item.name, event: item })),
     item => {
       achievementEventName.value = item.event.name;
       selectedAchievementEvent = item.event;
+    },
+    function (item, button) {
+      deleteAchievementReferenceItem("achievement_events", item.event, button, {
+        selected: () => selectedAchievementEvent,
+        clear: function () {
+          selectedAchievementEvent = null;
+          achievementEventName.value = "";
+        },
+        reload: loadAchievementEvents,
+        reopen: showEventSuggestions,
+        label: "Мероприятие"
+      });
     }
   );
 }
@@ -1435,10 +1493,22 @@ function showSubjectSuggestions() {
   renderSuggestionMenu(
     achievementSubject,
     achievementSubjectNames,
-    matches.map(item => ({ label: item.name, subject: item })),
+    matches.map(item => ({ id: item.id, label: item.name, subject: item })),
     item => {
       achievementSubject.value = item.subject.name;
       selectedAchievementSubject = item.subject;
+    },
+    function (item, button) {
+      deleteAchievementReferenceItem("achievement_subjects", item.subject, button, {
+        selected: () => selectedAchievementSubject,
+        clear: function () {
+          selectedAchievementSubject = null;
+          achievementSubject.value = "";
+        },
+        reload: loadAchievementSubjects,
+        reopen: showSubjectSuggestions,
+        label: "Предмет"
+      });
     }
   );
 }
@@ -1532,10 +1602,7 @@ async function loadAchievementTypes(selectedName = "") {
   if (!error) {
     const { data: sessionData } = await supabaseClient.auth.getSession();
     const userId = sessionData.session?.user?.id;
-    const storedNames = new Set(customTypes.map(item => item.name.toLocaleLowerCase("ru")));
-    const missingNames = defaultAchievementTypeNames.filter(function (name) {
-      return !storedNames.has(name.toLocaleLowerCase("ru"));
-    });
+    const missingNames = customTypes.length ? [] : defaultAchievementTypeNames;
     if (userId && missingNames.length) {
       const { data: addedTypes, error: seedError } = await supabaseClient
         .from("achievement_types")
@@ -1548,9 +1615,11 @@ async function loadAchievementTypes(selectedName = "") {
     }
   }
   const byName = new Map();
-  defaultAchievementTypeNames.forEach(function (name) {
-    byName.set(name.toLocaleLowerCase("ru"), { id: null, name: name, builtIn: true });
-  });
+  if (error) {
+    defaultAchievementTypeNames.forEach(function (name) {
+      byName.set(name.toLocaleLowerCase("ru"), { id: null, name: name, builtIn: true });
+    });
+  }
   customTypes.forEach(function (item) {
     byName.set(item.name.toLocaleLowerCase("ru"), item);
   });
@@ -1582,10 +1651,13 @@ function showAchievementTypeSuggestions() {
   renderSuggestionMenu(
     achievementType,
     achievementTypesMenu,
-    matches.map(item => ({ label: item.name, type: item })),
+    matches.map(item => ({ id: item.id, label: item.name, type: item })),
     function (item) {
       achievementType.value = item.type.name;
       selectedAchievementType = item.type;
+    },
+    function (item, button) {
+      deleteAchievementType(item.type, button);
     }
   );
 
@@ -1625,6 +1697,24 @@ async function addAchievementType(name, button) {
   achievementMessage.textContent = "Новый вид достижения добавлен в список";
 }
 
+async function deleteAchievementType(item, button) {
+  if (!confirm("Удалить вид достижения «" + item.name + "» из справочника?")) return;
+  button.disabled = true;
+  const { error } = await supabaseClient.from("achievement_types").delete().eq("id", item.id);
+  if (error) {
+    achievementMessage.textContent = "Не удалось удалить вид достижения: " + error.message;
+    button.disabled = false;
+    return;
+  }
+  if (selectedAchievementType?.id === item.id) {
+    selectedAchievementType = null;
+    achievementType.value = "";
+  }
+  await loadAchievementTypes();
+  showAchievementTypeSuggestions();
+  achievementMessage.textContent = "Вид достижения удалён из списка";
+}
+
 achievementType.addEventListener("input", function () {
   chooseAchievementType();
   showAchievementTypeSuggestions();
@@ -1654,10 +1744,7 @@ async function loadAchievementResults(selectedName = "") {
   if (!error) {
     const { data: sessionData } = await supabaseClient.auth.getSession();
     const userId = sessionData.session?.user?.id;
-    const storedNames = new Set(customResults.map(item => item.name.toLocaleLowerCase("ru")));
-    const missingNames = defaultAchievementResultNames.filter(function (name) {
-      return !storedNames.has(name.toLocaleLowerCase("ru"));
-    });
+    const missingNames = customResults.length ? [] : defaultAchievementResultNames;
     if (userId && missingNames.length) {
       const { data: addedResults, error: seedError } = await supabaseClient
         .from("achievement_results")
@@ -1671,9 +1758,11 @@ async function loadAchievementResults(selectedName = "") {
   }
 
   const byName = new Map();
-  defaultAchievementResultNames.forEach(function (name) {
-    byName.set(name.toLocaleLowerCase("ru"), { id: null, name: name, builtIn: true });
-  });
+  if (error) {
+    defaultAchievementResultNames.forEach(function (name) {
+      byName.set(name.toLocaleLowerCase("ru"), { id: null, name: name, builtIn: true });
+    });
+  }
   customResults.forEach(function (item) {
     byName.set(item.name.toLocaleLowerCase("ru"), item);
   });
@@ -1705,10 +1794,13 @@ function showAchievementResultSuggestions() {
   renderSuggestionMenu(
     achievementResult,
     achievementResultsMenu,
-    matches.map(item => ({ label: item.name, result: item })),
+    matches.map(item => ({ id: item.id, label: item.name, result: item })),
     function (item) {
       achievementResult.value = item.result.name;
       selectedAchievementResult = item.result;
+    },
+    function (item, button) {
+      deleteAchievementResult(item.result, button);
     }
   );
 
@@ -1748,6 +1840,24 @@ async function addAchievementResult(name, button) {
   achievementMessage.textContent = "Новый результат добавлен в список";
 }
 
+async function deleteAchievementResult(item, button) {
+  if (!confirm("Удалить результат «" + item.name + "» из справочника?")) return;
+  button.disabled = true;
+  const { error } = await supabaseClient.from("achievement_results").delete().eq("id", item.id);
+  if (error) {
+    achievementMessage.textContent = "Не удалось удалить результат: " + error.message;
+    button.disabled = false;
+    return;
+  }
+  if (selectedAchievementResult?.id === item.id) {
+    selectedAchievementResult = null;
+    achievementResult.value = "";
+  }
+  await loadAchievementResults();
+  showAchievementResultSuggestions();
+  achievementMessage.textContent = "Результат удалён из списка";
+}
+
 achievementResult.addEventListener("input", function () {
   chooseAchievementResult();
   showAchievementResultSuggestions();
@@ -1783,7 +1893,8 @@ const achievementColumns = [
   ["result", "Место / результат"],
   ["supervisor_name", "ФИО руководителя"],
   ["organizers", "Организаторы"],
-  ["event_date", "Дата проведения"],
+  ["event_date", "Начало"],
+  ["event_end_date", "Окончание"],
   ["link_url", "Ссылка"],
   ["city", "Город"]
 ];
@@ -1803,7 +1914,7 @@ function formatAchievementCell(key, value) {
       maximumFractionDigits: 2
     }).format(value);
   }
-  if (key === "event_date") {
+  if (key === "event_date" || key === "event_end_date") {
     return new Date(value + "T00:00:00").toLocaleDateString("ru-RU");
   }
   return String(value);
@@ -1949,6 +2060,15 @@ achievementForm.addEventListener("submit", async function (event) {
     showSupervisorSuggestions();
     return;
   }
+  if (
+    achievementStartDate.value &&
+    achievementEndDate.value &&
+    achievementEndDate.value < achievementStartDate.value
+  ) {
+    achievementMessage.textContent = "Дата окончания не может быть раньше даты начала";
+    achievementEndDate.focus();
+    return;
+  }
 
   const costValue = document.querySelector("#achievement-cost").value;
   const achievement = {
@@ -1974,6 +2094,7 @@ achievementForm.addEventListener("submit", async function (event) {
       : null,
     organizers: achievementValue("#achievement-organizers"),
     event_date: achievementValue("#achievement-date"),
+    event_end_date: achievementValue("#achievement-end-date"),
     link_url: achievementValue("#achievement-link"),
     city: achievementValue("#achievement-city")
   };
@@ -1990,6 +2111,7 @@ achievementForm.addEventListener("submit", async function (event) {
 
   achievementForm.reset();
   syncAchievementStageOptions();
+  syncAchievementDateRange();
   resetAchievementStudentSelection();
   selectedAchievementEvent = null;
   closeSuggestionMenu(achievementEventName, achievementEventNames);
