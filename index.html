@@ -336,8 +336,20 @@
               <option value="NON ACADEMIC">Non Academic</option>
             </select>
           </label>
-          <label>Формат<input type="text" id="achievement-format" placeholder="Очно / онлайн"></label>
-          <label>Место / результат<input type="text" id="achievement-result"></label>
+          <label>Формат
+            <select id="achievement-format">
+              <option value="">Не выбрано</option>
+              <option value="Офлайн">Офлайн</option>
+              <option value="Онлайн">Онлайн</option>
+            </select>
+          </label>
+          <label>Место / результат
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-result" autocomplete="off" placeholder="Начните вводить результат" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-results">
+              <span id="achievement-results" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+            <small>Если нужного варианта нет, его можно сразу добавить в список.</small>
+          </label>
           <label>ФИО руководителя
             <span class="student-autocomplete">
               <input type="text" id="achievement-supervisor" autocomplete="off" placeholder="Начните вводить фамилию или имя" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-supervisors">
@@ -373,6 +385,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=25"></script>
+    <script src="script.js?v=26"></script>
   </body>
 </html>

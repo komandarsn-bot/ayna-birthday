@@ -106,6 +106,8 @@ const achievementLevel = document.querySelector("#achievement-level");
 const achievementStage = document.querySelector("#achievement-stage");
 const achievementType = document.querySelector("#achievement-type");
 const achievementTypesMenu = document.querySelector("#achievement-types");
+const achievementResult = document.querySelector("#achievement-result");
+const achievementResultsMenu = document.querySelector("#achievement-results");
 const subjectsExcelFile = document.querySelector("#subjects-excel-file");
 const uploadSubjectsButton = document.querySelector("#upload-subjects-button");
 const subjectForm = document.querySelector("#subject-form");
@@ -123,6 +125,8 @@ let achievementSubjects = [];
 let selectedAchievementSubject = null;
 let achievementTypes = [];
 let selectedAchievementType = null;
+let achievementResults = [];
+let selectedAchievementResult = null;
 
 const defaultAchievementTypeNames = [
   "Олимпиада",
@@ -132,6 +136,16 @@ const defaultAchievementTypeNames = [
   "Благотворительное мероприятие",
   "Хакатон",
   "Вручение"
+];
+
+const defaultAchievementResultNames = [
+  "1 место",
+  "2 место",
+  "3 место",
+  "Почётная грамота",
+  "Абсолютный чемпион",
+  "Сертификат",
+  "Благодарственное письмо"
 ];
 
 const achievementScopeOrder = [
@@ -221,6 +235,7 @@ function updateAuthView(session) {
     loadAchievementEvents();
     loadAchievementSubjects();
     loadAchievementTypes();
+    loadAchievementResults();
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -1629,6 +1644,129 @@ achievementType.addEventListener("blur", function () {
   setTimeout(() => closeSuggestionMenu(achievementType, achievementTypesMenu), 120);
 });
 
+async function loadAchievementResults(selectedName = "") {
+  const { data: loadedResults, error } = await supabaseClient
+    .from("achievement_results")
+    .select("id,name")
+    .order("name");
+
+  let customResults = error ? [] : (loadedResults || []);
+  if (!error) {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const userId = sessionData.session?.user?.id;
+    const storedNames = new Set(customResults.map(item => item.name.toLocaleLowerCase("ru")));
+    const missingNames = defaultAchievementResultNames.filter(function (name) {
+      return !storedNames.has(name.toLocaleLowerCase("ru"));
+    });
+    if (userId && missingNames.length) {
+      const { data: addedResults, error: seedError } = await supabaseClient
+        .from("achievement_results")
+        .upsert(
+          missingNames.map(name => ({ user_id: userId, name: name })),
+          { onConflict: "user_id,name" }
+        )
+        .select("id,name");
+      if (!seedError && addedResults) customResults = customResults.concat(addedResults);
+    }
+  }
+
+  const byName = new Map();
+  defaultAchievementResultNames.forEach(function (name) {
+    byName.set(name.toLocaleLowerCase("ru"), { id: null, name: name, builtIn: true });
+  });
+  customResults.forEach(function (item) {
+    byName.set(item.name.toLocaleLowerCase("ru"), item);
+  });
+  achievementResults = Array.from(byName.values()).sort(function (a, b) {
+    return a.name.localeCompare(b.name, "ru", { numeric: true });
+  });
+
+  if (selectedName) {
+    achievementResult.value = selectedName;
+    chooseAchievementResult();
+  }
+  if (document.activeElement === achievementResult) showAchievementResultSuggestions();
+}
+
+function chooseAchievementResult() {
+  const value = achievementResult.value.trim().toLocaleLowerCase("ru");
+  selectedAchievementResult = achievementResults.find(function (item) {
+    return item.name.toLocaleLowerCase("ru") === value;
+  }) || null;
+}
+
+function showAchievementResultSuggestions() {
+  const value = achievementResult.value.trim();
+  const query = value.toLocaleLowerCase("ru");
+  const matches = achievementResults
+    .filter(item => item.name.toLocaleLowerCase("ru").includes(query))
+    .slice(0, 7);
+
+  renderSuggestionMenu(
+    achievementResult,
+    achievementResultsMenu,
+    matches.map(item => ({ label: item.name, result: item })),
+    function (item) {
+      achievementResult.value = item.result.name;
+      selectedAchievementResult = item.result;
+    }
+  );
+
+  const exactMatch = achievementResults.some(function (item) {
+    return item.name.toLocaleLowerCase("ru") === query;
+  });
+  if (value && !exactMatch) {
+    const addOption = document.createElement("button");
+    addOption.type = "button";
+    addOption.className = "student-suggestion-option suggestion-add-option";
+    addOption.textContent = "+ Добавить «" + value + "» в список";
+    addOption.addEventListener("mousedown", event => event.preventDefault());
+    addOption.addEventListener("click", function () {
+      addAchievementResult(value, addOption);
+    });
+    achievementResultsMenu.append(addOption);
+  }
+}
+
+async function addAchievementResult(name, button) {
+  const userId = await getCurrentUserId(achievementMessage);
+  if (!userId) return;
+  button.disabled = true;
+  achievementMessage.textContent = "Добавляем новый результат...";
+  const { error } = await supabaseClient
+    .from("achievement_results")
+    .upsert({ user_id: userId, name: name }, { onConflict: "user_id,name" });
+
+  if (error) {
+    achievementMessage.textContent = "Не удалось сохранить новый результат. Сначала обновите таблицы Supabase.";
+    button.disabled = false;
+    return;
+  }
+
+  await loadAchievementResults(name);
+  closeSuggestionMenu(achievementResult, achievementResultsMenu);
+  achievementMessage.textContent = "Новый результат добавлен в список";
+}
+
+achievementResult.addEventListener("input", function () {
+  chooseAchievementResult();
+  showAchievementResultSuggestions();
+});
+achievementResult.addEventListener("focus", showAchievementResultSuggestions);
+achievementResult.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") closeSuggestionMenu(achievementResult, achievementResultsMenu);
+  if (event.key === "ArrowDown" && !achievementResultsMenu.hidden) {
+    const firstOption = achievementResultsMenu.querySelector("button");
+    if (firstOption) {
+      event.preventDefault();
+      firstOption.focus();
+    }
+  }
+});
+achievementResult.addEventListener("blur", function () {
+  setTimeout(() => closeSuggestionMenu(achievementResult, achievementResultsMenu), 120);
+});
+
 const achievementColumns = [
   ["last_name", "Ф"],
   ["first_name", "И"],
@@ -1798,6 +1936,13 @@ achievementForm.addEventListener("submit", async function (event) {
     showAchievementTypeSuggestions();
     return;
   }
+  chooseAchievementResult();
+  if (achievementResult.value.trim() && !selectedAchievementResult) {
+    achievementMessage.textContent = "Выберите результат из списка или добавьте новый";
+    achievementResult.focus();
+    showAchievementResultSuggestions();
+    return;
+  }
   if (achievementSupervisor.value.trim() && !selectedAchievementSupervisor) {
     achievementMessage.textContent = "Выберите руководителя из списка учителей";
     achievementSupervisor.focus();
@@ -1823,7 +1968,7 @@ achievementForm.addEventListener("submit", async function (event) {
     project_name: selectedAchievementType.name,
     academic_type: achievementValue("#achievement-academic-type"),
     event_format: achievementValue("#achievement-format"),
-    result: achievementValue("#achievement-result"),
+    result: selectedAchievementResult ? selectedAchievementResult.name : null,
     supervisor_name: selectedAchievementSupervisor
       ? selectedAchievementSupervisor.last_name + " " + selectedAchievementSupervisor.first_name
       : null,
@@ -1852,6 +1997,8 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementSubject, achievementSubjectNames);
   selectedAchievementType = null;
   closeSuggestionMenu(achievementType, achievementTypesMenu);
+  selectedAchievementResult = null;
+  closeSuggestionMenu(achievementResult, achievementResultsMenu);
   selectedAchievementSupervisor = null;
   closeSuggestionMenu(achievementSupervisor, achievementSupervisors);
   achievementMessage.textContent = "Достижение сохранено";
