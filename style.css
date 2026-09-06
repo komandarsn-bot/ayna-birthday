@@ -662,6 +662,7 @@ input[type="file"] {
 }
 
 .achievement-currency-input input {
+  box-sizing: border-box;
   width: 100%;
   padding-right: 44px;
 }

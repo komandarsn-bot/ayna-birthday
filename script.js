@@ -102,6 +102,8 @@ const addEventButton = document.querySelector("#add-event-button");
 const eventManagerMessage = document.querySelector("#event-manager-message");
 const achievementSubject = document.querySelector("#achievement-subject");
 const achievementSubjectNames = document.querySelector("#achievement-subject-names");
+const achievementLevel = document.querySelector("#achievement-level");
+const achievementStage = document.querySelector("#achievement-stage");
 const subjectsExcelFile = document.querySelector("#subjects-excel-file");
 const uploadSubjectsButton = document.querySelector("#upload-subjects-button");
 const subjectForm = document.querySelector("#subject-form");
@@ -117,6 +119,32 @@ let achievementEvents = [];
 let selectedAchievementEvent = null;
 let achievementSubjects = [];
 let selectedAchievementSubject = null;
+
+const achievementScopeOrder = [
+  "Школьный",
+  "Районный",
+  "Городской",
+  "Республиканский",
+  "Международный"
+];
+
+function syncAchievementStageOptions() {
+  const levelRank = achievementScopeOrder.indexOf(achievementLevel.value);
+  achievementStage.disabled = levelRank < 0;
+  achievementStage.options[0].textContent = levelRank < 0
+    ? "Сначала выберите уровень"
+    : "Не выбрано";
+
+  Array.from(achievementStage.options).forEach(function (option) {
+    if (!option.value) return;
+    option.disabled = achievementScopeOrder.indexOf(option.value) > levelRank;
+  });
+
+  if (achievementStage.selectedOptions[0]?.disabled) achievementStage.value = "";
+}
+
+achievementLevel.addEventListener("change", syncAchievementStageOptions);
+syncAchievementStageOptions();
 
 let editingNewsId = null;
 let editingNewsImagePaths = [];
@@ -1619,6 +1647,13 @@ achievementForm.addEventListener("submit", async function (event) {
     showSubjectSuggestions();
     return;
   }
+  const levelRank = achievementScopeOrder.indexOf(achievementLevel.value);
+  const stageRank = achievementScopeOrder.indexOf(achievementStage.value);
+  if (stageRank > levelRank) {
+    achievementMessage.textContent = "Этап не может быть выше уровня мероприятия";
+    achievementStage.focus();
+    return;
+  }
   if (achievementSupervisor.value.trim() && !selectedAchievementSupervisor) {
     achievementMessage.textContent = "Выберите руководителя из списка учителей";
     achievementSupervisor.focus();
@@ -1665,6 +1700,7 @@ achievementForm.addEventListener("submit", async function (event) {
   }
 
   achievementForm.reset();
+  syncAchievementStageOptions();
   resetAchievementStudentSelection();
   selectedAchievementEvent = null;
   closeSuggestionMenu(achievementEventName, achievementEventNames);
