@@ -77,6 +77,7 @@ const achievementMessage = document.querySelector("#achievement-message");
 const loadAchievementsButton = document.querySelector("#load-achievements-button");
 const finishAchievementsButton = document.querySelector("#finish-achievements-button");
 const achievementExportMessage = document.querySelector("#achievement-export-message");
+const achievementExportPanel = document.querySelector("#achievement-export-panel");
 const copyLastAchievementButton = document.querySelector("#copy-last-achievement-button");
 const cancelAchievementEditButton = document.querySelector("#cancel-achievement-edit-button");
 const achievementsList = document.querySelector("#achievements-list");
@@ -2406,6 +2407,7 @@ finishAchievementsButton.addEventListener("click", async function () {
     lastAchievementExportAt = 0;
     await storeAchievementDirectory(achievementExportDirectory);
     await storeAchievementExportSession();
+    achievementExportPanel.classList.remove("needs-attention");
     achievementExportMessage.textContent = "Выбрана папка: " + achievementExportDirectory.name;
   } catch (error) {
     if (error.name !== "AbortError") achievementExportMessage.textContent = "Ошибка выбора папки: " + error.message;
@@ -2715,6 +2717,14 @@ achievementForm.addEventListener("submit", async function (event) {
   ) {
     achievementMessage.textContent = "Дата окончания не может быть раньше даты начала";
     achievementEndDate.focus();
+    return;
+  }
+
+  if (!achievementExportDirectory) {
+    achievementExportMessage.textContent = "Сначала выберите папку для сохранения Excel-файлов";
+    achievementExportPanel.classList.add("needs-attention");
+    achievementExportPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+    finishAchievementsButton.focus();
     return;
   }
 

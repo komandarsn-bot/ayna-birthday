@@ -892,26 +892,43 @@ input[type="file"] {
   gap: 14px;
 }
 
-.achievement-section-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
+.achievement-export-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 18px;
+  margin: 20px 0 24px;
+  padding: 14px 16px;
+  border: 1px solid #d5e0dd;
+  border-radius: 12px;
+  background: #f7faf9;
 }
 
-.achievement-section-header h2 {
-  margin-top: 0;
+.achievement-export-panel.needs-attention {
+  border-color: #c95656;
+  background: #fff8f8;
 }
 
-.achievement-section-header p {
-  margin-bottom: 0;
+.achievement-export-copy {
+  display: grid;
+  gap: 3px;
 }
 
-.achievement-section-header .secondary-button {
+.achievement-export-copy span {
+  color: #687873;
+  font-size: 14px;
+}
+
+.achievement-export-panel .secondary-button {
   width: auto;
   margin: 0;
-  flex: 0 0 auto;
+}
+
+.achievement-export-panel .form-message {
+  grid-column: 1 / -1;
+  min-height: 0;
+  margin: 0;
+  font-size: 14px;
 }
 
 .achievement-form-actions button {
@@ -992,6 +1009,8 @@ input[type="file"] {
 }
 
 @media (max-width: 600px) {
+  .achievement-export-panel { grid-template-columns: 1fr; }
+  .achievement-export-panel .secondary-button { width: 100%; }
   .news-row { align-items: flex-start; flex-wrap: wrap; }
   .news-row img { width: 100%; height: 180px; }
   .news-row-placeholder { width: 100%; height: 100px; }

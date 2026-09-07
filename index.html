@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=39">
+    <link rel="stylesheet" href="style.css?v=40">
   </head>
 
   <body>
@@ -236,14 +236,17 @@
       </section>
 
       <section class="card">
-        <div class="achievement-section-header">
-          <div>
-            <h2>База достижений</h2>
-            <p>Сначала выберите ученика и мероприятие из подготовленных справочников.</p>
+        <h2>База достижений</h2>
+        <p>Сначала выберите ученика и мероприятие из подготовленных справочников.</p>
+
+        <div id="achievement-export-panel" class="achievement-export-panel">
+          <div class="achievement-export-copy">
+            <strong>Сохранение файлов</strong>
+            <span>Excel-файл будет обновляться после сохранения достижения.</span>
           </div>
-          <button type="button" id="finish-achievements-button" class="secondary-button compact-button">Выбрать папку для сохранения файлов</button>
+          <button type="button" id="finish-achievements-button" class="secondary-button compact-button">Выбрать папку</button>
+          <p id="achievement-export-message" class="form-message" aria-live="polite">Папка не выбрана</p>
         </div>
-        <p id="achievement-export-message" class="form-message" aria-live="polite"></p>
 
         <form id="achievement-form" class="achievement-form">
           <div class="achievement-student-row">
@@ -393,6 +396,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=41"></script>
+    <script src="script.js?v=42"></script>
   </body>
 </html>
