@@ -1,6 +1,6 @@
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const columns = [
-  ["last_name", "Ф"], ["first_name", "И"], ["class_name", "Класс"],
+  ["last_name", "Фамилия"], ["first_name", "Имя"], ["class_name", "Класс"],
   ["event_name", "Наименование мероприятия"], ["order_reference", "Приказ"],
   ["cost", "Стоимость, ₸"], ["subject", "Предмет"], ["achievement_level", "Уровень"],
   ["event_stage", "Этап"], ["project_name", "Вид достижения"],
@@ -26,19 +26,29 @@ function formatValue(key, value) {
 }
 
 function buildColumnFilters() {
-  const selectedValues = new Map(Array.from(columnFilters.querySelectorAll("select"), select => [select.dataset.key, select.value]));
-  const controls = columns.map(([key, label]) => {
+  const selectedValues = new Map(Array.from(columnFilters.querySelectorAll("[data-key]"), control => [control.dataset.key, control.value]));
+  const controls = columns.filter(([key]) => key !== "link_url").map(([key, label]) => {
     const wrapper = document.createElement("label");
-    wrapper.textContent = label;
-    const select = document.createElement("select");
-    select.dataset.key = key;
-    select.append(new Option("Все", ""));
-    Array.from(new Set(records.map(item => item[key]).filter(value => value !== null && value !== undefined && value !== "")))
-      .sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }))
-      .forEach(value => select.append(new Option(formatValue(key, value), String(value))));
-    select.value = selectedValues.get(key) || "";
-    select.addEventListener("input", render);
-    wrapper.append(select);
+    wrapper.textContent = key === "event_date" ? "Период: с" : key === "event_end_date" ? "Период: по" : label;
+    let control;
+    if (key === "event_date" || key === "event_end_date") {
+      control = document.createElement("input");
+      control.type = "date";
+    } else {
+      control = document.createElement("select");
+      control.append(new Option("Все", ""));
+      if (key === "cost") {
+        control.append(new Option("Бесплатно", "free"), new Option("Платно", "paid"));
+      } else {
+        Array.from(new Set(records.map(item => item[key]).filter(value => value !== null && value !== undefined && value !== "")))
+          .sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }))
+          .forEach(value => control.append(new Option(formatValue(key, value), String(value))));
+      }
+    }
+    control.dataset.key = key;
+    control.value = selectedValues.get(key) || "";
+    control.addEventListener("input", render);
+    wrapper.append(control);
     return wrapper;
   });
   columnFilters.replaceChildren(...controls);
@@ -49,9 +59,17 @@ function visibleRecords() {
   return records.filter(item => {
     const text = columns.map(([key]) => item[key] ?? "").join(" ").toLocaleLowerCase("ru");
     if (query && !text.includes(query)) return false;
-    return Array.from(columnFilters.querySelectorAll("select")).every(select =>
-      !select.value || String(item[select.dataset.key] ?? "") === select.value
-    );
+    return Array.from(columnFilters.querySelectorAll("[data-key]")).every(control => {
+      if (!control.value) return true;
+      const key = control.dataset.key;
+      if (key === "cost") {
+        const paid = Number(item.cost || 0) > 0;
+        return control.value === "paid" ? paid : !paid;
+      }
+      if (key === "event_date") return (item.event_end_date || item.event_date || "") >= control.value;
+      if (key === "event_end_date") return (item.event_date || item.event_end_date || "") <= control.value;
+      return String(item[key] ?? "") === control.value;
+    });
   }).sort((a, b) => {
     const left = a[sortKey] ?? "";
     const right = b[sortKey] ?? "";
@@ -104,7 +122,7 @@ async function load() {
 searchInput.addEventListener("input", render);
 document.querySelector("#reset-filters").addEventListener("click", () => {
   searchInput.value = "";
-  columnFilters.querySelectorAll("select").forEach(select => { select.value = ""; });
+  columnFilters.querySelectorAll("[data-key]").forEach(control => { control.value = ""; });
   render();
 });
 document.querySelector("#refresh-table").addEventListener("click", load);

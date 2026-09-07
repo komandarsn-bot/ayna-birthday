@@ -2213,8 +2213,8 @@ async function addLocationReference(reference, name, button) {
 });
 
 const achievementColumns = [
-  ["last_name", "Ф"],
-  ["first_name", "И"],
+  ["last_name", "Фамилия"],
+  ["first_name", "Имя"],
   ["class_name", "Класс"],
   ["event_name", "Наименование мероприятия"],
   ["order_reference", "Приказ"],
@@ -2509,20 +2509,30 @@ let achievementSortDirection = "desc";
 
 function refreshAchievementFilterOptions() {
   const selectedValues = new Map(
-    Array.from(achievementColumnFilters.querySelectorAll("select"), select => [select.dataset.key, select.value])
+    Array.from(achievementColumnFilters.querySelectorAll("[data-key]"), control => [control.dataset.key, control.value])
   );
-  const controls = achievementColumns.map(function ([key, label]) {
+  const controls = achievementColumns.filter(([key]) => key !== "link_url").map(function ([key, label]) {
     const wrapper = document.createElement("label");
-    wrapper.textContent = label;
-    const select = document.createElement("select");
-    select.dataset.key = key;
-    const values = Array.from(new Set(loadedAchievements.map(item => item[key]).filter(value => value !== null && value !== undefined && value !== "")))
-      .sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }));
-    select.append(new Option("Все", ""));
-    values.forEach(value => select.append(new Option(formatAchievementCell(key, value), String(value))));
-    select.value = selectedValues.get(key) || "";
-    select.addEventListener("input", renderAchievementsTable);
-    wrapper.append(select);
+    wrapper.textContent = key === "event_date" ? "Период: с" : key === "event_end_date" ? "Период: по" : label;
+    let control;
+    if (key === "event_date" || key === "event_end_date") {
+      control = document.createElement("input");
+      control.type = "date";
+    } else {
+      control = document.createElement("select");
+      control.append(new Option("Все", ""));
+      if (key === "cost") {
+        control.append(new Option("Бесплатно", "free"), new Option("Платно", "paid"));
+      } else {
+        const values = Array.from(new Set(loadedAchievements.map(item => item[key]).filter(value => value !== null && value !== undefined && value !== "")))
+          .sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }));
+        values.forEach(value => control.append(new Option(formatAchievementCell(key, value), String(value))));
+      }
+    }
+    control.dataset.key = key;
+    control.value = selectedValues.get(key) || "";
+    control.addEventListener("input", renderAchievementsTable);
+    wrapper.append(control);
     return wrapper;
   });
   achievementColumnFilters.replaceChildren(...controls);
@@ -2536,8 +2546,16 @@ function getVisibleAchievements() {
       .join(" ")
       .toLocaleLowerCase("ru");
     if (search && !searchableText.includes(search)) return false;
-    return Array.from(achievementColumnFilters.querySelectorAll("select")).every(function (select) {
-      return !select.value || String(item[select.dataset.key] ?? "") === select.value;
+    return Array.from(achievementColumnFilters.querySelectorAll("[data-key]")).every(function (control) {
+      if (!control.value) return true;
+      const key = control.dataset.key;
+      if (key === "cost") {
+        const paid = Number(item.cost || 0) > 0;
+        return control.value === "paid" ? paid : !paid;
+      }
+      if (key === "event_date") return (item.event_end_date || item.event_date || "") >= control.value;
+      if (key === "event_end_date") return (item.event_date || item.event_end_date || "") <= control.value;
+      return String(item[key] ?? "") === control.value;
     });
   });
 
@@ -2678,7 +2696,7 @@ achievementTableSearch.addEventListener("input", renderAchievementsTable);
 
 resetAchievementFilters.addEventListener("click", function () {
   achievementTableSearch.value = "";
-  achievementColumnFilters.querySelectorAll("select").forEach(select => { select.value = ""; });
+  achievementColumnFilters.querySelectorAll("[data-key]").forEach(control => { control.value = ""; });
   renderAchievementsTable();
 });
 
