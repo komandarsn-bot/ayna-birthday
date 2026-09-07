@@ -75,6 +75,7 @@ const achievementForm = document.querySelector("#achievement-form");
 const saveAchievementButton = document.querySelector("#save-achievement-button");
 const achievementMessage = document.querySelector("#achievement-message");
 const loadAchievementsButton = document.querySelector("#load-achievements-button");
+const finishAchievementsButton = document.querySelector("#finish-achievements-button");
 const achievementsList = document.querySelector("#achievements-list");
 const studentsExcelFile = document.querySelector("#students-excel-file");
 const uploadStudentsButton = document.querySelector("#upload-students-button");
@@ -2224,6 +2225,124 @@ const achievementColumns = [
   ["city", "Город"]
 ];
 
+const achievementExportDatabaseName = "ayna-achievement-export";
+const achievementExportStoreName = "settings";
+let achievementExportDirectory = null;
+
+function openAchievementExportDatabase() {
+  return new Promise(function (resolve, reject) {
+    const request = indexedDB.open(achievementExportDatabaseName, 1);
+    request.onupgradeneeded = function () {
+      if (!request.result.objectStoreNames.contains(achievementExportStoreName)) {
+        request.result.createObjectStore(achievementExportStoreName);
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function loadStoredAchievementDirectory() {
+  const database = await openAchievementExportDatabase();
+  return new Promise(function (resolve, reject) {
+    const transaction = database.transaction(achievementExportStoreName, "readonly");
+    const request = transaction.objectStore(achievementExportStoreName).get("directory");
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function storeAchievementDirectory(directory) {
+  const database = await openAchievementExportDatabase();
+  return new Promise(function (resolve, reject) {
+    const transaction = database.transaction(achievementExportStoreName, "readwrite");
+    transaction.objectStore(achievementExportStoreName).put(directory, "directory");
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+async function ensureAchievementExportDirectory() {
+  if (!window.showDirectoryPicker) {
+    throw new Error("Выбор папки поддерживается в Google Chrome или Microsoft Edge");
+  }
+  if (achievementExportDirectory) {
+    const permission = await achievementExportDirectory.queryPermission({ mode: "readwrite" });
+    if (permission === "granted") return achievementExportDirectory;
+    if (await achievementExportDirectory.requestPermission({ mode: "readwrite" }) === "granted") {
+      return achievementExportDirectory;
+    }
+  }
+  achievementExportDirectory = await window.showDirectoryPicker({ mode: "readwrite" });
+  await storeAchievementDirectory(achievementExportDirectory);
+  return achievementExportDirectory;
+}
+
+async function getAchievementExportRows() {
+  const { data, error } = await supabaseClient
+    .from("achievements")
+    .select("*")
+    .order("event_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+async function writeAchievementsExcel(directory) {
+  const achievements = await getAchievementExportRows();
+  const rows = achievements.map(function (achievement) {
+    const row = {};
+    achievementColumns.forEach(function ([key, label]) {
+      row[label] = key === "cost" ? achievement[key] : formatAchievementCell(key, achievement[key]);
+    });
+    return row;
+  });
+  const worksheet = XLSX.utils.json_to_sheet(rows, {
+    header: achievementColumns.map(([, label]) => label)
+  });
+  worksheet["!cols"] = achievementColumns.map(function ([, label]) {
+    const longest = Math.max(label.length, ...rows.map(row => String(row[label] ?? "").length));
+    return { wch: Math.min(Math.max(longest + 2, 12), 42) };
+  });
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Достижения");
+  const content = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const fileHandle = await directory.getFileHandle("База достижений.xlsx", { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(content);
+  await writable.close();
+  return achievements.length;
+}
+
+async function syncAchievementExportIfReady() {
+  if (!achievementExportDirectory) return;
+  if (await achievementExportDirectory.queryPermission({ mode: "readwrite" }) !== "granted") return;
+  try {
+    await writeAchievementsExcel(achievementExportDirectory);
+  } catch (error) {
+    console.warn("Не удалось автоматически обновить Excel", error);
+  }
+}
+
+loadStoredAchievementDirectory()
+  .then(directory => { achievementExportDirectory = directory; })
+  .catch(error => console.warn("Не удалось восстановить выбранную папку", error));
+
+finishAchievementsButton.addEventListener("click", async function () {
+  finishAchievementsButton.disabled = true;
+  achievementMessage.textContent = "Сохраняем базу достижений в Excel...";
+  try {
+    const directory = await ensureAchievementExportDirectory();
+    const count = await writeAchievementsExcel(directory);
+    achievementMessage.textContent = "Excel сохранён. Записей: " + count;
+  } catch (error) {
+    if (error.name !== "AbortError") achievementMessage.textContent = "Ошибка экспорта: " + error.message;
+    else achievementMessage.textContent = "Выбор папки отменён";
+  } finally {
+    finishAchievementsButton.disabled = false;
+  }
+});
+
 function achievementValue(id) {
   const value = document.querySelector(id).value.trim();
   return value || null;
@@ -2317,6 +2436,7 @@ async function loadAchievements() {
         return;
       }
       row.remove();
+      await syncAchievementExportIfReady();
     });
     actionsCell.append(deleteButton);
     row.append(actionsCell);
@@ -2488,6 +2608,7 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementCity, achievementCitiesMenu);
   achievementMessage.textContent = "Достижение сохранено";
   loadAchievements();
+  await syncAchievementExportIfReady();
 });
 
 async function restoreSession() {
