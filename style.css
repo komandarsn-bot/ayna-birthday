@@ -711,11 +711,9 @@ input[type="file"] {
   font-weight: 700;
 }
 
-.achievement-form label:has(input[required], select[required])::after {
+.required-caption::after {
   content: "*";
-  position: absolute;
-  top: -2px;
-  right: 4px;
+  margin-left: 4px;
   color: #c83d3d;
   font-size: 1.05rem;
   font-weight: 800;
