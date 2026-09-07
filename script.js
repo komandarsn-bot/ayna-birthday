@@ -111,6 +111,8 @@ const achievementCountry = document.querySelector("#achievement-country");
 const achievementCountriesMenu = document.querySelector("#achievement-countries");
 const achievementCity = document.querySelector("#achievement-city");
 const achievementCitiesMenu = document.querySelector("#achievement-cities");
+const achievementOrganizers = document.querySelector("#achievement-organizers");
+const achievementOrganizersMenu = document.querySelector("#achievement-organizers-list");
 const achievementStartDate = document.querySelector("#achievement-date");
 const achievementEndDate = document.querySelector("#achievement-end-date");
 
@@ -141,6 +143,14 @@ const achievementCityReference = {
   menu: achievementCitiesMenu,
   table: "achievement_cities",
   label: "Город",
+  items: [],
+  selected: null
+};
+const achievementOrganizerReference = {
+  input: achievementOrganizers,
+  menu: achievementOrganizersMenu,
+  table: "achievement_organizers",
+  label: "Организатор",
   items: [],
   selected: null
 };
@@ -302,6 +312,7 @@ function updateAuthView(session) {
     loadAchievementResults();
     loadLocationReference(achievementCountryReference);
     loadLocationReference(achievementCityReference);
+    loadLocationReference(achievementOrganizerReference);
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -2120,7 +2131,7 @@ async function addLocationReference(reference, name, button) {
   achievementMessage.textContent = reference.label + " добавлен(а) в список";
 }
 
-[achievementCountryReference, achievementCityReference].forEach(function (reference) {
+[achievementCountryReference, achievementCityReference, achievementOrganizerReference].forEach(function (reference) {
   reference.input.addEventListener("input", function () {
     chooseLocationReference(reference);
     showLocationSuggestions(reference);
@@ -2332,6 +2343,13 @@ achievementForm.addEventListener("submit", async function (event) {
     showSupervisorSuggestions();
     return;
   }
+  chooseLocationReference(achievementOrganizerReference);
+  if (achievementOrganizers.value.trim() && !achievementOrganizerReference.selected) {
+    achievementMessage.textContent = "Выберите организатора из списка или добавьте нового";
+    achievementOrganizers.focus();
+    showLocationSuggestions(achievementOrganizerReference);
+    return;
+  }
   chooseLocationReference(achievementCountryReference);
   if (achievementCountry.value.trim() && !achievementCountryReference.selected) {
     achievementMessage.textContent = "Выберите страну из списка или добавьте новую";
@@ -2378,7 +2396,7 @@ achievementForm.addEventListener("submit", async function (event) {
     supervisor_name: selectedAchievementSupervisor
       ? selectedAchievementSupervisor.last_name + " " + selectedAchievementSupervisor.first_name
       : null,
-    organizers: achievementValue("#achievement-organizers"),
+    organizers: achievementOrganizerReference.selected ? achievementOrganizerReference.selected.name : null,
     event_date: achievementValue("#achievement-date"),
     event_end_date: achievementValue("#achievement-end-date"),
     link_url: achievementValue("#achievement-link"),
@@ -2412,6 +2430,8 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementResult, achievementResultsMenu);
   selectedAchievementSupervisor = null;
   closeSuggestionMenu(achievementSupervisor, achievementSupervisors);
+  achievementOrganizerReference.selected = null;
+  closeSuggestionMenu(achievementOrganizers, achievementOrganizersMenu);
   achievementCountryReference.selected = null;
   closeSuggestionMenu(achievementCountry, achievementCountriesMenu);
   achievementCityReference.selected = null;

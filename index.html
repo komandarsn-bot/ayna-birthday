@@ -334,7 +334,12 @@
               <span id="achievement-supervisors" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
-          <label>Организаторы<input type="text" id="achievement-organizers"></label>
+          <label>Организаторы
+            <span class="student-autocomplete">
+              <input type="text" id="achievement-organizers" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-organizers-list">
+              <span id="achievement-organizers-list" class="student-suggestion-menu" role="listbox" hidden></span>
+            </span>
+          </label>
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
           <label class="half-field">Страна
             <span class="student-autocomplete">
@@ -380,6 +385,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=30"></script>
+    <script src="script.js?v=31"></script>
   </body>
 </html>
