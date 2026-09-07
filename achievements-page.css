@@ -39,7 +39,7 @@ button.secondary { background: #fff; border: 1px solid #bfd0cb; }
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(240px, 1.7fr) repeat(4, minmax(125px, 1fr)) auto;
+  grid-template-columns: minmax(200px, 1.7fr) repeat(4, minmax(0, 1fr)) minmax(110px, auto);
   align-items: end;
   gap: 10px;
   margin: 18px 0 12px;
@@ -49,8 +49,8 @@ button.secondary { background: #fff; border: 1px solid #bfd0cb; }
   background: #fff;
 }
 
-.filters label { display: grid; gap: 5px; font-size: 12px; font-weight: 700; }
-.filters input, .filters select { min-width: 0; padding: 8px 9px; border: 1px solid #bfd0cb; border-radius: 7px; font: inherit; }
+.filters label { display: grid; min-width: 0; gap: 5px; font-size: 12px; font-weight: 700; }
+.filters input, .filters select { width: 100%; min-width: 0; max-width: 100%; padding: 8px 9px; border: 1px solid #bfd0cb; border-radius: 7px; font: inherit; }
 
 .table-wrap { overflow: auto; max-height: calc(100vh - 230px); border: 1px solid #d9e2df; border-radius: 12px; background: #fff; }
 table { width: 100%; min-width: 1780px; border-collapse: collapse; font-size: 11px; }

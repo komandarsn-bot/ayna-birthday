@@ -963,7 +963,7 @@ input[type="file"] {
 
 .achievement-table-filters {
   display: grid;
-  grid-template-columns: minmax(220px, 1.6fr) repeat(4, minmax(130px, 1fr)) auto;
+  grid-template-columns: minmax(180px, 1.6fr) repeat(4, minmax(0, 1fr)) minmax(110px, auto);
   align-items: end;
   gap: 12px;
   margin-bottom: 16px;
@@ -975,6 +975,7 @@ input[type="file"] {
 
 .achievement-table-filters label {
   display: grid;
+  min-width: 0;
   gap: 6px;
   font-size: 13px;
   font-weight: 700;
@@ -982,6 +983,8 @@ input[type="file"] {
 
 .achievement-table-filters input,
 .achievement-table-filters select {
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   padding: 9px 10px;
   font-size: 14px;
@@ -989,6 +992,7 @@ input[type="file"] {
 
 .achievement-table-filters .secondary-button {
   width: auto;
+  max-width: 100%;
   margin: 0;
 }
 
