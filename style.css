@@ -896,7 +896,7 @@ input[type="file"] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px 18px;
+  gap: 18px;
   margin: 20px 0 24px;
   padding: 14px 16px;
   border: 1px solid #d5e0dd;
@@ -911,24 +911,20 @@ input[type="file"] {
 
 .achievement-export-copy {
   display: grid;
-  gap: 3px;
+  gap: 5px;
 }
 
-.achievement-export-copy span {
+.achievement-export-copy .form-message {
+  min-height: 0;
+  margin: 0;
   color: #687873;
   font-size: 14px;
 }
 
 .achievement-export-panel .secondary-button {
   width: auto;
+  min-width: 168px;
   margin: 0;
-}
-
-.achievement-export-panel .form-message {
-  grid-column: 1 / -1;
-  min-height: 0;
-  margin: 0;
-  font-size: 14px;
 }
 
 .achievement-form-actions button {

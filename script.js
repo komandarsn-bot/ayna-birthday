@@ -2391,7 +2391,10 @@ Promise.all([loadStoredAchievementDirectory(), loadStoredAchievementExportSessio
     achievementExportDirectory = directory;
     achievementExportFileName = session?.fileName || "";
     lastAchievementExportAt = Number(session?.lastExportAt) || 0;
-    if (directory) achievementExportMessage.textContent = "Выбрана папка: " + directory.name;
+    if (directory) {
+      achievementExportMessage.textContent = "Выбрана папка: " + directory.name;
+      finishAchievementsButton.textContent = "Изменить папку";
+    }
   })
   .catch(error => console.warn("Не удалось восстановить настройки экспорта", error));
 
@@ -2409,6 +2412,7 @@ finishAchievementsButton.addEventListener("click", async function () {
     await storeAchievementExportSession();
     achievementExportPanel.classList.remove("needs-attention");
     achievementExportMessage.textContent = "Выбрана папка: " + achievementExportDirectory.name;
+    finishAchievementsButton.textContent = "Изменить папку";
   } catch (error) {
     if (error.name !== "AbortError") achievementExportMessage.textContent = "Ошибка выбора папки: " + error.message;
     else achievementExportMessage.textContent = "Выбор папки отменён";
