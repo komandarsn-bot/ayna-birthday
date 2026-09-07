@@ -18,12 +18,17 @@ const appContent =
 const adminTabs = Array.from(document.querySelectorAll('.admin-tabs [role="tab"]'));
 
 function selectAdminTab(selectedTab) {
+  const achievementsPanel = document.querySelector("#achievements-panel");
+  if (achievementsPanel && !achievementsPanel.hidden) saveAchievementFormDraft();
   adminTabs.forEach(function (tab) {
     const selected = tab === selectedTab;
     tab.setAttribute("aria-selected", String(selected));
     tab.tabIndex = selected ? 0 : -1;
     document.getElementById(tab.getAttribute("aria-controls")).hidden = !selected;
   });
+  if (selectedTab.getAttribute("aria-controls") === "achievements-panel") {
+    restoreAchievementFormDraft();
+  }
 }
 
 adminTabs.forEach(function (tab, index) {
@@ -130,6 +135,7 @@ let achievementTypes = [];
 let selectedAchievementType = null;
 let achievementResults = [];
 let selectedAchievementResult = null;
+let achievementFormDraft = null;
 const achievementCountryReference = {
   input: achievementCountry,
   menu: achievementCountriesMenu,
@@ -154,6 +160,37 @@ const achievementOrganizerReference = {
   items: [],
   selected: null
 };
+
+function saveAchievementFormDraft() {
+  if (!achievementForm) return;
+  achievementFormDraft = {};
+  achievementForm.querySelectorAll("input:not([type='file']), select, textarea").forEach(function (field) {
+    if (field.id) achievementFormDraft[field.id] = field.value;
+  });
+}
+
+function restoreAchievementFormDraft() {
+  if (!achievementForm || !achievementFormDraft) return;
+  Object.entries(achievementFormDraft).forEach(function ([id, value]) {
+    const field = document.getElementById(id);
+    if (field) field.value = value;
+  });
+  syncAchievementStageOptions();
+  syncAchievementDateRange();
+  chooseAchievementStudent();
+  chooseAchievementEvent();
+  chooseAchievementOrder();
+  chooseAchievementSubject();
+  chooseAchievementType();
+  chooseAchievementResult();
+  chooseAchievementSupervisor();
+  chooseLocationReference(achievementCountryReference);
+  chooseLocationReference(achievementCityReference);
+  chooseLocationReference(achievementOrganizerReference);
+}
+
+achievementForm.addEventListener("input", saveAchievementFormDraft);
+achievementForm.addEventListener("change", saveAchievementFormDraft);
 
 const defaultAchievementSubjectNames = [
   "Әліппе",
@@ -1182,6 +1219,16 @@ async function loadTeachers() {
       loadTeachers
     );
   }));
+}
+
+function chooseAchievementSupervisor() {
+  const value = achievementSupervisor.value.trim().toLocaleLowerCase("ru");
+  selectedAchievementSupervisor = achievementTeachers.find(function (teacher) {
+    const fullName = teacher.last_name + " " + teacher.first_name;
+    const reverseName = teacher.first_name + " " + teacher.last_name;
+    return fullName.toLocaleLowerCase("ru") === value ||
+      reverseName.toLocaleLowerCase("ru") === value;
+  }) || null;
 }
 
 function showSupervisorSuggestions() {
@@ -2417,6 +2464,7 @@ achievementForm.addEventListener("submit", async function (event) {
   }
 
   achievementForm.reset();
+  achievementFormDraft = null;
   syncAchievementStageOptions();
   syncAchievementDateRange();
   resetAchievementStudentSelection();
