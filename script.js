@@ -2128,7 +2128,9 @@ async function addLocationReference(reference, name, button) {
   }
   await loadLocationReference(reference, name);
   closeSuggestionMenu(reference.input, reference.menu);
-  achievementMessage.textContent = reference.label + " добавлен(а) в список";
+  achievementMessage.textContent = reference === achievementOrganizerReference
+    ? ""
+    : reference.label + " добавлен(а) в список";
 }
 
 [achievementCountryReference, achievementCityReference, achievementOrganizerReference].forEach(function (reference) {
