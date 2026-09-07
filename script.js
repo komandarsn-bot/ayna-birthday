@@ -2227,7 +2227,10 @@ const achievementColumns = [
 
 const achievementExportDatabaseName = "ayna-achievement-export";
 const achievementExportStoreName = "settings";
+const achievementExportSessionInterval = 30 * 60 * 1000;
 let achievementExportDirectory = null;
+let achievementExportFileName = "";
+let lastAchievementExportAt = 0;
 
 function openAchievementExportDatabase() {
   return new Promise(function (resolve, reject) {
@@ -2262,6 +2265,29 @@ async function storeAchievementDirectory(directory) {
   });
 }
 
+async function loadStoredAchievementExportSession() {
+  const database = await openAchievementExportDatabase();
+  return new Promise(function (resolve, reject) {
+    const transaction = database.transaction(achievementExportStoreName, "readonly");
+    const request = transaction.objectStore(achievementExportStoreName).get("export-session");
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function storeAchievementExportSession() {
+  const database = await openAchievementExportDatabase();
+  return new Promise(function (resolve, reject) {
+    const transaction = database.transaction(achievementExportStoreName, "readwrite");
+    transaction.objectStore(achievementExportStoreName).put({
+      fileName: achievementExportFileName,
+      lastExportAt: lastAchievementExportAt
+    }, "export-session");
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
 async function ensureAchievementExportDirectory() {
   if (!window.showDirectoryPicker) {
     throw new Error("Выбор папки поддерживается в Google Chrome или Microsoft Edge");
@@ -2274,7 +2300,10 @@ async function ensureAchievementExportDirectory() {
     }
   }
   achievementExportDirectory = await window.showDirectoryPicker({ mode: "readwrite" });
+  achievementExportFileName = "";
+  lastAchievementExportAt = 0;
   await storeAchievementDirectory(achievementExportDirectory);
+  await storeAchievementExportSession();
   return achievementExportDirectory;
 }
 
@@ -2309,18 +2338,26 @@ async function writeAchievementsExcel(directory) {
   const content = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
   const now = new Date();
   const twoDigits = value => String(value).padStart(2, "0");
-  const fileName = "База достижений " +
-    twoDigits(now.getDate()) + "-" +
-    twoDigits(now.getMonth() + 1) + "-" +
-    now.getFullYear() + " " +
-    twoDigits(now.getHours()) + "-" +
-    twoDigits(now.getMinutes()) + "-" +
-    twoDigits(now.getSeconds()) + "-" +
-    String(now.getMilliseconds()).padStart(3, "0") + ".xlsx";
-  const fileHandle = await directory.getFileHandle(fileName, { create: true });
+  const nowTimestamp = now.getTime();
+  if (
+    !achievementExportFileName ||
+    !lastAchievementExportAt ||
+    nowTimestamp - lastAchievementExportAt > achievementExportSessionInterval
+  ) {
+    achievementExportFileName = "База достижений " +
+      twoDigits(now.getDate()) + "-" +
+      twoDigits(now.getMonth() + 1) + "-" +
+      now.getFullYear() + " " +
+      twoDigits(now.getHours()) + "-" +
+      twoDigits(now.getMinutes()) + "-" +
+      twoDigits(now.getSeconds()) + ".xlsx";
+  }
+  const fileHandle = await directory.getFileHandle(achievementExportFileName, { create: true });
   const writable = await fileHandle.createWritable();
   await writable.write(content);
   await writable.close();
+  lastAchievementExportAt = nowTimestamp;
+  await storeAchievementExportSession();
   return achievements.length;
 }
 
@@ -2334,9 +2371,13 @@ async function syncAchievementExportIfReady() {
   }
 }
 
-loadStoredAchievementDirectory()
-  .then(directory => { achievementExportDirectory = directory; })
-  .catch(error => console.warn("Не удалось восстановить выбранную папку", error));
+Promise.all([loadStoredAchievementDirectory(), loadStoredAchievementExportSession()])
+  .then(function ([directory, session]) {
+    achievementExportDirectory = directory;
+    achievementExportFileName = session?.fileName || "";
+    lastAchievementExportAt = Number(session?.lastExportAt) || 0;
+  })
+  .catch(error => console.warn("Не удалось восстановить настройки экспорта", error));
 
 finishAchievementsButton.addEventListener("click", async function () {
   finishAchievementsButton.disabled = true;
