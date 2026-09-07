@@ -953,6 +953,11 @@ input[type="file"] {
   font-weight: 700;
 }
 
+.achievement-table td:last-child {
+  display: flex;
+  gap: 8px;
+}
+
 .compact-button {
   padding: 8px 12px;
   font-size: 14px;

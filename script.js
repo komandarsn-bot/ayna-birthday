@@ -77,6 +77,7 @@ const achievementMessage = document.querySelector("#achievement-message");
 const loadAchievementsButton = document.querySelector("#load-achievements-button");
 const finishAchievementsButton = document.querySelector("#finish-achievements-button");
 const copyLastAchievementButton = document.querySelector("#copy-last-achievement-button");
+const cancelAchievementEditButton = document.querySelector("#cancel-achievement-edit-button");
 const achievementsList = document.querySelector("#achievements-list");
 const studentsExcelFile = document.querySelector("#students-excel-file");
 const uploadStudentsButton = document.querySelector("#upload-students-button");
@@ -138,6 +139,7 @@ let selectedAchievementType = null;
 let achievementResults = [];
 let selectedAchievementResult = null;
 let achievementFormDraft = null;
+let editingAchievementId = null;
 const achievementCountryReference = {
   input: achievementCountry,
   menu: achievementCountriesMenu,
@@ -2432,6 +2434,60 @@ function formatAchievementCell(key, value) {
   return String(value);
 }
 
+function fillAchievementForm(achievement) {
+  selectedAchievementStudent = achievementStudents.find(item => item.id === achievement.student_id) || {
+    id: achievement.student_id,
+    last_name: achievement.last_name,
+    first_name: achievement.first_name,
+    class_name: achievement.class_name
+  };
+  achievementLastName.value = achievement.last_name || "";
+  achievementFirstName.value = achievement.first_name || "";
+  achievementClass.value = achievement.class_name || "";
+  selectedAchievementEvent = achievementEvents.find(item => item.id === achievement.event_id) || {
+    id: achievement.event_id,
+    name: achievement.event_name
+  };
+  achievementEventName.value = achievement.event_name || "";
+  selectedAchievementSubject = achievement.subject
+    ? achievementSubjects.find(item => item.id === achievement.subject_id || item.name === achievement.subject) || { id: achievement.subject_id, name: achievement.subject }
+    : null;
+  achievementSubject.value = achievement.subject || "";
+  selectedAchievementOrder = achievement.order_reference
+    ? achievementOrders.find(item => item.name === achievement.order_reference) || { name: achievement.order_reference }
+    : null;
+  achievementOrder.value = achievement.order_reference || "";
+  document.querySelector("#achievement-cost").value = achievement.cost ?? "";
+  achievementLevel.value = achievement.achievement_level || "";
+  syncAchievementStageOptions();
+  achievementStage.value = achievement.event_stage || "";
+  selectedAchievementType = achievementTypes.find(item => item.name === achievement.project_name) || { name: achievement.project_name };
+  achievementType.value = achievement.project_name || "";
+  document.querySelector("#achievement-academic-type").value = achievement.academic_type || "";
+  selectedAchievementResult = achievementResults.find(item => item.name === achievement.result) || { name: achievement.result };
+  achievementResult.value = achievement.result || "";
+  document.querySelector("#achievement-format").value = achievement.event_format || "";
+  achievementSupervisor.value = achievement.supervisor_name || "";
+  chooseAchievementSupervisor();
+  achievementOrganizerReference.selected = achievement.organizers ? { name: achievement.organizers } : null;
+  achievementOrganizers.value = achievement.organizers || "";
+  achievementCountryReference.selected = achievement.country ? { name: achievement.country } : null;
+  achievementCountry.value = achievement.country || "";
+  achievementCityReference.selected = achievement.city ? { name: achievement.city } : null;
+  achievementCity.value = achievement.city || "";
+  achievementStartDate.value = achievement.event_date || "";
+  achievementEndDate.value = achievement.event_end_date || achievement.event_date || "";
+  document.querySelector("#achievement-link").value = achievement.link_url || "";
+  syncAchievementDateRange();
+  saveAchievementFormDraft();
+}
+
+function stopAchievementEditing() {
+  editingAchievementId = null;
+  saveAchievementButton.textContent = "Сохранить достижение";
+  cancelAchievementEditButton.hidden = true;
+}
+
 async function loadAchievements() {
   achievementsList.textContent = "Загрузка...";
 
@@ -2487,6 +2543,18 @@ async function loadAchievements() {
     });
 
     const actionsCell = document.createElement("td");
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.className = "secondary-button compact-button";
+    editButton.textContent = "Редактировать";
+    editButton.addEventListener("click", function () {
+      fillAchievementForm(achievement);
+      editingAchievementId = achievement.id;
+      saveAchievementButton.textContent = "Сохранить изменения";
+      cancelAchievementEditButton.hidden = false;
+      achievementMessage.textContent = "Измените нужные данные и нажмите «Сохранить изменения»";
+      achievementForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "delete-button compact-button";
@@ -2506,7 +2574,7 @@ async function loadAchievements() {
       row.remove();
       await syncAchievementExportIfReady();
     });
-    actionsCell.append(deleteButton);
+    actionsCell.append(editButton, deleteButton);
     row.append(actionsCell);
     body.append(row);
   });
@@ -2538,57 +2606,20 @@ copyLastAchievementButton.addEventListener("click", async function () {
   }
 
   const last = rows[0];
-  selectedAchievementStudent = achievementStudents.find(item => item.id === last.student_id) || {
-    id: last.student_id,
-    last_name: last.last_name,
-    first_name: last.first_name,
-    class_name: last.class_name
-  };
-  achievementLastName.value = last.last_name || "";
-  achievementFirstName.value = last.first_name || "";
-  achievementClass.value = last.class_name || "";
-
-  selectedAchievementEvent = achievementEvents.find(item => item.id === last.event_id) || {
-    id: last.event_id,
-    name: last.event_name
-  };
-  achievementEventName.value = last.event_name || "";
-
-  selectedAchievementSubject = last.subject
-    ? achievementSubjects.find(item => item.id === last.subject_id || item.name === last.subject) || { id: last.subject_id, name: last.subject }
-    : null;
-  achievementSubject.value = last.subject || "";
-  selectedAchievementOrder = last.order_reference
-    ? achievementOrders.find(item => item.name === last.order_reference) || { name: last.order_reference }
-    : null;
-  achievementOrder.value = last.order_reference || "";
-  document.querySelector("#achievement-cost").value = last.cost ?? "";
-
-  achievementLevel.value = last.achievement_level || "";
-  syncAchievementStageOptions();
-  achievementStage.value = last.event_stage || "";
-  selectedAchievementType = achievementTypes.find(item => item.name === last.project_name) || { name: last.project_name };
-  achievementType.value = last.project_name || "";
-  document.querySelector("#achievement-academic-type").value = last.academic_type || "";
-  selectedAchievementResult = achievementResults.find(item => item.name === last.result) || { name: last.result };
-  achievementResult.value = last.result || "";
-  document.querySelector("#achievement-format").value = last.event_format || "";
-
-  achievementSupervisor.value = last.supervisor_name || "";
-  chooseAchievementSupervisor();
-  achievementOrganizerReference.selected = last.organizers ? { name: last.organizers } : null;
-  achievementOrganizers.value = last.organizers || "";
-  achievementCountryReference.selected = last.country ? { name: last.country } : null;
-  achievementCountry.value = last.country || "";
-  achievementCityReference.selected = last.city ? { name: last.city } : null;
-  achievementCity.value = last.city || "";
-  achievementStartDate.value = last.event_date || "";
-  achievementEndDate.value = last.event_end_date || last.event_date || "";
-  document.querySelector("#achievement-link").value = last.link_url || "";
-
-  saveAchievementFormDraft();
+  stopAchievementEditing();
+  fillAchievementForm(last);
   achievementMessage.textContent = "Данные последней записи перенесены. Измените нужные поля и сохраните новое достижение";
   achievementLastName.focus();
+});
+
+cancelAchievementEditButton.addEventListener("click", function () {
+  achievementForm.reset();
+  achievementFormDraft = null;
+  syncAchievementStageOptions();
+  syncAchievementDateRange();
+  resetAchievementStudentSelection();
+  stopAchievementEditing();
+  achievementMessage.textContent = "Редактирование отменено";
 });
 
 achievementForm.addEventListener("submit", async function (event) {
@@ -2715,9 +2746,13 @@ achievementForm.addEventListener("submit", async function (event) {
     city: achievementCityReference.selected ? achievementCityReference.selected.name : null
   };
 
+  const wasEditing = Boolean(editingAchievementId);
   saveAchievementButton.disabled = true;
-  achievementMessage.textContent = "Сохраняем...";
-  const { error } = await supabaseClient.from("achievements").insert(achievement);
+  achievementMessage.textContent = wasEditing ? "Сохраняем изменения..." : "Сохраняем...";
+  const saveRequest = wasEditing
+    ? supabaseClient.from("achievements").update(achievement).eq("id", editingAchievementId)
+    : supabaseClient.from("achievements").insert(achievement);
+  const { error } = await saveRequest;
   saveAchievementButton.disabled = false;
 
   if (error) {
@@ -2748,16 +2783,18 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementCountry, achievementCountriesMenu);
   achievementCityReference.selected = null;
   closeSuggestionMenu(achievementCity, achievementCitiesMenu);
+  stopAchievementEditing();
   loadAchievements();
   const exportResult = await syncAchievementExportIfReady();
+  const savedText = wasEditing ? "Изменения сохранены." : "Достижение сохранено.";
   if (exportResult.status === "saved") {
     achievementMessage.textContent = exportResult.createdNewFile
-      ? "Достижение сохранено. Создан новый Excel-файл: " + exportResult.fileName
-      : "Достижение сохранено. Excel-файл обновлён: " + exportResult.fileName;
+      ? savedText + " Создан новый Excel-файл: " + exportResult.fileName
+      : savedText + " Excel-файл обновлён: " + exportResult.fileName;
   } else if (exportResult.status === "folder-not-selected" || exportResult.status === "permission-required") {
-    achievementMessage.textContent = "Достижение сохранено. Выберите папку для сохранения Excel-файлов";
+    achievementMessage.textContent = savedText + " Выберите папку для сохранения Excel-файлов";
   } else {
-    achievementMessage.textContent = "Достижение сохранено, но Excel обновить не удалось";
+    achievementMessage.textContent = savedText + " Excel обновить не удалось";
   }
 });
 
