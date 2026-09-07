@@ -171,15 +171,14 @@
             <option value="story">Событие</option>
             <option value="announcement">Объявление</option>
           </select>
-          <small>В объявлении текст и QR-код показываются одновременно на одном слайде.</small>
         </label>
         <label>
           Заголовок
-          <input type="text" id="news-title" maxlength="160" placeholder="Например: Победа на олимпиаде">
+          <input type="text" id="news-title" maxlength="160">
         </label>
         <label>
           Текст публикации
-          <textarea id="news-body" maxlength="6000" rows="7" placeholder="Расскажите о событии — длинный текст автоматически разделится на слайды"></textarea>
+          <textarea id="news-body" maxlength="6000" rows="7"></textarea>
           <small>Чтобы выделить текст жирным, поставьте звёздочки: *важный текст*</small>
         </label>
         <label id="news-image-field">
@@ -188,11 +187,11 @@
         </label>
         <label>
           Ссылка для QR-кода (необязательно)
-          <input type="url" id="news-link" placeholder="https://example.com/registration">
+          <input type="url" id="news-link">
         </label>
         <label>
           Текст возле QR-кода (необязательно)
-          <input type="text" id="news-qr-text" maxlength="240" placeholder="Например: Зарегистрируйтесь до 15 сентября">
+          <input type="text" id="news-qr-text" maxlength="240">
         </label>
         <label>
           Сколько дней показывать публикацию
