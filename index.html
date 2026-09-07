@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=33">
+    <link rel="stylesheet" href="style.css?v=34">
   </head>
 
   <body>
@@ -221,8 +221,7 @@
         <details class="achievement-reference-manager">
           <summary class="achievement-reference-summary">
             <span>
-              <strong>Справочники</strong>
-              <small>Справочник мероприятий</small>
+              <strong>Загрузка мероприятий</strong>
             </span>
             <span class="reference-summary-action" aria-hidden="true">
               <span class="reference-open-label">Настроить</span>
@@ -230,21 +229,13 @@
             </span>
           </summary>
 
-          <div class="achievement-reference-content">
-            <p>Загрузите список мероприятий из Excel.</p>
-            <div class="achievement-reference-grid">
-        <section class="achievement-reference-block" aria-labelledby="event-manager-heading">
-          <div>
-            <h3 id="event-manager-heading">Справочник мероприятий</h3>
-            <p>Excel должен содержать столбец «Наименование мероприятия».</p>
-          </div>
-          <div class="achievement-event-actions">
-            <input type="file" id="events-excel-file" accept=".xlsx,.xls">
-            <button type="button" id="upload-events-button">Загрузить Excel</button>
-          </div>
-          <p id="event-manager-message" class="form-message" aria-live="polite"></p>
-        </section>
+          <div class="achievement-reference-content compact-reference-content">
+            <p class="reference-upload-hint">Столбец Excel: «Наименование мероприятия».</p>
+            <div class="achievement-event-actions">
+              <input type="file" id="events-excel-file" accept=".xlsx,.xls">
+              <button type="button" id="upload-events-button">Загрузить файл</button>
             </div>
+            <p id="event-manager-message" class="form-message" aria-live="polite"></p>
           </div>
         </details>
 
