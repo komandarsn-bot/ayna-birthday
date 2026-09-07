@@ -2307,7 +2307,17 @@ async function writeAchievementsExcel(directory) {
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Достижения");
   const content = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  const fileHandle = await directory.getFileHandle("База достижений.xlsx", { create: true });
+  const now = new Date();
+  const twoDigits = value => String(value).padStart(2, "0");
+  const fileName = "База достижений " +
+    twoDigits(now.getDate()) + "-" +
+    twoDigits(now.getMonth() + 1) + "-" +
+    now.getFullYear() + " " +
+    twoDigits(now.getHours()) + "-" +
+    twoDigits(now.getMinutes()) + "-" +
+    twoDigits(now.getSeconds()) + "-" +
+    String(now.getMilliseconds()).padStart(3, "0") + ".xlsx";
+  const fileHandle = await directory.getFileHandle(fileName, { create: true });
   const writable = await fileHandle.createWritable();
   await writable.write(content);
   await writable.close();
