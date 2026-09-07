@@ -25,7 +25,6 @@
       <input
         type="text"
         id="email"
-        placeholder="Логин"
         aria-label="Логин"
         autocomplete="username"
         autocapitalize="none"
@@ -35,7 +34,6 @@
       <input
         type="password"
         id="password"
-        placeholder="Пароль"
         autocomplete="current-password"
       >
     </div>
@@ -100,7 +98,7 @@
           <form id="student-form" class="school-person-form">
             <label>Фамилия<input type="text" id="student-last-name" required></label>
             <label>Имя<input type="text" id="student-first-name" required></label>
-            <label>Класс<input type="text" id="student-class" required placeholder="Например: 7А"></label>
+            <label>Класс<input type="text" id="student-class" required></label>
             <label>Дата рождения<input type="date" id="student-birth-date" required></label>
             <button type="submit" id="add-student-button">Добавить ученика</button>
           </form>
@@ -119,7 +117,7 @@
           <form id="teacher-form" class="school-person-form">
             <label>Фамилия<input type="text" id="teacher-last-name" required></label>
             <label>Имя<input type="text" id="teacher-first-name" required></label>
-            <label>Должность<input type="text" id="teacher-position" required placeholder="Например: учитель информатики"></label>
+            <label>Должность<input type="text" id="teacher-position" required></label>
             <label>Дата рождения<input type="date" id="teacher-birth-date" required></label>
             <button type="submit" id="add-teacher-button">Добавить учителя</button>
           </form>
@@ -245,34 +243,34 @@
           <div class="achievement-student-row">
             <label>Фамилия
               <span class="student-autocomplete">
-                <input type="text" id="achievement-last-name" required autocomplete="off" placeholder="Начните вводить фамилию" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-last-names">
+                <input type="text" id="achievement-last-name" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-last-names">
                 <span id="achievement-last-names" class="student-suggestion-menu" role="listbox" hidden></span>
               </span>
             </label>
             <label>Имя
               <span class="student-autocomplete">
-                <input type="text" id="achievement-first-name" required autocomplete="off" placeholder="Начните вводить имя" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-first-names">
+                <input type="text" id="achievement-first-name" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-first-names">
                 <span id="achievement-first-names" class="student-suggestion-menu" role="listbox" hidden></span>
               </span>
             </label>
-            <label>Класс<input type="text" id="achievement-class" required readonly placeholder="Заполнится автоматически"></label>
+            <label>Класс<input type="text" id="achievement-class" required readonly></label>
           </div>
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
           <label class="wide-field">Наименование мероприятия
             <span class="student-autocomplete">
-              <input type="text" id="achievement-event-name" required autocomplete="off" placeholder="Начните вводить название" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-event-names">
+              <input type="text" id="achievement-event-name" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-event-names">
               <span id="achievement-event-names" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <label class="third-field">Предмет
             <span class="student-autocomplete">
-              <input type="text" id="achievement-subject" required autocomplete="off" placeholder="Начните вводить предмет" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-subject-names">
+              <input type="text" id="achievement-subject" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-subject-names">
               <span id="achievement-subject-names" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <label class="third-field">Приказ
             <span class="student-autocomplete">
-              <input type="text" id="achievement-order" autocomplete="off" placeholder="Начните вводить приказ" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-orders">
+              <input type="text" id="achievement-order" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-orders">
               <span id="achievement-orders" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
@@ -305,7 +303,7 @@
           </label>
           <label class="half-field">Вид достижения
             <span class="student-autocomplete">
-              <input type="text" id="achievement-type" required autocomplete="off" placeholder="Например: олимпиада или конкурс" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-types">
+              <input type="text" id="achievement-type" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-types">
               <span id="achievement-types" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
@@ -318,7 +316,7 @@
           </label>
           <label class="half-field">Место / результат
             <span class="student-autocomplete">
-              <input type="text" id="achievement-result" autocomplete="off" placeholder="Начните вводить результат" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-results">
+              <input type="text" id="achievement-result" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-results">
               <span id="achievement-results" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
@@ -332,7 +330,7 @@
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
           <label>ФИО руководителя
             <span class="student-autocomplete">
-              <input type="text" id="achievement-supervisor" autocomplete="off" placeholder="Начните вводить фамилию или имя" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-supervisors">
+              <input type="text" id="achievement-supervisor" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-supervisors">
               <span id="achievement-supervisors" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
@@ -340,13 +338,13 @@
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
           <label class="half-field">Страна
             <span class="student-autocomplete">
-              <input type="text" id="achievement-country" autocomplete="off" placeholder="Начните вводить страну" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-countries">
+              <input type="text" id="achievement-country" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-countries">
               <span id="achievement-countries" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <label class="half-field">Город
             <span class="student-autocomplete">
-              <input type="text" id="achievement-city" autocomplete="off" placeholder="Начните вводить город" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-cities">
+              <input type="text" id="achievement-city" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-cities">
               <span id="achievement-cities" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
@@ -356,7 +354,7 @@
             <label>Окончание<input type="date" id="achievement-end-date"></label>
           </fieldset>
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
-          <label>Ссылка<input type="url" id="achievement-link" placeholder="https://..."></label>
+          <label>Ссылка<input type="url" id="achievement-link"></label>
 
           <div class="achievement-form-actions wide-field">
             <button type="submit" id="save-achievement-button">Сохранить достижение</button>
