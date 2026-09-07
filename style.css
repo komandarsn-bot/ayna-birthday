@@ -892,6 +892,28 @@ input[type="file"] {
   gap: 14px;
 }
 
+.achievement-section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.achievement-section-header h2 {
+  margin-top: 0;
+}
+
+.achievement-section-header p {
+  margin-bottom: 0;
+}
+
+.achievement-section-header .secondary-button {
+  width: auto;
+  margin: 0;
+  flex: 0 0 auto;
+}
+
 .achievement-form-actions button {
   width: auto;
   margin: 0;

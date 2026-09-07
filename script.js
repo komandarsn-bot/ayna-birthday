@@ -76,6 +76,7 @@ const saveAchievementButton = document.querySelector("#save-achievement-button")
 const achievementMessage = document.querySelector("#achievement-message");
 const loadAchievementsButton = document.querySelector("#load-achievements-button");
 const finishAchievementsButton = document.querySelector("#finish-achievements-button");
+const achievementExportMessage = document.querySelector("#achievement-export-message");
 const copyLastAchievementButton = document.querySelector("#copy-last-achievement-button");
 const cancelAchievementEditButton = document.querySelector("#cancel-achievement-edit-button");
 const achievementsList = document.querySelector("#achievements-list");
@@ -2389,12 +2390,13 @@ Promise.all([loadStoredAchievementDirectory(), loadStoredAchievementExportSessio
     achievementExportDirectory = directory;
     achievementExportFileName = session?.fileName || "";
     lastAchievementExportAt = Number(session?.lastExportAt) || 0;
+    if (directory) achievementExportMessage.textContent = "Выбрана папка: " + directory.name;
   })
   .catch(error => console.warn("Не удалось восстановить настройки экспорта", error));
 
 finishAchievementsButton.addEventListener("click", async function () {
   finishAchievementsButton.disabled = true;
-  achievementMessage.textContent = "Выберите папку для сохранения файлов...";
+  achievementExportMessage.textContent = "Выберите папку для сохранения файлов...";
   try {
     if (!window.showDirectoryPicker) {
       throw new Error("Выбор папки поддерживается в Google Chrome или Microsoft Edge");
@@ -2404,10 +2406,10 @@ finishAchievementsButton.addEventListener("click", async function () {
     lastAchievementExportAt = 0;
     await storeAchievementDirectory(achievementExportDirectory);
     await storeAchievementExportSession();
-    achievementMessage.textContent = "Папка для сохранения файлов выбрана";
+    achievementExportMessage.textContent = "Выбрана папка: " + achievementExportDirectory.name;
   } catch (error) {
-    if (error.name !== "AbortError") achievementMessage.textContent = "Ошибка выбора папки: " + error.message;
-    else achievementMessage.textContent = "Выбор папки отменён";
+    if (error.name !== "AbortError") achievementExportMessage.textContent = "Ошибка выбора папки: " + error.message;
+    else achievementExportMessage.textContent = "Выбор папки отменён";
   } finally {
     finishAchievementsButton.disabled = false;
   }
