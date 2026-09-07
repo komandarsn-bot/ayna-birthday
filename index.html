@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=42">
+    <link rel="stylesheet" href="style.css?v=43">
   </head>
 
   <body>
@@ -235,16 +235,29 @@
         </details>
       </section>
 
+      <section id="achievement-export-panel" class="card achievement-upload-card">
+        <details id="achievement-export-details" class="achievement-reference-manager">
+          <summary class="achievement-reference-summary">
+            <span>
+              <strong>Постоянное хранение обновлений базы</strong>
+              <small id="achievement-export-summary">Папка не выбрана</small>
+            </span>
+            <span class="reference-summary-action" aria-hidden="true">
+              <span class="reference-open-label">Настроить</span>
+              <span class="reference-close-label">Скрыть</span>
+            </span>
+          </summary>
+          <div class="achievement-reference-content compact-reference-content">
+            <div class="achievement-export-row">
+              <p id="achievement-export-message" class="form-message" aria-live="polite">Выберите папку для автоматического сохранения Excel-файлов.</p>
+              <button type="button" id="finish-achievements-button" class="secondary-button compact-button">Выбрать папку</button>
+            </div>
+          </div>
+        </details>
+      </section>
+
       <section class="card">
         <h2>База достижений</h2>
-
-        <div id="achievement-export-panel" class="achievement-export-panel">
-          <div class="achievement-export-copy">
-            <strong>Постоянное хранение обновлений базы</strong>
-            <p id="achievement-export-message" class="form-message" aria-live="polite">Папка не выбрана</p>
-          </div>
-          <button type="button" id="finish-achievements-button" class="secondary-button compact-button">Выбрать папку</button>
-        </div>
 
         <form id="achievement-form" class="achievement-form">
           <div class="achievement-student-row">
@@ -394,6 +407,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=43"></script>
+    <script src="script.js?v=44"></script>
   </body>
 </html>
