@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayna — база достижений</title>
+    <link rel="stylesheet" href="achievements-page.css?v=1">
+  </head>
+  <body>
+    <header class="table-page-header">
+      <a href="index.html" class="back-link">← Вернуться в админ-панель</a>
+      <img src="ayna-logo.png" alt="Ayna">
+      <button type="button" id="refresh-table">Обновить</button>
+    </header>
+
+    <main>
+      <div class="title-row">
+        <div>
+          <h1>База достижений</h1>
+          <p id="records-count">Загрузка данных…</p>
+        </div>
+      </div>
+
+      <section class="filters" aria-label="Фильтры достижений">
+        <label class="search-filter">Поиск<input type="search" id="table-search"></label>
+        <label>Класс<select id="table-class"><option value="">Все</option></select></label>
+        <label>Уровень<select id="table-level"><option value="">Все</option></select></label>
+        <label>Этап<select id="table-stage"><option value="">Все</option></select></label>
+        <label>Формат<select id="table-format"><option value="">Все</option></select></label>
+        <button type="button" id="reset-filters" class="secondary">Сбросить</button>
+      </section>
+
+      <section id="table-wrap" class="table-wrap" aria-live="polite">Загрузка данных…</section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="achievements-page.js?v=1"></script>
+  </body>
+</html>
