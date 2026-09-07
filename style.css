@@ -941,6 +941,37 @@ input[type="file"] {
   margin: 0;
 }
 
+.achievement-table-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.6fr) repeat(4, minmax(130px, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #dbe4e1;
+  border-radius: 12px;
+  background: #f7faf9;
+}
+
+.achievement-table-filters label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.achievement-table-filters input,
+.achievement-table-filters select {
+  min-width: 0;
+  padding: 9px 10px;
+  font-size: 14px;
+}
+
+.achievement-table-filters .secondary-button {
+  width: auto;
+  margin: 0;
+}
+
 .achievement-table-wrap {
   max-width: 100%;
   overflow-x: auto;
@@ -975,6 +1006,23 @@ input[type="file"] {
   letter-spacing: 0.02em;
 }
 
+.achievement-sort-button,
+.achievement-sort-button:hover {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+}
+
+.achievement-sort-button:focus-visible {
+  outline: 2px solid #e4c455;
+  outline-offset: 3px;
+}
+
 .achievement-table tbody tr:nth-child(even) {
   background: #f8faf9;
 }
@@ -995,6 +1043,8 @@ input[type="file"] {
 }
 
 @media (max-width: 600px) {
+  .achievement-table-filters { grid-template-columns: 1fr; }
+  .achievement-table-filters .secondary-button { width: 100%; }
   .achievement-export-row { grid-template-columns: 1fr; }
   .achievement-export-row .secondary-button { width: 100%; }
   .news-row { align-items: flex-start; flex-wrap: wrap; }

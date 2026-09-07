@@ -83,6 +83,12 @@ const achievementExportSummary = document.querySelector("#achievement-export-sum
 const copyLastAchievementButton = document.querySelector("#copy-last-achievement-button");
 const cancelAchievementEditButton = document.querySelector("#cancel-achievement-edit-button");
 const achievementsList = document.querySelector("#achievements-list");
+const achievementTableSearch = document.querySelector("#achievement-table-search");
+const achievementTableClass = document.querySelector("#achievement-table-class");
+const achievementTableLevel = document.querySelector("#achievement-table-level");
+const achievementTableStage = document.querySelector("#achievement-table-stage");
+const achievementTableFormat = document.querySelector("#achievement-table-format");
+const resetAchievementFilters = document.querySelector("#reset-achievement-filters");
 const studentsExcelFile = document.querySelector("#students-excel-file");
 const uploadStudentsButton = document.querySelector("#upload-students-button");
 const studentsUploadMessage = document.querySelector("#students-upload-message");
@@ -2500,22 +2506,59 @@ function stopAchievementEditing() {
   cancelAchievementEditButton.hidden = true;
 }
 
-async function loadAchievements() {
-  achievementsList.textContent = "Загрузка...";
+let loadedAchievements = [];
+let achievementSortKey = "event_date";
+let achievementSortDirection = "desc";
 
-  const { data: achievements, error } = await supabaseClient
-    .from("achievements")
-    .select("*")
-    .order("event_date", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false });
+function setAchievementFilterOptions(select, values) {
+  const currentValue = select.value;
+  const options = [new Option("Все", "")];
+  Array.from(new Set(values.filter(Boolean)))
+    .sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }))
+    .forEach(value => options.push(new Option(value, value)));
+  select.replaceChildren(...options);
+  if (values.includes(currentValue)) select.value = currentValue;
+}
 
-  if (error) {
-    achievementsList.textContent = "Ошибка: " + error.message;
+function refreshAchievementFilterOptions() {
+  setAchievementFilterOptions(achievementTableClass, loadedAchievements.map(item => item.class_name));
+  setAchievementFilterOptions(achievementTableLevel, loadedAchievements.map(item => item.achievement_level));
+  setAchievementFilterOptions(achievementTableStage, loadedAchievements.map(item => item.event_stage));
+  setAchievementFilterOptions(achievementTableFormat, loadedAchievements.map(item => item.event_format));
+}
+
+function getVisibleAchievements() {
+  const search = achievementTableSearch.value.trim().toLocaleLowerCase("ru");
+  const filtered = loadedAchievements.filter(function (item) {
+    const searchableText = achievementColumns
+      .map(([key]) => item[key] ?? "")
+      .join(" ")
+      .toLocaleLowerCase("ru");
+    return (!search || searchableText.includes(search)) &&
+      (!achievementTableClass.value || item.class_name === achievementTableClass.value) &&
+      (!achievementTableLevel.value || item.achievement_level === achievementTableLevel.value) &&
+      (!achievementTableStage.value || item.event_stage === achievementTableStage.value) &&
+      (!achievementTableFormat.value || item.event_format === achievementTableFormat.value);
+  });
+
+  return filtered.sort(function (a, b) {
+    const left = a[achievementSortKey] ?? "";
+    const right = b[achievementSortKey] ?? "";
+    const comparison = typeof left === "number" && typeof right === "number"
+      ? left - right
+      : String(left).localeCompare(String(right), "ru", { numeric: true });
+    return achievementSortDirection === "asc" ? comparison : -comparison;
+  });
+}
+
+function renderAchievementsTable() {
+  const achievements = getVisibleAchievements();
+  if (!loadedAchievements.length) {
+    achievementsList.textContent = "Достижений пока нет";
     return;
   }
-
   if (!achievements.length) {
-    achievementsList.textContent = "Достижений пока нет";
+    achievementsList.textContent = "По выбранным фильтрам записей нет";
     return;
   }
 
@@ -2524,10 +2567,25 @@ async function loadAchievements() {
   const head = document.createElement("thead");
   const headRow = document.createElement("tr");
 
-  achievementColumns.forEach(function ([, label]) {
+  achievementColumns.forEach(function ([key, label]) {
     const cell = document.createElement("th");
     cell.scope = "col";
-    cell.textContent = label;
+    const sortButton = document.createElement("button");
+    sortButton.type = "button";
+    sortButton.className = "achievement-sort-button";
+    sortButton.textContent = label + (achievementSortKey === key
+      ? (achievementSortDirection === "asc" ? " ↑" : " ↓")
+      : "");
+    sortButton.addEventListener("click", function () {
+      if (achievementSortKey === key) {
+        achievementSortDirection = achievementSortDirection === "asc" ? "desc" : "asc";
+      } else {
+        achievementSortKey = key;
+        achievementSortDirection = "asc";
+      }
+      renderAchievementsTable();
+    });
+    cell.append(sortButton);
     headRow.append(cell);
   });
   const actionsHead = document.createElement("th");
@@ -2584,6 +2642,9 @@ async function loadAchievements() {
         return;
       }
       row.remove();
+      loadedAchievements = loadedAchievements.filter(item => item.id !== achievement.id);
+      refreshAchievementFilterOptions();
+      renderAchievementsTable();
       await syncAchievementExportIfReady();
     });
     actionsCell.append(editButton, deleteButton);
@@ -2595,7 +2656,35 @@ async function loadAchievements() {
   achievementsList.replaceChildren(table);
 }
 
+async function loadAchievements() {
+  achievementsList.textContent = "Загрузка...";
+  const { data, error } = await supabaseClient
+    .from("achievements")
+    .select("*")
+    .order("event_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  if (error) {
+    achievementsList.textContent = "Ошибка: " + error.message;
+    return;
+  }
+  loadedAchievements = data || [];
+  refreshAchievementFilterOptions();
+  renderAchievementsTable();
+}
+
 loadAchievementsButton.addEventListener("click", loadAchievements);
+
+[achievementTableSearch, achievementTableClass, achievementTableLevel, achievementTableStage, achievementTableFormat]
+  .forEach(control => control.addEventListener("input", renderAchievementsTable));
+
+resetAchievementFilters.addEventListener("click", function () {
+  achievementTableSearch.value = "";
+  achievementTableClass.value = "";
+  achievementTableLevel.value = "";
+  achievementTableStage.value = "";
+  achievementTableFormat.value = "";
+  renderAchievementsTable();
+});
 
 copyLastAchievementButton.addEventListener("click", async function () {
   copyLastAchievementButton.disabled = true;
