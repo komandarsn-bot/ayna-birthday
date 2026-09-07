@@ -2339,11 +2339,13 @@ async function writeAchievementsExcel(directory) {
   const now = new Date();
   const twoDigits = value => String(value).padStart(2, "0");
   const nowTimestamp = now.getTime();
+  let createdNewFile = false;
   if (
     !achievementExportFileName ||
     !lastAchievementExportAt ||
     nowTimestamp - lastAchievementExportAt > achievementExportSessionInterval
   ) {
+    createdNewFile = true;
     achievementExportFileName = "База достижений " +
       twoDigits(now.getDate()) + "-" +
       twoDigits(now.getMonth() + 1) + "-" +
@@ -2358,16 +2360,24 @@ async function writeAchievementsExcel(directory) {
   await writable.close();
   lastAchievementExportAt = nowTimestamp;
   await storeAchievementExportSession();
-  return achievements.length;
+  return {
+    count: achievements.length,
+    createdNewFile,
+    fileName: achievementExportFileName
+  };
 }
 
 async function syncAchievementExportIfReady() {
-  if (!achievementExportDirectory) return;
-  if (await achievementExportDirectory.queryPermission({ mode: "readwrite" }) !== "granted") return;
+  if (!achievementExportDirectory) return { status: "folder-not-selected" };
+  if (await achievementExportDirectory.queryPermission({ mode: "readwrite" }) !== "granted") {
+    return { status: "permission-required" };
+  }
   try {
-    await writeAchievementsExcel(achievementExportDirectory);
+    const result = await writeAchievementsExcel(achievementExportDirectory);
+    return { status: "saved", ...result };
   } catch (error) {
     console.warn("Не удалось автоматически обновить Excel", error);
+    return { status: "error", error };
   }
 }
 
@@ -2663,9 +2673,17 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementCountry, achievementCountriesMenu);
   achievementCityReference.selected = null;
   closeSuggestionMenu(achievementCity, achievementCitiesMenu);
-  achievementMessage.textContent = "Достижение сохранено";
   loadAchievements();
-  await syncAchievementExportIfReady();
+  const exportResult = await syncAchievementExportIfReady();
+  if (exportResult.status === "saved") {
+    achievementMessage.textContent = exportResult.createdNewFile
+      ? "Достижение сохранено. Создан новый Excel-файл: " + exportResult.fileName
+      : "Достижение сохранено. Excel-файл обновлён: " + exportResult.fileName;
+  } else if (exportResult.status === "folder-not-selected" || exportResult.status === "permission-required") {
+    achievementMessage.textContent = "Достижение сохранено. Выберите папку для сохранения Excel-файлов";
+  } else {
+    achievementMessage.textContent = "Достижение сохранено, но Excel обновить не удалось";
+  }
 });
 
 async function restoreSession() {
