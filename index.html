@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=34">
+    <link rel="stylesheet" href="style.css?v=35">
   </head>
 
   <body>
@@ -214,10 +214,7 @@
     </div>
 
     <div id="achievements-panel" role="tabpanel" aria-labelledby="achievements-tab" hidden>
-      <section class="card">
-        <h2>База достижений</h2>
-        <p>Сначала выберите ученика и мероприятие из подготовленных справочников.</p>
-
+      <section class="card achievement-upload-card">
         <details class="achievement-reference-manager">
           <summary class="achievement-reference-summary">
             <span>
@@ -238,6 +235,11 @@
             <p id="event-manager-message" class="form-message" aria-live="polite"></p>
           </div>
         </details>
+      </section>
+
+      <section class="card">
+        <h2>База достижений</h2>
+        <p>Сначала выберите ученика и мероприятие из подготовленных справочников.</p>
 
         <form id="achievement-form" class="achievement-form">
           <div class="achievement-student-row">

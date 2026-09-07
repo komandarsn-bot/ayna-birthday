@@ -541,6 +541,17 @@ input[type="file"] {
   overflow: hidden;
 }
 
+.achievement-upload-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.achievement-upload-card .achievement-reference-manager {
+  margin: 0;
+  border: 0;
+  border-radius: inherit;
+}
+
 .achievement-reference-manager h3,
 .achievement-reference-manager p {
   margin: 0;
