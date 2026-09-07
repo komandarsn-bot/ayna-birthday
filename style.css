@@ -897,6 +897,8 @@ input[type="file"] {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 18px;
+  width: 100%;
+  max-width: 760px;
   margin: 20px 0 24px;
   padding: 14px 16px;
   border: 1px solid #d5e0dd;
