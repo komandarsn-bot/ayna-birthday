@@ -84,10 +84,7 @@ const copyLastAchievementButton = document.querySelector("#copy-last-achievement
 const cancelAchievementEditButton = document.querySelector("#cancel-achievement-edit-button");
 const achievementsList = document.querySelector("#achievements-list");
 const achievementTableSearch = document.querySelector("#achievement-table-search");
-const achievementTableClass = document.querySelector("#achievement-table-class");
-const achievementTableLevel = document.querySelector("#achievement-table-level");
-const achievementTableStage = document.querySelector("#achievement-table-stage");
-const achievementTableFormat = document.querySelector("#achievement-table-format");
+const achievementColumnFilters = document.querySelector("#achievement-column-filters");
 const resetAchievementFilters = document.querySelector("#reset-achievement-filters");
 const studentsExcelFile = document.querySelector("#students-excel-file");
 const uploadStudentsButton = document.querySelector("#upload-students-button");
@@ -2510,21 +2507,25 @@ let loadedAchievements = [];
 let achievementSortKey = "event_date";
 let achievementSortDirection = "desc";
 
-function setAchievementFilterOptions(select, values) {
-  const currentValue = select.value;
-  const options = [new Option("Все", "")];
-  Array.from(new Set(values.filter(Boolean)))
-    .sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }))
-    .forEach(value => options.push(new Option(value, value)));
-  select.replaceChildren(...options);
-  if (values.includes(currentValue)) select.value = currentValue;
-}
-
 function refreshAchievementFilterOptions() {
-  setAchievementFilterOptions(achievementTableClass, loadedAchievements.map(item => item.class_name));
-  setAchievementFilterOptions(achievementTableLevel, loadedAchievements.map(item => item.achievement_level));
-  setAchievementFilterOptions(achievementTableStage, loadedAchievements.map(item => item.event_stage));
-  setAchievementFilterOptions(achievementTableFormat, loadedAchievements.map(item => item.event_format));
+  const selectedValues = new Map(
+    Array.from(achievementColumnFilters.querySelectorAll("select"), select => [select.dataset.key, select.value])
+  );
+  const controls = achievementColumns.map(function ([key, label]) {
+    const wrapper = document.createElement("label");
+    wrapper.textContent = label;
+    const select = document.createElement("select");
+    select.dataset.key = key;
+    const values = Array.from(new Set(loadedAchievements.map(item => item[key]).filter(value => value !== null && value !== undefined && value !== "")))
+      .sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }));
+    select.append(new Option("Все", ""));
+    values.forEach(value => select.append(new Option(formatAchievementCell(key, value), String(value))));
+    select.value = selectedValues.get(key) || "";
+    select.addEventListener("input", renderAchievementsTable);
+    wrapper.append(select);
+    return wrapper;
+  });
+  achievementColumnFilters.replaceChildren(...controls);
 }
 
 function getVisibleAchievements() {
@@ -2534,11 +2535,10 @@ function getVisibleAchievements() {
       .map(([key]) => item[key] ?? "")
       .join(" ")
       .toLocaleLowerCase("ru");
-    return (!search || searchableText.includes(search)) &&
-      (!achievementTableClass.value || item.class_name === achievementTableClass.value) &&
-      (!achievementTableLevel.value || item.achievement_level === achievementTableLevel.value) &&
-      (!achievementTableStage.value || item.event_stage === achievementTableStage.value) &&
-      (!achievementTableFormat.value || item.event_format === achievementTableFormat.value);
+    if (search && !searchableText.includes(search)) return false;
+    return Array.from(achievementColumnFilters.querySelectorAll("select")).every(function (select) {
+      return !select.value || String(item[select.dataset.key] ?? "") === select.value;
+    });
   });
 
   return filtered.sort(function (a, b) {
@@ -2674,15 +2674,11 @@ async function loadAchievements() {
 
 loadAchievementsButton.addEventListener("click", loadAchievements);
 
-[achievementTableSearch, achievementTableClass, achievementTableLevel, achievementTableStage, achievementTableFormat]
-  .forEach(control => control.addEventListener("input", renderAchievementsTable));
+achievementTableSearch.addEventListener("input", renderAchievementsTable);
 
 resetAchievementFilters.addEventListener("click", function () {
   achievementTableSearch.value = "";
-  achievementTableClass.value = "";
-  achievementTableLevel.value = "";
-  achievementTableStage.value = "";
-  achievementTableFormat.value = "";
+  achievementColumnFilters.querySelectorAll("select").forEach(select => { select.value = ""; });
   renderAchievementsTable();
 });
 

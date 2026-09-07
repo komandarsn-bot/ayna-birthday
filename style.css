@@ -963,7 +963,7 @@ input[type="file"] {
 
 .achievement-table-filters {
   display: grid;
-  grid-template-columns: minmax(180px, 1.6fr) repeat(4, minmax(0, 1fr)) minmax(110px, auto);
+  grid-template-columns: minmax(240px, 1fr) auto;
   align-items: end;
   gap: 12px;
   margin-bottom: 16px;
@@ -971,6 +971,25 @@ input[type="file"] {
   border: 1px solid #dbe4e1;
   border-radius: 12px;
   background: #f7faf9;
+}
+
+.achievement-all-filters {
+  grid-column: 1 / -1;
+  border-top: 1px solid #dbe4e1;
+  padding-top: 10px;
+}
+
+.achievement-all-filters summary {
+  cursor: pointer;
+  color: #174a42;
+  font-weight: 700;
+}
+
+.achievement-column-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .achievement-table-filters label {
@@ -1069,6 +1088,7 @@ input[type="file"] {
 @media (max-width: 600px) {
   .achievement-table-filters { grid-template-columns: 1fr; }
   .achievement-table-filters .secondary-button { width: 100%; }
+  .achievement-column-filters { grid-template-columns: 1fr; }
   .achievement-export-row { grid-template-columns: 1fr; }
   .achievement-export-row .secondary-button { width: 100%; }
   .news-row { align-items: flex-start; flex-wrap: wrap; }

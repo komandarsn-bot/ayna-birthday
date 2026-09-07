@@ -13,20 +13,10 @@ const columns = [
 const tableWrap = document.querySelector("#table-wrap");
 const recordsCount = document.querySelector("#records-count");
 const searchInput = document.querySelector("#table-search");
-const classFilter = document.querySelector("#table-class");
-const levelFilter = document.querySelector("#table-level");
-const stageFilter = document.querySelector("#table-stage");
-const formatFilter = document.querySelector("#table-format");
+const columnFilters = document.querySelector("#column-filters");
 let records = [];
 let sortKey = "event_date";
 let sortDirection = "desc";
-
-function fillOptions(select, values) {
-  const options = [new Option("Все", "")];
-  Array.from(new Set(values.filter(Boolean))).sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }))
-    .forEach(value => options.push(new Option(value, value)));
-  select.replaceChildren(...options);
-}
 
 function formatValue(key, value) {
   if (value === null || value === undefined || value === "") return "—";
@@ -35,14 +25,33 @@ function formatValue(key, value) {
   return String(value);
 }
 
+function buildColumnFilters() {
+  const selectedValues = new Map(Array.from(columnFilters.querySelectorAll("select"), select => [select.dataset.key, select.value]));
+  const controls = columns.map(([key, label]) => {
+    const wrapper = document.createElement("label");
+    wrapper.textContent = label;
+    const select = document.createElement("select");
+    select.dataset.key = key;
+    select.append(new Option("Все", ""));
+    Array.from(new Set(records.map(item => item[key]).filter(value => value !== null && value !== undefined && value !== "")))
+      .sort((a, b) => String(a).localeCompare(String(b), "ru", { numeric: true }))
+      .forEach(value => select.append(new Option(formatValue(key, value), String(value))));
+    select.value = selectedValues.get(key) || "";
+    select.addEventListener("input", render);
+    wrapper.append(select);
+    return wrapper;
+  });
+  columnFilters.replaceChildren(...controls);
+}
+
 function visibleRecords() {
   const query = searchInput.value.trim().toLocaleLowerCase("ru");
   return records.filter(item => {
     const text = columns.map(([key]) => item[key] ?? "").join(" ").toLocaleLowerCase("ru");
-    return (!query || text.includes(query)) && (!classFilter.value || item.class_name === classFilter.value) &&
-      (!levelFilter.value || item.achievement_level === levelFilter.value) &&
-      (!stageFilter.value || item.event_stage === stageFilter.value) &&
-      (!formatFilter.value || item.event_format === formatFilter.value);
+    if (query && !text.includes(query)) return false;
+    return Array.from(columnFilters.querySelectorAll("select")).every(select =>
+      !select.value || String(item[select.dataset.key] ?? "") === select.value
+    );
   }).sort((a, b) => {
     const left = a[sortKey] ?? "";
     const right = b[sortKey] ?? "";
@@ -88,11 +97,15 @@ async function load() {
   const { data, error } = await client.from("achievements").select("*").order("event_date", { ascending: false });
   if (error) { tableWrap.textContent = "Ошибка: " + error.message; return; }
   records = data || [];
-  fillOptions(classFilter, records.map(item => item.class_name)); fillOptions(levelFilter, records.map(item => item.achievement_level));
-  fillOptions(stageFilter, records.map(item => item.event_stage)); fillOptions(formatFilter, records.map(item => item.event_format)); render();
+  buildColumnFilters();
+  render();
 }
 
-[searchInput, classFilter, levelFilter, stageFilter, formatFilter].forEach(control => control.addEventListener("input", render));
-document.querySelector("#reset-filters").addEventListener("click", () => { searchInput.value = ""; classFilter.value = ""; levelFilter.value = ""; stageFilter.value = ""; formatFilter.value = ""; render(); });
+searchInput.addEventListener("input", render);
+document.querySelector("#reset-filters").addEventListener("click", () => {
+  searchInput.value = "";
+  columnFilters.querySelectorAll("select").forEach(select => { select.value = ""; });
+  render();
+});
 document.querySelector("#refresh-table").addEventListener("click", load);
 load();
