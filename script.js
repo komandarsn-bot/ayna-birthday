@@ -2381,13 +2381,19 @@ Promise.all([loadStoredAchievementDirectory(), loadStoredAchievementExportSessio
 
 finishAchievementsButton.addEventListener("click", async function () {
   finishAchievementsButton.disabled = true;
-  achievementMessage.textContent = "Сохраняем базу достижений в Excel...";
+  achievementMessage.textContent = "Выберите папку для сохранения файлов...";
   try {
-    const directory = await ensureAchievementExportDirectory();
-    const count = await writeAchievementsExcel(directory);
-    achievementMessage.textContent = "Excel сохранён. Записей: " + count;
+    if (!window.showDirectoryPicker) {
+      throw new Error("Выбор папки поддерживается в Google Chrome или Microsoft Edge");
+    }
+    achievementExportDirectory = await window.showDirectoryPicker({ mode: "readwrite" });
+    achievementExportFileName = "";
+    lastAchievementExportAt = 0;
+    await storeAchievementDirectory(achievementExportDirectory);
+    await storeAchievementExportSession();
+    achievementMessage.textContent = "Папка для сохранения файлов выбрана";
   } catch (error) {
-    if (error.name !== "AbortError") achievementMessage.textContent = "Ошибка экспорта: " + error.message;
+    if (error.name !== "AbortError") achievementMessage.textContent = "Ошибка выбора папки: " + error.message;
     else achievementMessage.textContent = "Выбор папки отменён";
   } finally {
     finishAchievementsButton.disabled = false;
