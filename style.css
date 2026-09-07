@@ -892,7 +892,13 @@ input[type="file"] {
   gap: 14px;
 }
 
+.achievement-form-actions button {
+  width: auto;
+  margin: 0;
+}
+
 #achievement-message {
+  flex: 0 0 100%;
   min-height: 20px;
   margin: 0;
 }
