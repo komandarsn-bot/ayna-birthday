@@ -2312,8 +2312,8 @@ achievementForm.addEventListener("submit", async function (event) {
     return;
   }
   chooseAchievementSubject();
-  if (!selectedAchievementSubject) {
-    achievementMessage.textContent = "Выберите предмет из справочника";
+  if (achievementSubject.value.trim() && !selectedAchievementSubject) {
+    achievementMessage.textContent = "Выберите предмет из справочника или добавьте новый";
     achievementSubject.focus();
     showSubjectSuggestions();
     return;
@@ -2381,14 +2381,14 @@ achievementForm.addEventListener("submit", async function (event) {
     user_id: sessionData.session.user.id,
     student_id: selectedAchievementStudent.id,
     event_id: selectedAchievementEvent.id,
-    subject_id: selectedAchievementSubject.id,
+    subject_id: selectedAchievementSubject ? selectedAchievementSubject.id : null,
     last_name: selectedAchievementStudent.last_name,
     first_name: selectedAchievementStudent.first_name,
     class_name: selectedAchievementStudent.class_name,
     event_name: selectedAchievementEvent.name,
     order_reference: selectedAchievementOrder ? selectedAchievementOrder.name : null,
     cost: costValue === "" ? null : Number(costValue),
-    subject: selectedAchievementSubject.name,
+    subject: selectedAchievementSubject ? selectedAchievementSubject.name : null,
     achievement_level: achievementValue("#achievement-level"),
     event_stage: achievementValue("#achievement-stage"),
     project_name: selectedAchievementType.name,

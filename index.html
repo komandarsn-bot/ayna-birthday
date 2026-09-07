@@ -264,7 +264,7 @@
           </label>
           <label class="third-field">Предмет
             <span class="student-autocomplete">
-              <input type="text" id="achievement-subject" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-subject-names">
+              <input type="text" id="achievement-subject" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-subject-names">
               <span id="achievement-subject-names" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
@@ -282,7 +282,7 @@
           </label>
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
           <label class="half-field">Уровень
-            <select id="achievement-level">
+            <select id="achievement-level" required>
               <option value="">Не выбрано</option>
               <option value="Международный">Международный</option>
               <option value="Республиканский">Республиканский</option>
@@ -292,7 +292,7 @@
             </select>
           </label>
           <label class="half-field">Этап
-            <select id="achievement-stage" disabled>
+            <select id="achievement-stage" required disabled>
               <option value="">Сначала выберите уровень</option>
               <option value="Международный">Международный</option>
               <option value="Республиканский">Республиканский</option>
@@ -308,7 +308,7 @@
             </span>
           </label>
           <label class="half-field">Academic / Non Academic
-            <select id="achievement-academic-type">
+            <select id="achievement-academic-type" required>
               <option value="">Не выбрано</option>
               <option value="ACADEMIC">Academic</option>
               <option value="NON ACADEMIC">Non Academic</option>
@@ -316,12 +316,12 @@
           </label>
           <label class="half-field">Место / результат
             <span class="student-autocomplete">
-              <input type="text" id="achievement-result" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-results">
+              <input type="text" id="achievement-result" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-results">
               <span id="achievement-results" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <label class="half-field">Формат
-            <select id="achievement-format">
+            <select id="achievement-format" required>
               <option value="">Не выбрано</option>
               <option value="Офлайн">Офлайн</option>
               <option value="Онлайн">Онлайн</option>
@@ -330,33 +330,33 @@
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
           <label>ФИО руководителя
             <span class="student-autocomplete">
-              <input type="text" id="achievement-supervisor" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-supervisors">
+              <input type="text" id="achievement-supervisor" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-supervisors">
               <span id="achievement-supervisors" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <label>Организаторы
             <span class="student-autocomplete">
-              <input type="text" id="achievement-organizers" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-organizers-list">
+              <input type="text" id="achievement-organizers" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-organizers-list">
               <span id="achievement-organizers-list" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
           <label class="half-field">Страна
             <span class="student-autocomplete">
-              <input type="text" id="achievement-country" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-countries">
+              <input type="text" id="achievement-country" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-countries">
               <span id="achievement-countries" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <label class="half-field">Город
             <span class="student-autocomplete">
-              <input type="text" id="achievement-city" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-cities">
+              <input type="text" id="achievement-city" required autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="achievement-cities">
               <span id="achievement-cities" class="student-suggestion-menu" role="listbox" hidden></span>
             </span>
           </label>
           <fieldset class="achievement-date-range wide-field">
             <legend>Период проведения</legend>
-            <label>Начало<input type="date" id="achievement-date"></label>
-            <label>Окончание<input type="date" id="achievement-end-date"></label>
+            <label>Начало<input type="date" id="achievement-date" required></label>
+            <label>Окончание<input type="date" id="achievement-end-date" required></label>
           </fieldset>
           <div class="achievement-group-divider wide-field" aria-hidden="true"></div>
           <label>Ссылка<input type="url" id="achievement-link"></label>
@@ -385,6 +385,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=32"></script>
+    <script src="script.js?v=33"></script>
   </body>
 </html>
