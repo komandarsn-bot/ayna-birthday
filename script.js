@@ -76,6 +76,7 @@ const saveAchievementButton = document.querySelector("#save-achievement-button")
 const achievementMessage = document.querySelector("#achievement-message");
 const loadAchievementsButton = document.querySelector("#load-achievements-button");
 const finishAchievementsButton = document.querySelector("#finish-achievements-button");
+const copyLastAchievementButton = document.querySelector("#copy-last-achievement-button");
 const achievementsList = document.querySelector("#achievements-list");
 const studentsExcelFile = document.querySelector("#students-excel-file");
 const uploadStudentsButton = document.querySelector("#upload-students-button");
@@ -2515,6 +2516,80 @@ async function loadAchievements() {
 }
 
 loadAchievementsButton.addEventListener("click", loadAchievements);
+
+copyLastAchievementButton.addEventListener("click", async function () {
+  copyLastAchievementButton.disabled = true;
+  achievementMessage.textContent = "Загружаем последнюю запись...";
+
+  const { data: rows, error } = await supabaseClient
+    .from("achievements")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  copyLastAchievementButton.disabled = false;
+  if (error) {
+    achievementMessage.textContent = "Ошибка: " + error.message;
+    return;
+  }
+  if (!rows?.length) {
+    achievementMessage.textContent = "В базе пока нет достижений";
+    return;
+  }
+
+  const last = rows[0];
+  selectedAchievementStudent = achievementStudents.find(item => item.id === last.student_id) || {
+    id: last.student_id,
+    last_name: last.last_name,
+    first_name: last.first_name,
+    class_name: last.class_name
+  };
+  achievementLastName.value = last.last_name || "";
+  achievementFirstName.value = last.first_name || "";
+  achievementClass.value = last.class_name || "";
+
+  selectedAchievementEvent = achievementEvents.find(item => item.id === last.event_id) || {
+    id: last.event_id,
+    name: last.event_name
+  };
+  achievementEventName.value = last.event_name || "";
+
+  selectedAchievementSubject = last.subject
+    ? achievementSubjects.find(item => item.id === last.subject_id || item.name === last.subject) || { id: last.subject_id, name: last.subject }
+    : null;
+  achievementSubject.value = last.subject || "";
+  selectedAchievementOrder = last.order_reference
+    ? achievementOrders.find(item => item.name === last.order_reference) || { name: last.order_reference }
+    : null;
+  achievementOrder.value = last.order_reference || "";
+  document.querySelector("#achievement-cost").value = last.cost ?? "";
+
+  achievementLevel.value = last.achievement_level || "";
+  syncAchievementStageOptions();
+  achievementStage.value = last.event_stage || "";
+  selectedAchievementType = achievementTypes.find(item => item.name === last.project_name) || { name: last.project_name };
+  achievementType.value = last.project_name || "";
+  document.querySelector("#achievement-academic-type").value = last.academic_type || "";
+  selectedAchievementResult = achievementResults.find(item => item.name === last.result) || { name: last.result };
+  achievementResult.value = last.result || "";
+  document.querySelector("#achievement-format").value = last.event_format || "";
+
+  achievementSupervisor.value = last.supervisor_name || "";
+  chooseAchievementSupervisor();
+  achievementOrganizerReference.selected = last.organizers ? { name: last.organizers } : null;
+  achievementOrganizers.value = last.organizers || "";
+  achievementCountryReference.selected = last.country ? { name: last.country } : null;
+  achievementCountry.value = last.country || "";
+  achievementCityReference.selected = last.city ? { name: last.city } : null;
+  achievementCity.value = last.city || "";
+  achievementStartDate.value = last.event_date || "";
+  achievementEndDate.value = last.event_end_date || last.event_date || "";
+  document.querySelector("#achievement-link").value = last.link_url || "";
+
+  saveAchievementFormDraft();
+  achievementMessage.textContent = "Данные последней записи перенесены. Измените нужные поля и сохраните новое достижение";
+  achievementLastName.focus();
+});
 
 achievementForm.addEventListener("submit", async function (event) {
   event.preventDefault();
