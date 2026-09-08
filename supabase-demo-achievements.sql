@@ -1,5 +1,5 @@
 -- Демонстрационное заполнение базы достижений.
--- Добавляет 30 реалистичных записей для существующих учеников.
+-- Добавляет 50 новых реалистичных записей для существующих учеников.
 -- Запустите один раз целиком: Supabase -> SQL Editor -> New query -> Run.
 
 do $$
@@ -32,7 +32,7 @@ begin
     where student.user_id = owner_id
   ), demo_number as (
     select number
-    from generate_series(1, 30) as series(number)
+    from generate_series(1, 50) as series(number)
   ), prepared as (
     select
       number.number,
@@ -140,6 +140,6 @@ begin
     coalesce(prepared.city_name, 'Астана')
   from prepared;
 
-  raise notice 'Добавлено 30 демонстрационных достижений';
+  raise notice 'Добавлено 50 демонстрационных достижений';
 end;
 $$ language plpgsql;
