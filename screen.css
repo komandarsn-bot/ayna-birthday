@@ -105,7 +105,7 @@ body {
 .news-slide.is-leaving { animation: card-disappear 0.65s ease both; }
 
 .leaderboard-slide {
-  width: min(1500px, 96%);
+  width: min(1200px, 96%);
   height: auto;
   max-height: 100%;
   min-height: 0;
@@ -149,11 +149,11 @@ body {
   font-size: clamp(15px, 1.1vw, 21px);
   font-weight: 700;
 }
-.leaderboard-slide table { width: 100%; height: auto; border-collapse: collapse; table-layout: fixed; }
+.leaderboard-slide table { width: 100%; height: auto; border-collapse: collapse; table-layout: auto; }
 .leaderboard-slide th,
 .leaderboard-slide td {
   height: clamp(48px, 5.2vh, 62px);
-  padding: clamp(9px, 1.1vh, 14px) clamp(14px, 1.5vw, 24px);
+  padding: clamp(8px, 1vh, 12px) clamp(10px, .9vw, 16px);
   border: 0;
   color: #244943;
   font-size: clamp(15px, 1.25vw, 23px);
@@ -172,11 +172,11 @@ body {
 .leaderboard-slide tbody td:nth-child(even) { background: #ffffff; }
 .birthday-stage.is-leaderboard { padding: clamp(6px, .8vh, 12px) 0 0; }
 .birthday-stage.is-leaderboard #tv-birthday-list { align-items: center; }
-.leaderboard-slide th:nth-child(1), .leaderboard-slide td:nth-child(1) { width: 10%; text-align: center; }
-.leaderboard-slide th:nth-child(2), .leaderboard-slide td:nth-child(2) { width: 38%; }
-.leaderboard-slide th:nth-child(3), .leaderboard-slide td:nth-child(3) { width: 14%; text-align: center; }
-.leaderboard-slide th:nth-child(4), .leaderboard-slide td:nth-child(4) { width: 22%; text-align: center; }
-.leaderboard-slide th:nth-child(5), .leaderboard-slide td:nth-child(5) { width: 16%; text-align: center; font-weight: 700; }
+.leaderboard-slide th:nth-child(1), .leaderboard-slide td:nth-child(1) { width: 1%; text-align: center; white-space: nowrap; }
+.leaderboard-slide th:nth-child(2), .leaderboard-slide td:nth-child(2) { width: auto; }
+.leaderboard-slide th:nth-child(3), .leaderboard-slide td:nth-child(3) { width: 1%; text-align: center; white-space: nowrap; }
+.leaderboard-slide th:nth-child(4), .leaderboard-slide td:nth-child(4) { width: 1%; text-align: center; white-space: nowrap; }
+.leaderboard-slide th:nth-child(5), .leaderboard-slide td:nth-child(5) { width: 1%; text-align: center; font-weight: 700; white-space: nowrap; }
 
 .news-photo {
   position: relative;
