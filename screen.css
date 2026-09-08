@@ -105,7 +105,7 @@ body {
 .news-slide.is-leaving { animation: card-disappear 0.65s ease both; }
 
 .leaderboard-slide {
-  width: min(1200px, 96%);
+  width: min(960px, 96%);
   height: auto;
   max-height: 100%;
   min-height: 0;
