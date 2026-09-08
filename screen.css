@@ -170,7 +170,7 @@ body {
 .leaderboard-slide tbody tr:last-child td { border-bottom: 0; }
 .leaderboard-slide tbody td:nth-child(odd) { background: #f5f8f7; }
 .leaderboard-slide tbody td:nth-child(even) { background: #ffffff; }
-.leaderboard-slide tbody tr + tr td { border-top: 2px solid #d6e0dd; }
+.leaderboard-slide tbody tr + tr td { border-top: 2px solid #86ada4; }
 .leaderboard-slide tbody tr.rank-gold td {
   background: linear-gradient(90deg, #ffd43b 0%, #ffe78b 100%);
   color: #493700;

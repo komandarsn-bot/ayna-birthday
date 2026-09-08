@@ -64,12 +64,13 @@ input[type="file"] {
 
 .admin-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 20px;
 }
 
 .admin-tabs button {
-  flex: 1;
+  flex: 1 1 220px;
   padding: 16px 20px;
   background: #ffffff;
   border: 1px solid #c7d8d3;
