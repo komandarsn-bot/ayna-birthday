@@ -599,7 +599,7 @@ loadNewsButton.addEventListener("click", async function () {
   newsList.textContent = "Загрузка...";
   const { data: news, error } = await supabaseClient
     .from("news")
-    .select("id, title, body, image_path, image_paths, link_url, qr_text, expires_at, created_at")
+    .select("id, title, body, image_path, image_paths, link_url, qr_text, expires_at, is_published, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -616,6 +616,7 @@ loadNewsButton.addEventListener("click", async function () {
   news.forEach(function (item) {
     const row = document.createElement("article");
     row.classList.add("news-row");
+    row.classList.toggle("is-inactive", !item.is_published);
 
     const imagePaths = getNewsImagePaths(item);
     let preview;
@@ -636,7 +637,10 @@ loadNewsButton.addEventListener("click", async function () {
     title.textContent = item.title;
     const body = document.createElement("span");
     body.textContent = item.body;
-    content.append(title, body);
+    const publicationStatus = document.createElement("span");
+    publicationStatus.className = item.is_published ? "publication-status is-active" : "publication-status is-inactive";
+    publicationStatus.textContent = item.is_published ? "Активна" : "Деактивирована";
+    content.append(title, publicationStatus, body);
     if (imagePaths.length > 1) {
       const count = document.createElement("span");
       count.classList.add("news-image-count");
@@ -713,9 +717,33 @@ loadNewsButton.addEventListener("click", async function () {
       if (!newsList.children.length) newsList.textContent = "Публикаций пока нет";
     });
 
+    const toggleButton = document.createElement("button");
+    toggleButton.type = "button";
+    toggleButton.classList.add("secondary-button");
+    toggleButton.textContent = item.is_published ? "Деактивировать" : "Активировать";
+    toggleButton.addEventListener("click", async function () {
+      toggleButton.disabled = true;
+      const nextState = !item.is_published;
+      const { error: updateError } = await supabaseClient
+        .from("news")
+        .update({ is_published: nextState })
+        .eq("id", item.id);
+      if (updateError) {
+        alert("Ошибка изменения статуса: " + updateError.message);
+        toggleButton.disabled = false;
+        return;
+      }
+      item.is_published = nextState;
+      row.classList.toggle("is-inactive", !nextState);
+      publicationStatus.className = nextState ? "publication-status is-active" : "publication-status is-inactive";
+      publicationStatus.textContent = nextState ? "Активна" : "Деактивирована";
+      toggleButton.textContent = nextState ? "Деактивировать" : "Активировать";
+      toggleButton.disabled = false;
+    });
+
     const actions = document.createElement("div");
     actions.classList.add("news-actions");
-    actions.append(editButton, deleteButton);
+    actions.append(editButton, toggleButton, deleteButton);
     row.append(preview, content, actions);
     newsList.append(row);
   });
