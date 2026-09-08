@@ -51,9 +51,7 @@ create policy "student_achievement_points_owner_delete" on public.student_achiev
 
 create or replace function public.achievement_result_category(p_result text)
 returns text
-language sql
-immutable
-as $$
+as $function$
   select case
     when lower(trim(p_result)) in ('1 место', 'абсолютный чемпион')
       then '1 место / абсолютный чемпион'
@@ -63,13 +61,13 @@ as $$
     when nullif(trim(p_result), '') is not null then 'номинация / грамота'
     else null
   end;
-$$;
+$function$
+language sql
+immutable;
 
 create or replace function public.calculate_achievement_points(p_stage text, p_result text)
 returns smallint
-language sql
-immutable
-as $$
+as $function$
   with scoring as (
     select case lower(trim(p_stage))
       when 'школьный' then 5
@@ -90,14 +88,13 @@ as $$
     else null
   end::smallint
   from scoring;
-$$;
+$function$
+language sql
+immutable;
 
 create or replace function public.sync_student_achievement_points()
 returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
+as $function$
 declare
   calculated_points smallint;
   calculated_category text;
@@ -133,7 +130,10 @@ begin
 
   return new;
 end;
-$$;
+$function$
+language plpgsql
+security definer
+set search_path = public;
 
 drop trigger if exists achievements_sync_student_points on public.achievements;
 create trigger achievements_sync_student_points
