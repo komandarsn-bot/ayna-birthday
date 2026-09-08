@@ -271,6 +271,9 @@ function renderLeaderboard(slide) {
   const body = document.createElement("tbody");
   slide.rows.forEach(function (item) {
     const row = document.createElement("tr");
+    if (item.place_number === 1) row.classList.add("rank-gold");
+    if (item.place_number === 2) row.classList.add("rank-silver");
+    if (item.place_number === 3) row.classList.add("rank-bronze");
     [item.place_number, item.student_name, item.class_name, item.achievements_count, item.total_points].forEach(function (value) {
       const cell = document.createElement("td");
       cell.textContent = value;
