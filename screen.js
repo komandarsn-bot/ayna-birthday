@@ -440,7 +440,6 @@ function updateLeaderboard(data) {
   else if (activeKind === "leaderboard" && !leaderboardSlides.length) startSequence();
   else if (changed && activeKind === "leaderboard") {
     activeIndex = Math.min(activeIndex, leaderboardSlides.length - 1);
-    renderCurrentSlide();
   }
 }
 

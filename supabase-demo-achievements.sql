@@ -133,8 +133,8 @@ begin
     (array['1 место','2 место','3 место','Почётная грамота','Сертификат','Благодарственное письмо'])[(prepared.number % 6) + 1],
     coalesce(nullif(concat_ws(' ', prepared.teacher_last_name, prepared.teacher_first_name), ''), 'Администрация школы'),
     coalesce(prepared.organizer_name, 'Школа Ayna'),
-    current_date - (prepared.number * 6),
-    current_date - (prepared.number * 6) + (prepared.number % 3),
+    current_date - (prepared.number % 2),
+    current_date - (prepared.number % 2),
     null,
     coalesce(prepared.country_name, 'Казахстан'),
     coalesce(prepared.city_name, 'Астана')
