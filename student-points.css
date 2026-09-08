@@ -23,7 +23,6 @@ body { margin: 0; }
 
 main { width: min(1280px, calc(100% - 48px)); margin: 40px auto 56px; }
 .title-row { padding-bottom: 24px; border-bottom: 1px solid #d7dfdc; }
-.eyebrow { margin: 0 0 8px; color: #9a7420; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 h1 { margin: 0; font-size: clamp(30px, 3vw, 38px); line-height: 1.15; font-weight: 650; letter-spacing: -.025em; }
 #points-count { margin: 9px 0 0; color: #70807c; font-size: 14px; }
 
@@ -86,7 +85,7 @@ tbody tr:hover { background: #f5f8f7; }
 tbody tr[data-place="1"] { background: #fffbeb; }
 tbody tr[data-place="1"]:hover { background: #faf4d9; }
 
-.place { width: 108px; text-align: center; }
+.place { text-align: center; }
 th.place { font-size: 13px; font-weight: 650; }
 .place span {
   display: inline-block;
@@ -99,10 +98,14 @@ th.place { font-size: 13px; font-weight: 650; }
 }
 .place .top-place { color: #173d37; }
 tr[data-place="1"] .place .top-place { color: #9b7210; }
-.student-name { width: 42%; color: #173d37; font-size: 15px; font-weight: 650; }
-th:nth-child(3), td:nth-child(3) { width: 140px; }
-.achievements-column { width: 170px; text-align: center; }
-.points { width: 135px; text-align: right; color: #173d37; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.student-name { color: #173d37; font-size: 15px; font-weight: 650; }
+th:nth-child(1), td:nth-child(1) { width: 9%; }
+th:nth-child(2), td:nth-child(2) { width: 52%; }
+th:nth-child(3), td:nth-child(3) { width: 13%; text-align: center; }
+th:nth-child(4), td:nth-child(4) { width: 14%; text-align: center; }
+th:nth-child(5), td:nth-child(5) { width: 12%; text-align: center; }
+.achievements-column { text-align: center; }
+.points { text-align: center; color: #173d37; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
 th.points { color: #fff; font-size: 13px; font-weight: 650; }
 .empty-state { padding: 44px 20px; text-align: center; color: #70807c; }
 
@@ -113,9 +116,10 @@ th.points { color: #fff; font-size: 13px; font-weight: 650; }
   .filters { grid-template-columns: 1fr; }
   .filters button { width: 100%; }
   th, td { height: 62px; padding: 0 9px; }
-  .place { width: 58px; }
-  .student-name { width: auto; font-size: 14px; }
+  th:nth-child(1), td:nth-child(1) { width: 58px; }
+  th:nth-child(2), td:nth-child(2) { width: auto; }
+  .student-name { font-size: 14px; }
   th:nth-child(3), td:nth-child(3) { width: 76px; }
-  .points { width: 70px; }
+  th:nth-child(5), td:nth-child(5) { width: 70px; }
   .achievements-column { display: none; }
 }
