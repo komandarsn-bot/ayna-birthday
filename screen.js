@@ -29,6 +29,7 @@ function showScreenState(title, description) {
   clearTimeout(transitionTimer);
   activeKind = null;
   birthdayStage.classList.remove("is-birthday");
+  birthdayStage.classList.remove("is-news", "is-leaderboard");
   birthdayTitle.hidden = true;
   const card = document.createElement("article");
   card.classList.add("tv-person", "state-card");
@@ -46,6 +47,7 @@ function showScreenState(title, description) {
 
 function renderBirthday(person) {
   birthdayStage.classList.add("is-birthday");
+  birthdayStage.classList.remove("is-news", "is-leaderboard");
   birthdayTitle.hidden = false;
   birthdayTitle.classList.remove("is-appearing");
   void birthdayTitle.offsetWidth;
@@ -211,6 +213,8 @@ function refitCurrentNewsText() {
 
 function renderNews(item) {
   birthdayStage.classList.remove("is-birthday");
+  birthdayStage.classList.add("is-news");
+  birthdayStage.classList.remove("is-leaderboard");
   birthdayTitle.hidden = true;
   const slide = item.slides[activeNewsSlide] || item.slides[0];
   const card = document.createElement("article");
@@ -245,6 +249,8 @@ function renderNews(item) {
 
 function renderLeaderboard(slide) {
   birthdayStage.classList.remove("is-birthday");
+  birthdayStage.classList.add("is-leaderboard");
+  birthdayStage.classList.remove("is-news");
   birthdayTitle.hidden = true;
   const card = document.createElement("article");
   card.className = "leaderboard-slide";
