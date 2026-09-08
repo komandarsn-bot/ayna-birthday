@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayna — баллы учеников</title>
+    <link rel="stylesheet" href="student-points.css?v=1">
+  </head>
+  <body>
+    <header class="page-header">
+      <a href="index.html" class="back-link">← Вернуться в админ-панель</a>
+      <img src="ayna-logo.png" alt="Ayna">
+      <button type="button" id="refresh-points">Обновить</button>
+    </header>
+
+    <main>
+      <section class="title-row">
+        <div>
+          <p class="eyebrow">База достижений</p>
+          <h1>Баллы учеников</h1>
+          <p id="points-count">Загрузка данных…</p>
+        </div>
+      </section>
+
+      <section class="filters" aria-label="Поиск и фильтры">
+        <label>Поиск ученика<input type="search" id="points-search"></label>
+        <label>Класс<select id="class-filter"><option value="">Все классы</option></select></label>
+        <button type="button" id="reset-points" class="secondary">Сбросить</button>
+      </section>
+
+      <section id="points-table" class="table-wrap" aria-live="polite">Загрузка данных…</section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="student-points.js?v=1"></script>
+  </body>
+</html>
