@@ -4,6 +4,7 @@ const countLabel = document.querySelector("#points-count");
 const searchControl = document.querySelector("#points-search");
 const classControl = document.querySelector("#class-filter");
 let pointRows = [];
+let pointsLoading = false;
 
 function normalized(value) {
   return String(value || "").trim().toLocaleLowerCase("ru");
@@ -67,10 +68,12 @@ function fillClassFilter() {
   classControl.value = classes.includes(current) ? current : "";
 }
 
-async function loadPoints() {
-  tableContainer.textContent = "Загрузка данных…";
+async function loadPoints(silent = false) {
+  if (pointsLoading) return;
+  pointsLoading = true;
+  if (!silent) tableContainer.textContent = "Загрузка данных…";
   const { data: sessionData } = await pointsClient.auth.getSession();
-  if (!sessionData.session) { location.replace("index.html"); return; }
+  if (!sessionData.session) { pointsLoading = false; location.replace("index.html"); return; }
 
   const { data, error } = await pointsClient
     .from("student_points_totals")
@@ -80,20 +83,31 @@ async function loadPoints() {
     .order("last_name", { ascending: true });
 
   if (error) {
-    tableContainer.textContent = `Ошибка загрузки баллов: ${error.message}`;
-    countLabel.textContent = "Не удалось загрузить данные";
+    if (!silent) {
+      tableContainer.textContent = `Ошибка загрузки баллов: ${error.message}`;
+      countLabel.textContent = "Не удалось загрузить данные";
+    }
+    pointsLoading = false;
     return;
   }
 
   let previousPoints = null;
   let currentPlace = 0;
-  pointRows = (data || []).map(item => {
+  const nextRows = (data || []).map(item => {
     if (Number(item.total_points) !== previousPoints) currentPlace += 1;
     previousPoints = Number(item.total_points);
     return { ...item, place: currentPlace };
   });
+  const currentSignature = JSON.stringify(pointRows.map(item => [item.student_id, item.achievements_count, item.total_points, item.place]));
+  const nextSignature = JSON.stringify(nextRows.map(item => [item.student_id, item.achievements_count, item.total_points, item.place]));
+  if (silent && currentSignature === nextSignature) {
+    pointsLoading = false;
+    return;
+  }
+  pointRows = nextRows;
   fillClassFilter();
   renderPoints();
+  pointsLoading = false;
 }
 
 searchControl.addEventListener("input", renderPoints);
@@ -103,14 +117,14 @@ document.querySelector("#reset-points").addEventListener("click", () => {
   classControl.value = "";
   renderPoints();
 });
-document.querySelector("#refresh-points").addEventListener("click", loadPoints);
+document.querySelector("#refresh-points").addEventListener("click", () => loadPoints(false));
 window.addEventListener("storage", event => {
-  if (event.key === "ayna-achievements-updated") loadPoints();
+  if (event.key === "ayna-achievements-updated") loadPoints(true);
 });
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) loadPoints();
+  if (!document.hidden) loadPoints(true);
 });
 setInterval(() => {
-  if (!document.hidden) loadPoints();
+  if (!document.hidden) loadPoints(true);
 }, 30000);
-loadPoints();
+loadPoints(false);
