@@ -106,13 +106,16 @@ body {
 
 .leaderboard-slide {
   width: min(1380px, 96%);
-  max-height: 680px;
+  height: min(680px, 100%);
+  min-height: 0;
   overflow: hidden;
   border: 1px solid #d8e1de;
   border-radius: clamp(16px, 1.5vw, 24px);
   background: #fff;
   box-shadow: 0 24px 60px rgba(35, 55, 51, .12);
   animation: card-appear .9s cubic-bezier(.22, 1, .36, 1) both;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 .leaderboard-slide.is-leaving { animation: card-disappear .65s ease both; }
 .leaderboard-heading {
@@ -145,10 +148,11 @@ body {
   font-size: clamp(15px, 1.1vw, 21px);
   font-weight: 700;
 }
-.leaderboard-slide table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.leaderboard-slide table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; }
 .leaderboard-slide th,
 .leaderboard-slide td {
-  height: clamp(38px, 4.8vh, 52px);
+  height: auto;
+  min-height: 34px;
   padding: 0 clamp(16px, 2.2vw, 34px);
   border-bottom: 1px solid #e5ebe9;
   color: #244943;
@@ -157,7 +161,7 @@ body {
   vertical-align: middle;
 }
 .leaderboard-slide th {
-  height: clamp(38px, 4.4vh, 48px);
+  height: 42px;
   background: #17463f;
   color: #fff;
   font-size: clamp(13px, 1vw, 19px);

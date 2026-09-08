@@ -413,7 +413,14 @@ function startSequence() {
 
 function updateLeaderboard(data) {
   const normalized = [1, 2].map(function (shiftNumber) {
-    const rows = data.filter(item => Number(item.shift_number) === shiftNumber);
+    const rows = data.filter(function (item) {
+      const gradeMatch = String(item.class_name || "").match(/\d+/);
+      const grade = gradeMatch ? Number(gradeMatch[0]) : null;
+      const matchesClassShift = shiftNumber === 1
+        ? grade >= 5 && grade <= 7
+        : grade >= 8 && grade <= 11;
+      return Number(item.shift_number) === shiftNumber && matchesClassShift;
+    });
     if (!rows.length) return null;
     return {
       shift_number: shiftNumber,
@@ -434,7 +441,6 @@ function updateLeaderboard(data) {
   else if (changed && activeKind === "leaderboard") {
     activeIndex = Math.min(activeIndex, leaderboardSlides.length - 1);
     renderCurrentSlide();
-    scheduleNextSlide();
   }
 }
 
