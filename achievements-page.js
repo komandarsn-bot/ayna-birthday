@@ -16,6 +16,7 @@ const searchInput = document.querySelector("#table-search");
 const columnFilters = document.querySelector("#column-filters");
 let records = [];
 let students = [];
+let referenceLists = {};
 let sortKey = "event_date";
 let sortDirection = "desc";
 const scopeOrder = ["Международный", "Республиканский", "Городской", "Районный", "Школьный"];
@@ -101,6 +102,17 @@ function makeEditControl(key, value) {
   control.className = "inline-edit-control";
   control.dataset.key = key;
   control.value = value ?? "";
+  if (referenceLists[key]) {
+    const list = document.createElement("datalist");
+    list.id = "reference-" + key + "-" + Math.random().toString(36).slice(2);
+    referenceLists[key].forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.name;
+      list.append(option);
+    });
+    control.setAttribute("list", list.id);
+    control.referenceListElement = list;
+  }
   return control;
 }
 
@@ -140,7 +152,10 @@ function startInlineEdit(row, item) {
   studentInput.addEventListener("input", chooseStudent);
   chooseStudent();
 
-  columns.slice(3).forEach(([key], index) => cells[index + 3].replaceChildren(makeEditControl(key, item[key])));
+  columns.slice(3).forEach(([key], index) => {
+    const control = makeEditControl(key, item[key]);
+    cells[index + 3].replaceChildren(control, ...(control.referenceListElement ? [control.referenceListElement] : []));
+  });
   const actionsCell = cells[cells.length - 1];
   const saveButton = document.createElement("button");
   saveButton.textContent = "Сохранить";
@@ -158,11 +173,26 @@ function startInlineEdit(row, item) {
       first_name: selectedStudent.first_name,
       class_name: selectedStudent.class_name
     };
+    const requiredReferenceKeys = ["event_name", "project_name", "result", "supervisor_name", "organizers", "country", "city"];
+    let invalidReferenceControl = null;
     row.querySelectorAll(".inline-edit-control[data-key]").forEach(control => {
       const key = control.dataset.key;
       if (key === "first_name" || key === "class_name") return;
+      if (referenceLists[key] && control.value) {
+        const match = referenceLists[key].find(reference => reference.name.toLocaleLowerCase("ru") === control.value.trim().toLocaleLowerCase("ru"));
+        if (!match) invalidReferenceControl = control;
+        if (key === "event_name" && match) update.event_id = match.id;
+        if (key === "subject" && match) update.subject_id = match.id;
+      }
+      if (referenceLists[key] && requiredReferenceKeys.includes(key) && !control.value) invalidReferenceControl = control;
       update[key] = key === "cost" ? (control.value === "" ? null : Number(control.value)) : (control.value || null);
     });
+    if (invalidReferenceControl) {
+      alert("Выберите значение из подсказок базы данных");
+      invalidReferenceControl.focus();
+      return;
+    }
+    if (!update.subject) update.subject_id = null;
     const levelRank = scopeOrder.indexOf(update.achievement_level);
     const stageRank = scopeOrder.indexOf(update.event_stage);
     if (stageRank > levelRank) { alert("Этап не может быть выше уровня мероприятия"); return; }
@@ -222,15 +252,38 @@ async function load() {
   tableWrap.textContent = "Загрузка данных…";
   const { data: sessionData } = await client.auth.getSession();
   if (!sessionData.session) { location.replace("index.html"); return; }
-  const [achievementsResult, studentsResult] = await Promise.all([
+  const [achievementsResult, studentsResult, eventsResult, ordersResult, subjectsResult, typesResult, resultsResult, teachersResult, organizersResult, countriesResult, citiesResult] = await Promise.all([
     client.from("achievements").select("*").order("event_date", { ascending: false }),
-    client.from("students").select("id,last_name,first_name,class_name").order("last_name")
+    client.from("students").select("id,last_name,first_name,class_name").order("last_name"),
+    client.from("achievement_events").select("id,name").order("name"),
+    client.from("achievement_orders").select("id,name").order("name"),
+    client.from("achievement_subjects").select("id,name").order("name"),
+    client.from("achievement_types").select("id,name").order("name"),
+    client.from("achievement_results").select("id,name").order("name"),
+    client.from("teachers").select("id,last_name,first_name").order("last_name"),
+    client.from("achievement_organizers").select("id,name").order("name"),
+    client.from("achievement_countries").select("id,name").order("name"),
+    client.from("achievement_cities").select("id,name").order("name")
   ]);
   const { data, error } = achievementsResult;
   if (error) { tableWrap.textContent = "Ошибка: " + error.message; return; }
   if (studentsResult.error) { tableWrap.textContent = "Ошибка загрузки учеников: " + studentsResult.error.message; return; }
   records = data || [];
   students = studentsResult.data || [];
+  const referenceResults = [eventsResult, ordersResult, subjectsResult, typesResult, resultsResult, teachersResult, organizersResult, countriesResult, citiesResult];
+  const referenceError = referenceResults.find(result => result.error)?.error;
+  if (referenceError) { tableWrap.textContent = "Ошибка загрузки справочников: " + referenceError.message; return; }
+  referenceLists = {
+    event_name: eventsResult.data || [],
+    order_reference: ordersResult.data || [],
+    subject: subjectsResult.data || [],
+    project_name: typesResult.data || [],
+    result: resultsResult.data || [],
+    supervisor_name: (teachersResult.data || []).map(teacher => ({ id: teacher.id, name: teacher.last_name + " " + teacher.first_name })),
+    organizers: organizersResult.data || [],
+    country: countriesResult.data || [],
+    city: citiesResult.data || []
+  };
   buildColumnFilters();
   render();
 }
