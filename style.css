@@ -7,7 +7,7 @@ body {
 
 header {
   background-color: #ffffff;
-  padding: 24px 20px;
+  padding: 18px 20px;
   text-align: center;
   border-bottom: 1px solid rgba(23, 58, 53, 0.1);
   box-shadow: 0 4px 18px rgba(23, 58, 53, 0.05);
@@ -15,7 +15,7 @@ header {
 
 .admin-site-logo {
   display: block;
-  width: clamp(170px, 24vw, 280px);
+  width: clamp(165px, 20vw, 230px);
   height: auto;
   margin: 0 auto;
 }
@@ -306,15 +306,60 @@ input[type="file"] {
 
 .cabinet-header {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 20px;
 }
 
-.cabinet-header h2 { margin-top: 0; }
-.cabinet-header p { margin-bottom: 0; }
+.cabinet-card {
+  padding: 18px 22px;
+  border: 1px solid rgba(23, 58, 53, 0.08);
+  box-shadow: 0 10px 30px rgba(23, 58, 53, 0.07);
+}
+
+.cabinet-identity,
+.cabinet-user-line {
+  display: flex;
+  align-items: center;
+}
+
+.cabinet-identity { gap: 14px; min-width: 0; }
+
+.cabinet-avatar {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #173a35, #245a51);
+  color: #f0cf58;
+  font-size: 21px;
+  font-weight: 800;
+  box-shadow: 0 7px 16px rgba(23, 58, 53, 0.18);
+}
+
+.cabinet-profile { min-width: 0; }
+.cabinet-header h2 { margin: 0; font-size: 22px; letter-spacing: -0.02em; }
+.cabinet-user-line { gap: 7px; margin-top: 5px; color: #687a75; font-size: 14px; }
+.cabinet-user-line p { margin: 0; color: #35544e; font-weight: 700; }
+.cabinet-role { white-space: nowrap; }
+.cabinet-status { width: 8px; height: 8px; border-radius: 50%; background: #38a276; box-shadow: 0 0 0 3px #e3f2ec; }
+.cabinet-separator { color: #a2afab; }
+
+.cabinet-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border: 1px solid #cad8d4;
+  background: #f8faf9;
+  color: #244943;
+  font-size: 14px;
+}
+
+.cabinet-logout:hover { background: #edf3f1; }
+.cabinet-logout svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 .tv-leaderboard-settings {
   display: grid;
@@ -1183,6 +1228,13 @@ input[type="file"] {
 }
 
 @media (max-width: 600px) {
+  .cabinet-card { padding: 16px; }
+  .cabinet-header { align-items: flex-start; }
+  .cabinet-avatar { width: 42px; height: 42px; border-radius: 12px; }
+  .cabinet-header h2 { font-size: 18px; }
+  .cabinet-role, .cabinet-separator { display: none; }
+  .cabinet-logout { padding: 9px 10px; }
+  .cabinet-logout span { display: none; }
   .admin-tabs {
     grid-template-columns: repeat(4, minmax(130px, 1fr));
     overflow-x: auto;

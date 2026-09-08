@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=54">
+    <link rel="stylesheet" href="style.css?v=55">
   </head>
 
   <body>
@@ -46,15 +46,24 @@
   </section>
 
   <div id="app-content" hidden>
-    <section class="card">
+    <section class="card cabinet-card">
       <div class="cabinet-header">
-        <div>
-          <h2>Личный кабинет</h2>
-          <p id="current-user-email"></p>
+        <div class="cabinet-identity">
+          <div class="cabinet-avatar" aria-hidden="true">A</div>
+          <div class="cabinet-profile">
+            <h2>Панель управления</h2>
+            <div class="cabinet-user-line">
+              <span class="cabinet-status" aria-hidden="true"></span>
+              <span class="cabinet-role">Администратор</span>
+              <span class="cabinet-separator" aria-hidden="true">·</span>
+              <p id="current-user-email"></p>
+            </div>
+          </div>
         </div>
 
-        <button type="button" id="logout-button">
-          Выйти
+        <button type="button" id="logout-button" class="cabinet-logout">
+          <span>Выйти</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/></svg>
         </button>
       </div>
     </section>
