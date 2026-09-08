@@ -63,23 +63,39 @@ input[type="file"] {
 }
 
 .admin-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
   margin-bottom: 20px;
+  border: 1px solid #d5dfdc;
+  border-radius: 14px;
+  background: #e9eeec;
+  box-shadow: 0 6px 18px rgba(23, 58, 53, 0.06);
 }
 
 .admin-tabs button {
-  flex: 1 1 220px;
-  padding: 16px 20px;
-  background: #ffffff;
-  border: 1px solid #c7d8d3;
+  min-width: 0;
+  padding: 12px 8px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #31514c;
+  font-size: clamp(12px, 1.4vw, 15px);
+  line-height: 1.15;
+  white-space: nowrap;
+  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.admin-tabs button:hover {
+  background: rgba(255, 255, 255, 0.7);
+  color: #173a35;
 }
 
 .admin-tabs button[aria-selected="true"] {
   background: #173a35;
-  border-color: #173a35;
   color: #ffffff;
+  box-shadow: 0 5px 14px rgba(23, 58, 53, 0.2);
 }
 
 .admin-tabs button:focus-visible {
@@ -1167,6 +1183,11 @@ input[type="file"] {
 }
 
 @media (max-width: 600px) {
+  .admin-tabs {
+    grid-template-columns: repeat(4, minmax(130px, 1fr));
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
   .achievement-table-filters { grid-template-columns: 1fr; }
   .achievement-table-filters .secondary-button { width: 100%; }
   .achievement-column-filters { grid-template-columns: 1fr; }
