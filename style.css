@@ -299,6 +299,33 @@ input[type="file"] {
 .cabinet-header h2 { margin-top: 0; }
 .cabinet-header p { margin-bottom: 0; }
 
+.tv-leaderboard-settings {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto minmax(190px, 240px) auto;
+  align-items: end;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #d5e0dc;
+  border-radius: 12px;
+  background: #f7faf9;
+}
+.tv-leaderboard-settings > div { align-self: center; }
+.tv-leaderboard-settings strong,
+.tv-leaderboard-settings small { display: block; }
+.tv-leaderboard-settings small { margin-top: 4px; color: #657873; }
+.tv-leaderboard-settings label { display: grid; gap: 6px; font-weight: 700; }
+.tv-leaderboard-settings select { min-height: 46px; }
+.tv-leaderboard-settings button { width: auto; margin: 0; white-space: nowrap; }
+.tv-leaderboard-settings .tv-setting-toggle { display: flex; align-items: center; align-self: center; gap: 8px; }
+.tv-leaderboard-settings .tv-setting-toggle input { width: 18px; height: 18px; }
+.tv-leaderboard-settings .form-message { grid-column: 1 / -1; margin: 0; }
+
+@media (max-width: 900px) {
+  .tv-leaderboard-settings { grid-template-columns: 1fr; align-items: stretch; }
+  .tv-leaderboard-settings button { width: 100%; }
+}
+
 .birthday-person {
   background-color: #f4f1e8;
   border-left: 6px solid #e4c455;

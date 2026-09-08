@@ -6,7 +6,7 @@ const birthdayTitle = document.querySelector("#birthday-title");
 const birthdayStage = document.querySelector(".birthday-stage");
 const screenKey = new URLSearchParams(window.location.search).get("key");
 
-let birthdays = [], newsItems = [];
+let birthdays = [], newsItems = [], leaderboardSlides = [];
 let activeKind = null, activeIndex = 0;
 let activeNewsSlide = 0;
 let slideTimer, transitionTimer, isLoading = false;
@@ -243,9 +243,44 @@ function renderNews(item) {
   if (renderedContent.body) fitNewsText(renderedContent.body, renderedContent.textContainer || content);
 }
 
+function renderLeaderboard(slide) {
+  birthdayStage.classList.remove("is-birthday");
+  birthdayTitle.hidden = true;
+  const card = document.createElement("article");
+  card.className = "leaderboard-slide";
+  const heading = document.createElement("div");
+  heading.className = "leaderboard-heading";
+  const headingText = document.createElement("div");
+  const title = document.createElement("h1");
+  title.textContent = `Топ-10 учеников · ${slide.shift_number} смена`;
+  const period = document.createElement("p");
+  period.textContent = slide.period_label;
+  headingText.append(title, period);
+  const classes = document.createElement("span");
+  classes.textContent = slide.shift_number === 1 ? "5–7 классы" : "8–11 классы";
+  heading.append(headingText, classes);
+
+  const table = document.createElement("table");
+  table.innerHTML = "<thead><tr><th>Место</th><th>Ученик</th><th>Класс</th><th>Достижений</th><th>Баллы</th></tr></thead>";
+  const body = document.createElement("tbody");
+  slide.rows.forEach(function (item) {
+    const row = document.createElement("tr");
+    [item.place_number, item.student_name, item.class_name, item.achievements_count, item.total_points].forEach(function (value) {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.append(cell);
+    });
+    body.append(row);
+  });
+  table.append(body);
+  card.append(heading, table);
+  tvBirthdayList.replaceChildren(card);
+}
+
 function renderCurrentSlide() {
   if (activeKind === "birthday") renderBirthday(birthdays[activeIndex]);
   if (activeKind === "news") renderNews(newsItems[activeIndex]);
+  if (activeKind === "leaderboard") renderLeaderboard(leaderboardSlides[activeIndex]);
 }
 
 function scheduleNextSlide() {
@@ -256,6 +291,7 @@ function scheduleNextSlide() {
   if (currentSlide && currentSlide.type === "text") duration = 15000;
   if (currentSlide && currentSlide.type === "announcement") duration = 15000;
   if (currentSlide && currentSlide.type === "qr") duration = 10000;
+  if (activeKind === "leaderboard") duration = 15000;
   slideTimer = setTimeout(transitionToNextSlide, duration);
 }
 
@@ -263,6 +299,7 @@ function chooseNextSlide() {
   if (activeKind === "birthday") {
     if (activeIndex + 1 < birthdays.length) activeIndex += 1;
     else if (newsItems.length) { activeKind = "news"; activeIndex = 0; activeNewsSlide = 0; }
+    else if (leaderboardSlides.length) { activeKind = "leaderboard"; activeIndex = 0; }
     else activeIndex = 0;
   } else if (activeKind === "news") {
     const currentNews = newsItems[activeIndex];
@@ -270,6 +307,10 @@ function chooseNextSlide() {
       activeNewsSlide += 1;
     } else if (activeIndex + 1 < newsItems.length) {
       activeIndex += 1;
+      activeNewsSlide = 0;
+    } else if (leaderboardSlides.length) {
+      activeKind = "leaderboard";
+      activeIndex = 0;
       activeNewsSlide = 0;
     } else if (birthdays.length) {
       activeKind = "birthday";
@@ -279,6 +320,11 @@ function chooseNextSlide() {
       activeIndex = 0;
       activeNewsSlide = 0;
     }
+  } else if (activeKind === "leaderboard") {
+    if (activeIndex + 1 < leaderboardSlides.length) activeIndex += 1;
+    else if (birthdays.length) { activeKind = "birthday"; activeIndex = 0; }
+    else if (newsItems.length) { activeKind = "news"; activeIndex = 0; activeNewsSlide = 0; }
+    else activeIndex = 0;
   }
 }
 
@@ -357,11 +403,39 @@ function startSequence() {
   clearTimeout(transitionTimer);
   if (birthdays.length) activeKind = "birthday";
   else if (newsItems.length) activeKind = "news";
+  else if (leaderboardSlides.length) activeKind = "leaderboard";
   else { showScreenState("Сегодня пока нет новых публикаций"); return; }
   activeIndex = 0;
   activeNewsSlide = 0;
   renderCurrentSlide();
   scheduleNextSlide();
+}
+
+function updateLeaderboard(data) {
+  const normalized = [1, 2].map(function (shiftNumber) {
+    const rows = data.filter(item => Number(item.shift_number) === shiftNumber);
+    if (!rows.length) return null;
+    return {
+      shift_number: shiftNumber,
+      period_label: rows[0].period_label || "",
+      rows: rows.map(item => ({
+        place_number: Number(item.place_number),
+        student_name: item.student_name,
+        class_name: item.class_name,
+        achievements_count: Number(item.achievements_count),
+        total_points: Number(item.total_points)
+      }))
+    };
+  }).filter(Boolean);
+  const changed = JSON.stringify(normalized) !== JSON.stringify(leaderboardSlides);
+  leaderboardSlides = normalized;
+  if (!activeKind) startSequence();
+  else if (activeKind === "leaderboard" && !leaderboardSlides.length) startSequence();
+  else if (changed && activeKind === "leaderboard") {
+    activeIndex = Math.min(activeIndex, leaderboardSlides.length - 1);
+    renderCurrentSlide();
+    scheduleNextSlide();
+  }
 }
 
 function updateBirthdays(data) {
@@ -425,13 +499,15 @@ async function loadContent() {
   if (isLoading) return;
   isLoading = true;
   try {
-    const [birthdayResult, newsResult] = await Promise.all([
+    const [birthdayResult, newsResult, leaderboardResult] = await Promise.all([
       supabaseClient.rpc("get_screen_birthdays", { p_access_token: screenKey }),
-      supabaseClient.rpc("get_screen_news", { p_access_token: screenKey })
+      supabaseClient.rpc("get_screen_news", { p_access_token: screenKey }),
+      supabaseClient.rpc("get_screen_leaderboard", { p_access_token: screenKey })
     ]);
     if (!birthdayResult.error) updateBirthdays(birthdayResult.data || []);
     if (!newsResult.error) updateNews(newsResult.data || []);
-    if (birthdayResult.error && newsResult.error && !activeKind) showScreenState("Восстанавливаем связь", "Повторим попытку через несколько секунд.");
+    if (!leaderboardResult.error) updateLeaderboard(leaderboardResult.data || []);
+    if (birthdayResult.error && newsResult.error && leaderboardResult.error && !activeKind) showScreenState("Восстанавливаем связь", "Повторим попытку через несколько секунд.");
   } finally {
     isLoading = false;
   }

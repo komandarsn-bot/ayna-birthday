@@ -104,6 +104,72 @@ body {
 }
 .news-slide.is-leaving { animation: card-disappear 0.65s ease both; }
 
+.leaderboard-slide {
+  width: min(1380px, 96%);
+  max-height: 680px;
+  overflow: hidden;
+  border: 1px solid #d8e1de;
+  border-radius: clamp(16px, 1.5vw, 24px);
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(35, 55, 51, .12);
+  animation: card-appear .9s cubic-bezier(.22, 1, .36, 1) both;
+}
+.leaderboard-slide.is-leaving { animation: card-disappear .65s ease both; }
+.leaderboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(18px, 2.2vh, 28px) clamp(28px, 3vw, 48px);
+  border-bottom: 1px solid #dce4e1;
+  text-align: left;
+}
+.leaderboard-heading h1 {
+  margin: 0;
+  color: #17463f;
+  font-size: clamp(28px, 2.5vw, 46px);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+}
+.leaderboard-heading p {
+  margin: 7px 0 0;
+  color: #6b7b77;
+  font-size: clamp(16px, 1.2vw, 23px);
+}
+.leaderboard-heading > span {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #f5e8b1;
+  color: #705817;
+  font-size: clamp(15px, 1.1vw, 21px);
+  font-weight: 700;
+}
+.leaderboard-slide table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.leaderboard-slide th,
+.leaderboard-slide td {
+  height: clamp(38px, 4.8vh, 52px);
+  padding: 0 clamp(16px, 2.2vw, 34px);
+  border-bottom: 1px solid #e5ebe9;
+  color: #244943;
+  font-size: clamp(15px, 1.25vw, 23px);
+  text-align: left;
+  vertical-align: middle;
+}
+.leaderboard-slide th {
+  height: clamp(38px, 4.4vh, 48px);
+  background: #17463f;
+  color: #fff;
+  font-size: clamp(13px, 1vw, 19px);
+  font-weight: 650;
+}
+.leaderboard-slide tbody tr:last-child td { border-bottom: 0; }
+.leaderboard-slide th:nth-child(1), .leaderboard-slide td:nth-child(1) { width: 11%; text-align: center; }
+.leaderboard-slide th:nth-child(2), .leaderboard-slide td:nth-child(2) { width: 43%; }
+.leaderboard-slide th:nth-child(3), .leaderboard-slide td:nth-child(3) { width: 14%; text-align: center; }
+.leaderboard-slide th:nth-child(4), .leaderboard-slide td:nth-child(4) { width: 18%; text-align: center; }
+.leaderboard-slide th:nth-child(5), .leaderboard-slide td:nth-child(5) { width: 14%; text-align: center; font-weight: 700; }
+
 .news-photo {
   position: relative;
   z-index: 1;

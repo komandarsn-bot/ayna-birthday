@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=49">
+    <link rel="stylesheet" href="style.css?v=50">
   </head>
 
   <body>
@@ -69,6 +69,24 @@
           hidden
         ></a>
       </p>
+
+      <div class="tv-leaderboard-settings">
+        <div>
+          <strong>Топ-10 учеников на ТВ</strong>
+          <small>Первая и вторая смены показываются отдельно</small>
+        </div>
+        <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked> Показывать</label>
+        <label>Период
+          <select id="tv-leaderboard-period">
+            <option value="week">Текущая неделя</option>
+            <option value="month">Текущий месяц</option>
+            <option value="quarter">Текущая четверть</option>
+            <option value="school_year" selected>Текущий учебный год</option>
+          </select>
+        </label>
+        <button type="button" id="save-tv-leaderboard-settings">Сохранить настройку</button>
+        <p id="tv-leaderboard-message" class="form-message" aria-live="polite"></p>
+      </div>
     </section>
 
     <details class="card school-base-card school-base-manager">
@@ -419,6 +437,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=48"></script>
+    <script src="script.js?v=49"></script>
   </body>
 </html>

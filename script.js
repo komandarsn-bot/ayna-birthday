@@ -57,6 +57,10 @@ const createScreenButton =
 
 const screenUrl =
   document.querySelector("#screen-url");
+const tvLeaderboardEnabled = document.querySelector("#tv-leaderboard-enabled");
+const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
+const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
+const tvLeaderboardMessage = document.querySelector("#tv-leaderboard-message");
 
 const newsTitle = document.querySelector("#news-title");
 const newsType = document.querySelector("#news-type");
@@ -361,6 +365,7 @@ function updateAuthView(session) {
     loadLocationReference(achievementCountryReference);
     loadLocationReference(achievementCityReference);
     loadLocationReference(achievementOrganizerReference);
+    loadTvLeaderboardSettings();
   } else {
     currentUserEmail.textContent = "";
     screenUrl.hidden = true;
@@ -517,6 +522,37 @@ function sortPeopleByUpcomingBirthday(people, today = new Date()) {
       .localeCompare((b.last_name || "") + (b.first_name || "") + (b.full_name || ""), "ru")
   );
 }
+
+async function loadTvLeaderboardSettings() {
+  const { data, error } = await supabaseClient
+    .from("screen_leaderboard_settings")
+    .select("is_enabled,period_type")
+    .maybeSingle();
+  if (error) {
+    tvLeaderboardMessage.textContent = "Сначала выполните SQL настройки рейтинга";
+    return;
+  }
+  if (!data) return;
+  tvLeaderboardEnabled.checked = data.is_enabled;
+  tvLeaderboardPeriod.value = data.period_type;
+}
+
+saveTvLeaderboardSettingsButton.addEventListener("click", async function () {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) return;
+  saveTvLeaderboardSettingsButton.disabled = true;
+  tvLeaderboardMessage.textContent = "Сохраняем...";
+  const { error } = await supabaseClient
+    .from("screen_leaderboard_settings")
+    .upsert({
+      user_id: sessionData.session.user.id,
+      is_enabled: tvLeaderboardEnabled.checked,
+      period_type: tvLeaderboardPeriod.value,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
+  saveTvLeaderboardSettingsButton.disabled = false;
+  tvLeaderboardMessage.textContent = error ? "Ошибка: " + error.message : "Настройка сохранена";
+});
 
 loadNewsButton.addEventListener("click", async function () {
   newsList.textContent = "Загрузка...";
