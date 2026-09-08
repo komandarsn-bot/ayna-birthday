@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=50">
+    <link rel="stylesheet" href="style.css?v=51">
   </head>
 
   <body>
@@ -85,6 +85,15 @@
           </select>
         </label>
         <button type="button" id="save-tv-leaderboard-settings">Сохранить настройку</button>
+        <details class="quarter-date-settings">
+          <summary>Даты учебных четвертей</summary>
+          <div class="quarter-date-grid">
+            <fieldset><legend>1 четверть</legend><label>Начало<input type="date" id="quarter-1-start"></label><label>Окончание<input type="date" id="quarter-1-end"></label></fieldset>
+            <fieldset><legend>2 четверть</legend><label>Начало<input type="date" id="quarter-2-start"></label><label>Окончание<input type="date" id="quarter-2-end"></label></fieldset>
+            <fieldset><legend>3 четверть</legend><label>Начало<input type="date" id="quarter-3-start"></label><label>Окончание<input type="date" id="quarter-3-end"></label></fieldset>
+            <fieldset><legend>4 четверть</legend><label>Начало<input type="date" id="quarter-4-start"></label><label>Окончание<input type="date" id="quarter-4-end"></label></fieldset>
+          </div>
+        </details>
         <p id="tv-leaderboard-message" class="form-message" aria-live="polite"></p>
       </div>
     </section>
@@ -437,6 +446,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=49"></script>
+    <script src="script.js?v=50"></script>
   </body>
 </html>

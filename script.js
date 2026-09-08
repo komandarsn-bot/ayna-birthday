@@ -61,6 +61,28 @@ const tvLeaderboardEnabled = document.querySelector("#tv-leaderboard-enabled");
 const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
 const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
 const tvLeaderboardMessage = document.querySelector("#tv-leaderboard-message");
+const quarterDateControls = [1, 2, 3, 4].map(number => ({
+  start: document.querySelector(`#quarter-${number}-start`),
+  end: document.querySelector(`#quarter-${number}-end`)
+}));
+
+function defaultQuarterDates() {
+  const today = new Date();
+  const firstYear = today.getMonth() >= 8 ? today.getFullYear() : today.getFullYear() - 1;
+  return [
+    [`${firstYear}-09-01`, `${firstYear}-10-31`],
+    [`${firstYear}-11-01`, `${firstYear}-12-31`],
+    [`${firstYear + 1}-01-01`, `${firstYear + 1}-03-31`],
+    [`${firstYear + 1}-04-01`, `${firstYear + 1}-05-31`]
+  ];
+}
+
+function fillDefaultQuarterDates() {
+  defaultQuarterDates().forEach((dates, index) => {
+    if (!quarterDateControls[index].start.value) quarterDateControls[index].start.value = dates[0];
+    if (!quarterDateControls[index].end.value) quarterDateControls[index].end.value = dates[1];
+  });
+}
 
 const newsTitle = document.querySelector("#news-title");
 const newsType = document.querySelector("#news-type");
@@ -526,20 +548,31 @@ function sortPeopleByUpcomingBirthday(people, today = new Date()) {
 async function loadTvLeaderboardSettings() {
   const { data, error } = await supabaseClient
     .from("screen_leaderboard_settings")
-    .select("is_enabled,period_type")
+    .select("is_enabled,period_type,quarter_1_start,quarter_1_end,quarter_2_start,quarter_2_end,quarter_3_start,quarter_3_end,quarter_4_start,quarter_4_end")
     .maybeSingle();
   if (error) {
     tvLeaderboardMessage.textContent = "Сначала выполните SQL настройки рейтинга";
     return;
   }
-  if (!data) return;
-  tvLeaderboardEnabled.checked = data.is_enabled;
-  tvLeaderboardPeriod.value = data.period_type;
+  if (data) {
+    tvLeaderboardEnabled.checked = data.is_enabled;
+    tvLeaderboardPeriod.value = data.period_type;
+    quarterDateControls.forEach((controls, index) => {
+      controls.start.value = data[`quarter_${index + 1}_start`] || "";
+      controls.end.value = data[`quarter_${index + 1}_end`] || "";
+    });
+  }
+  fillDefaultQuarterDates();
 }
 
 saveTvLeaderboardSettingsButton.addEventListener("click", async function () {
   const { data: sessionData } = await supabaseClient.auth.getSession();
   if (!sessionData.session) return;
+  const invalidQuarter = quarterDateControls.find(controls => !controls.start.value || !controls.end.value || controls.end.value < controls.start.value);
+  if (invalidQuarter) {
+    tvLeaderboardMessage.textContent = "Проверьте даты начала и окончания четвертей";
+    return;
+  }
   saveTvLeaderboardSettingsButton.disabled = true;
   tvLeaderboardMessage.textContent = "Сохраняем...";
   const { error } = await supabaseClient
@@ -548,6 +581,14 @@ saveTvLeaderboardSettingsButton.addEventListener("click", async function () {
       user_id: sessionData.session.user.id,
       is_enabled: tvLeaderboardEnabled.checked,
       period_type: tvLeaderboardPeriod.value,
+      quarter_1_start: quarterDateControls[0].start.value,
+      quarter_1_end: quarterDateControls[0].end.value,
+      quarter_2_start: quarterDateControls[1].start.value,
+      quarter_2_end: quarterDateControls[1].end.value,
+      quarter_3_start: quarterDateControls[2].start.value,
+      quarter_3_end: quarterDateControls[2].end.value,
+      quarter_4_start: quarterDateControls[3].start.value,
+      quarter_4_end: quarterDateControls[3].end.value,
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id" });
   saveTvLeaderboardSettingsButton.disabled = false;

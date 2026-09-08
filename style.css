@@ -320,10 +320,18 @@ input[type="file"] {
 .tv-leaderboard-settings .tv-setting-toggle { display: flex; align-items: center; align-self: center; gap: 8px; }
 .tv-leaderboard-settings .tv-setting-toggle input { width: 18px; height: 18px; }
 .tv-leaderboard-settings .form-message { grid-column: 1 / -1; margin: 0; }
+.quarter-date-settings { grid-column: 1 / -1; border-top: 1px solid #d5e0dc; padding-top: 12px; }
+.quarter-date-settings summary { cursor: pointer; font-weight: 700; }
+.quarter-date-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.quarter-date-grid fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 12px; border: 1px solid #d5e0dc; border-radius: 9px; }
+.quarter-date-grid legend { padding: 0 6px; font-weight: 700; }
+.quarter-date-grid input { min-height: 42px; }
 
 @media (max-width: 900px) {
   .tv-leaderboard-settings { grid-template-columns: 1fr; align-items: stretch; }
   .tv-leaderboard-settings button { width: 100%; }
+  .quarter-date-grid { grid-template-columns: 1fr; }
+  .quarter-date-grid fieldset { grid-template-columns: 1fr; }
 }
 
 .birthday-person {

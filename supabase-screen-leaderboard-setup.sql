@@ -6,8 +6,25 @@ create table if not exists public.screen_leaderboard_settings (
   is_enabled boolean not null default true,
   period_type text not null default 'school_year'
     check (period_type in ('week', 'month', 'quarter', 'school_year')),
+  quarter_1_start date,
+  quarter_1_end date,
+  quarter_2_start date,
+  quarter_2_end date,
+  quarter_3_start date,
+  quarter_3_end date,
+  quarter_4_start date,
+  quarter_4_end date,
   updated_at timestamptz not null default now()
 );
+
+alter table public.screen_leaderboard_settings add column if not exists quarter_1_start date;
+alter table public.screen_leaderboard_settings add column if not exists quarter_1_end date;
+alter table public.screen_leaderboard_settings add column if not exists quarter_2_start date;
+alter table public.screen_leaderboard_settings add column if not exists quarter_2_end date;
+alter table public.screen_leaderboard_settings add column if not exists quarter_3_start date;
+alter table public.screen_leaderboard_settings add column if not exists quarter_3_end date;
+alter table public.screen_leaderboard_settings add column if not exists quarter_4_start date;
+alter table public.screen_leaderboard_settings add column if not exists quarter_4_end date;
 
 alter table public.screen_leaderboard_settings enable row level security;
 
@@ -40,6 +57,14 @@ as $function$
       owner.user_id,
       coalesce(setting.is_enabled, true) as is_enabled,
       coalesce(setting.period_type, 'school_year') as period_type,
+      setting.quarter_1_start,
+      setting.quarter_1_end,
+      setting.quarter_2_start,
+      setting.quarter_2_end,
+      setting.quarter_3_start,
+      setting.quarter_3_end,
+      setting.quarter_4_start,
+      setting.quarter_4_end,
       (now() at time zone 'Asia/Qyzylorda')::date as today
     from screen_owner owner
     left join public.screen_leaderboard_settings setting on setting.user_id = owner.user_id
@@ -50,10 +75,10 @@ as $function$
         when 'week' then date_trunc('week', settings.today::timestamp)::date
         when 'month' then date_trunc('month', settings.today::timestamp)::date
         when 'quarter' then case
-          when extract(month from settings.today) between 9 and 10 then make_date(extract(year from settings.today)::integer, 9, 1)
-          when extract(month from settings.today) between 11 and 12 then make_date(extract(year from settings.today)::integer, 11, 1)
-          when extract(month from settings.today) between 1 and 3 then make_date(extract(year from settings.today)::integer, 1, 1)
-          when extract(month from settings.today) between 4 and 5 then make_date(extract(year from settings.today)::integer, 4, 1)
+          when extract(month from settings.today) between 9 and 10 then coalesce(settings.quarter_1_start, make_date(extract(year from settings.today)::integer, 9, 1))
+          when extract(month from settings.today) between 11 and 12 then coalesce(settings.quarter_2_start, make_date(extract(year from settings.today)::integer, 11, 1))
+          when extract(month from settings.today) between 1 and 3 then coalesce(settings.quarter_3_start, make_date(extract(year from settings.today)::integer, 1, 1))
+          when extract(month from settings.today) between 4 and 5 then coalesce(settings.quarter_4_start, make_date(extract(year from settings.today)::integer, 4, 1))
           else make_date(extract(year from settings.today)::integer, 6, 1)
         end
         else make_date(
@@ -65,10 +90,10 @@ as $function$
         when 'week' then (date_trunc('week', settings.today::timestamp)::date + 6)
         when 'month' then (date_trunc('month', settings.today::timestamp) + interval '1 month - 1 day')::date
         when 'quarter' then case
-          when extract(month from settings.today) between 9 and 10 then make_date(extract(year from settings.today)::integer, 10, 31)
-          when extract(month from settings.today) between 11 and 12 then make_date(extract(year from settings.today)::integer, 12, 31)
-          when extract(month from settings.today) between 1 and 3 then make_date(extract(year from settings.today)::integer, 3, 31)
-          when extract(month from settings.today) between 4 and 5 then make_date(extract(year from settings.today)::integer, 5, 31)
+          when extract(month from settings.today) between 9 and 10 then coalesce(settings.quarter_1_end, make_date(extract(year from settings.today)::integer, 10, 31))
+          when extract(month from settings.today) between 11 and 12 then coalesce(settings.quarter_2_end, make_date(extract(year from settings.today)::integer, 12, 31))
+          when extract(month from settings.today) between 1 and 3 then coalesce(settings.quarter_3_end, make_date(extract(year from settings.today)::integer, 3, 31))
+          when extract(month from settings.today) between 4 and 5 then coalesce(settings.quarter_4_end, make_date(extract(year from settings.today)::integer, 5, 31))
           else make_date(extract(year from settings.today)::integer, 8, 31)
         end
         else make_date(
