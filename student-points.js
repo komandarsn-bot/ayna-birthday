@@ -87,8 +87,8 @@ async function loadPoints() {
 
   let previousPoints = null;
   let currentPlace = 0;
-  pointRows = (data || []).map((item, index) => {
-    if (Number(item.total_points) !== previousPoints) currentPlace = index + 1;
+  pointRows = (data || []).map(item => {
+    if (Number(item.total_points) !== previousPoints) currentPlace += 1;
     previousPoints = Number(item.total_points);
     return { ...item, place: currentPlace };
   });
@@ -104,4 +104,13 @@ document.querySelector("#reset-points").addEventListener("click", () => {
   renderPoints();
 });
 document.querySelector("#refresh-points").addEventListener("click", loadPoints);
+window.addEventListener("storage", event => {
+  if (event.key === "ayna-achievements-updated") loadPoints();
+});
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) loadPoints();
+});
+setInterval(() => {
+  if (!document.hidden) loadPoints();
+}, 30000);
 loadPoints();

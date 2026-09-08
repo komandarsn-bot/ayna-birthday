@@ -200,6 +200,7 @@ function startInlineEdit(row, item) {
     saveButton.textContent = "Сохраняем...";
     const { error } = await client.from("achievements").update(update).eq("id", item.id);
     if (error) { alert("Ошибка: " + error.message); saveButton.disabled = false; saveButton.textContent = "Сохранить"; return; }
+    try { localStorage.setItem("ayna-achievements-updated", String(Date.now())); } catch (_error) {}
     Object.assign(item, update);
     buildColumnFilters();
     render();

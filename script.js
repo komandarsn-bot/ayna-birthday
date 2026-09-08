@@ -2884,6 +2884,12 @@ achievementForm.addEventListener("submit", async function (event) {
     return;
   }
 
+  try {
+    localStorage.setItem("ayna-achievements-updated", String(Date.now()));
+  } catch (_error) {
+    // Сохранение достижения не должно зависеть от доступности localStorage.
+  }
+
   achievementForm.reset();
   achievementFormDraft = null;
   syncAchievementStageOptions();
