@@ -55,18 +55,19 @@ button.secondary { background: #fff; border: 1px solid #bfd0cb; }
 
 .table-wrap { overflow: hidden; border: 1px solid #d9e2df; border-radius: 18px; background: #fff; box-shadow: 0 14px 38px rgba(18, 61, 55, .09); }
 table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-th, td { padding: 0 22px; height: 76px; border-bottom: 1px solid #e2e9e7; text-align: left; vertical-align: middle; }
-th { height: 64px; background: #173f39; color: #fff; font-size: 13px; font-weight: 750; letter-spacing: .015em; }
+th, td { padding: 0 22px; height: 72px; border-bottom: 1px solid #e2e9e7; text-align: left; vertical-align: middle; }
+th { height: 60px; background: #173f39; color: #fff; font-size: 15px; font-weight: 700; letter-spacing: 0; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:nth-child(even) { background: #f7f9f8; }
-.place { width: 120px; text-align: center; font-size: 18px; font-weight: 800; }
-.student-name { width: 42%; font-size: 17px; font-weight: 750; color: #123d37; }
+.place { width: 120px; text-align: center; font-weight: 700; }
+th.place { font-size: 15px; font-weight: 700; }
+.student-name { width: 42%; font-size: 16px; font-weight: 650; color: #123d37; }
 th:nth-child(3), td:nth-child(3) { width: 150px; }
 .achievements-column { width: 180px; text-align: center; }
-.points { width: 150px; text-align: center; color: #173f39; font-size: 21px; font-weight: 850; }
-th.points { color: #fff; font-size: 13px; font-weight: 750; }
+.points { width: 150px; text-align: center; color: #173f39; font-size: 18px; font-weight: 750; }
+th.points { color: #fff; font-size: 15px; font-weight: 700; }
 .top-place,
-.place span:not(.top-place) { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #edf2f0; color: #173a35; }
+.place span:not(.top-place) { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #edf2f0; color: #173a35; font-size: 16px; font-weight: 750; }
 .top-place { background: #f2cf4e; box-shadow: 0 4px 12px rgba(181, 139, 16, .22); }
 tr[data-place="2"] .top-place { background: #dfe5e3; box-shadow: none; }
 tr[data-place="3"] .top-place { background: #dca878; box-shadow: none; }
