@@ -13,6 +13,134 @@ header {
   box-shadow: 0 4px 18px rgba(23, 58, 53, 0.05);
 }
 
+/* Единый интерфейс разделов админ-панели */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.45;
+}
+
+#app-content > [role="tabpanel"] {
+  animation: admin-panel-appear .24s ease both;
+}
+
+#app-content > [role="tabpanel"] > .card,
+#settings-panel > .card,
+#settings-panel > details.card {
+  border: 1px solid rgba(23, 58, 53, 0.09);
+  border-radius: 18px;
+  box-shadow: 0 12px 34px rgba(23, 58, 53, 0.075);
+}
+
+#app-content > [role="tabpanel"] > .card:not(.achievement-upload-card),
+#settings-panel > .card:not(.school-base-card) {
+  padding: clamp(22px, 3vw, 32px);
+}
+
+#app-content h2 {
+  margin: 0 0 8px;
+  color: #123f38;
+  font-size: clamp(24px, 2.6vw, 30px);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+}
+
+#app-content h3 {
+  color: #1c4942;
+  letter-spacing: -0.015em;
+}
+
+#app-content label {
+  color: #234a44;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#app-content input:not([type="checkbox"]):not([type="file"]),
+#app-content select,
+#app-content textarea {
+  border: 1px solid #c8d7d3;
+  border-radius: 10px;
+  background: #fbfcfc;
+  color: #173a35;
+  font-family: inherit;
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+#app-content input:not([type="checkbox"]):not([type="file"]):focus,
+#app-content select:focus,
+#app-content textarea:focus {
+  outline: none;
+  border-color: #4d8379;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(42, 105, 94, 0.12);
+}
+
+#app-content button,
+#app-content .button-link {
+  border-radius: 10px;
+  transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+
+#app-content button:hover,
+#app-content .button-link:hover {
+  transform: translateY(-1px);
+}
+
+#app-content button:active,
+#app-content .button-link:active {
+  transform: translateY(0);
+}
+
+#app-content button:not(.secondary-button):not(.cabinet-logout) {
+  box-shadow: 0 6px 14px rgba(196, 157, 28, 0.16);
+}
+
+.school-base-section,
+.birthday-database-group,
+.news-row,
+.achievement-student-row,
+.achievement-date-range,
+.achievement-table-filters {
+  border-color: #d6e1de;
+  background: #f9fbfa;
+  box-shadow: none;
+}
+
+.school-base-summary,
+.achievement-reference-summary {
+  min-height: 64px;
+  background: linear-gradient(180deg, #ffffff, #fafcfb);
+}
+
+.school-base-summary:hover,
+.achievement-reference-summary:hover {
+  background: #f4f8f6;
+}
+
+.news-list-header,
+.achievement-list-header,
+.birthday-list-heading {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e8e5;
+}
+
+.form-hint,
+.form-message,
+.news-form small,
+#app-content .card > p {
+  color: #657873;
+}
+
+@keyframes admin-panel-appear {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app-content > [role="tabpanel"] { animation: none; }
+  #app-content button, #app-content .button-link { transition: none; }
+}
+
 .admin-site-logo {
   display: block;
   width: clamp(165px, 20vw, 230px);
