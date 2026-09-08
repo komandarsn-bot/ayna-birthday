@@ -3,19 +3,75 @@ const tableContainer = document.querySelector("#points-table");
 const countLabel = document.querySelector("#points-count");
 const searchControl = document.querySelector("#points-search");
 const classControl = document.querySelector("#class-filter");
+const shiftControl = document.querySelector("#shift-filter");
+const periodStartControl = document.querySelector("#period-start");
+const periodEndControl = document.querySelector("#period-end");
 let pointRows = [];
+let pointEntries = [];
+let students = [];
+let achievementsById = new Map();
+let sourceSignature = "";
 let pointsLoading = false;
 
 function normalized(value) {
   return String(value || "").trim().toLocaleLowerCase("ru");
 }
 
+function classGrade(className) {
+  const match = String(className || "").match(/\d+/);
+  return match ? Number(match[0]) : null;
+}
+
+function matchesShift(className) {
+  if (!shiftControl.value) return true;
+  const grade = classGrade(className);
+  if (shiftControl.value === "1") return grade >= 5 && grade <= 7;
+  return grade >= 8 && grade <= 11;
+}
+
+function matchesPeriod(entry) {
+  const achievement = achievementsById.get(entry.achievement_id);
+  if (!periodStartControl.value && !periodEndControl.value) return true;
+  if (!achievement) return false;
+  const start = achievement.event_date || achievement.event_end_date;
+  const end = achievement.event_end_date || achievement.event_date;
+  if (!start || !end) return false;
+  if (periodStartControl.value && end < periodStartControl.value) return false;
+  if (periodEndControl.value && start > periodEndControl.value) return false;
+  return true;
+}
+
+function rebuildPointRows() {
+  const studentsById = new Map(students.map(student => [student.id, student]));
+  const totals = new Map();
+  pointEntries.forEach(entry => {
+    const student = studentsById.get(entry.student_id);
+    if (!student || !matchesShift(student.class_name) || !matchesPeriod(entry)) return;
+    if (classControl.value && student.class_name !== classControl.value) return;
+    const total = totals.get(student.id) || { achievements_count: 0, total_points: 0 };
+    total.achievements_count += 1;
+    total.total_points += Number(entry.points) || 0;
+    totals.set(student.id, total);
+  });
+
+  const ranked = students
+    .filter(student => totals.has(student.id) && totals.get(student.id).total_points > 0)
+    .map(student => ({ ...student, ...totals.get(student.id) }))
+    .sort((a, b) => b.total_points - a.total_points || a.last_name.localeCompare(b.last_name, "ru") || a.first_name.localeCompare(b.first_name, "ru"));
+
+  let previousPoints = null;
+  let currentPlace = 0;
+  pointRows = ranked.map(item => {
+    if (item.total_points !== previousPoints) currentPlace += 1;
+    previousPoints = item.total_points;
+    return { ...item, place: currentPlace };
+  });
+  renderPoints();
+}
+
 function visibleRows() {
   const search = normalized(searchControl.value);
-  return pointRows.filter(item => {
-    if (classControl.value && item.class_name !== classControl.value) return false;
-    return !search || normalized(`${item.last_name} ${item.first_name} ${item.class_name}`).includes(search);
-  });
+  return pointRows.filter(item => !search || normalized(`${item.last_name} ${item.first_name} ${item.class_name}`).includes(search));
 }
 
 function renderPoints() {
@@ -24,7 +80,7 @@ function renderPoints() {
   if (!rows.length) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.textContent = pointRows.length ? "По выбранным параметрам учеников нет" : "Начисленных баллов пока нет";
+    empty.textContent = pointEntries.length ? "По выбранным параметрам учеников нет" : "Начисленных баллов пока нет";
     tableContainer.replaceChildren(empty);
     return;
   }
@@ -34,14 +90,9 @@ function renderPoints() {
   const body = document.createElement("tbody");
   rows.forEach(item => {
     const row = document.createElement("tr");
-    row.dataset.place = item.place;
     const place = document.createElement("td");
     place.className = "place";
-    const placeMark = document.createElement("span");
-    placeMark.className = item.place <= 3 ? "top-place" : "";
-    placeMark.textContent = item.place;
-    place.append(placeMark);
-
+    place.textContent = item.place;
     const name = document.createElement("td");
     name.className = "student-name";
     name.textContent = `${item.last_name} ${item.first_name}`;
@@ -62,7 +113,8 @@ function renderPoints() {
 
 function fillClassFilter() {
   const current = classControl.value;
-  const classes = Array.from(new Set(pointRows.map(item => item.class_name).filter(Boolean)))
+  const studentIds = new Set(pointEntries.map(item => item.student_id));
+  const classes = Array.from(new Set(students.filter(item => studentIds.has(item.id)).map(item => item.class_name).filter(Boolean)))
     .sort((a, b) => a.localeCompare(b, "ru", { numeric: true }));
   classControl.replaceChildren(new Option("Все классы", ""), ...classes.map(value => new Option(value, value)));
   classControl.value = classes.includes(current) ? current : "";
@@ -75,47 +127,48 @@ async function loadPoints(silent = false) {
   const { data: sessionData } = await pointsClient.auth.getSession();
   if (!sessionData.session) { pointsLoading = false; location.replace("index.html"); return; }
 
-  const { data, error } = await pointsClient
-    .from("student_points_totals")
-    .select("student_id,last_name,first_name,class_name,achievements_count,total_points")
-    .gt("total_points", 0)
-    .order("total_points", { ascending: false })
-    .order("last_name", { ascending: true });
-
-  if (error) {
+  const [pointsResult, studentsResult, achievementsResult] = await Promise.all([
+    pointsClient.from("student_achievement_points").select("student_id,achievement_id,points").order("achievement_id"),
+    pointsClient.from("students").select("id,last_name,first_name,class_name").order("id"),
+    pointsClient.from("achievements").select("id,event_date,event_end_date").order("id")
+  ]);
+  const failed = [pointsResult, studentsResult, achievementsResult].find(result => result.error);
+  if (failed) {
     if (!silent) {
-      tableContainer.textContent = `Ошибка загрузки баллов: ${error.message}`;
+      tableContainer.textContent = `Ошибка загрузки баллов: ${failed.error.message}`;
       countLabel.textContent = "Не удалось загрузить данные";
     }
     pointsLoading = false;
     return;
   }
 
-  let previousPoints = null;
-  let currentPlace = 0;
-  const nextRows = (data || []).map(item => {
-    if (Number(item.total_points) !== previousPoints) currentPlace += 1;
-    previousPoints = Number(item.total_points);
-    return { ...item, place: currentPlace };
-  });
-  const currentSignature = JSON.stringify(pointRows.map(item => [item.student_id, item.achievements_count, item.total_points, item.place]));
-  const nextSignature = JSON.stringify(nextRows.map(item => [item.student_id, item.achievements_count, item.total_points, item.place]));
-  if (silent && currentSignature === nextSignature) {
+  const nextSignature = JSON.stringify([
+    pointsResult.data,
+    studentsResult.data,
+    achievementsResult.data
+  ]);
+  if (silent && sourceSignature === nextSignature) {
     pointsLoading = false;
     return;
   }
-  pointRows = nextRows;
+  sourceSignature = nextSignature;
+  pointEntries = pointsResult.data || [];
+  students = studentsResult.data || [];
+  achievementsById = new Map((achievementsResult.data || []).map(item => [item.id, item]));
   fillClassFilter();
-  renderPoints();
+  rebuildPointRows();
   pointsLoading = false;
 }
 
 searchControl.addEventListener("input", renderPoints);
-classControl.addEventListener("change", renderPoints);
+[classControl, shiftControl, periodStartControl, periodEndControl].forEach(control => control.addEventListener("change", rebuildPointRows));
 document.querySelector("#reset-points").addEventListener("click", () => {
   searchControl.value = "";
   classControl.value = "";
-  renderPoints();
+  shiftControl.value = "";
+  periodStartControl.value = "";
+  periodEndControl.value = "";
+  rebuildPointRows();
 });
 document.querySelector("#refresh-points").addEventListener("click", () => loadPoints(false));
 window.addEventListener("storage", event => {
