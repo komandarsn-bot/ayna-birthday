@@ -21,7 +21,7 @@ body { margin: 0; }
 .back-link { color: #315c55; font-size: 14px; font-weight: 650; text-decoration: none; }
 .back-link:hover { color: #123d37; }
 
-main { width: min(1280px, calc(100% - 48px)); margin: 40px auto 56px; }
+main { width: min(1080px, calc(100% - 48px)); margin: 36px auto 52px; }
 .title-row { padding-bottom: 24px; border-bottom: 1px solid #d7dfdc; }
 h1 { margin: 0; font-size: clamp(30px, 3vw, 38px); line-height: 1.15; font-weight: 650; letter-spacing: -.025em; }
 #points-count { margin: 9px 0 0; color: #70807c; font-size: 14px; }
@@ -77,35 +77,33 @@ button.secondary:hover { background: #eef3f1; }
   box-shadow: 0 8px 24px rgba(25, 60, 53, .05);
 }
 table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-th, td { height: 68px; padding: 0 20px; border-bottom: 1px solid #e1e7e5; text-align: left; vertical-align: middle; }
+th, td { height: 58px; padding: 0 18px; border-bottom: 1px solid #e1e7e5; text-align: left; vertical-align: middle; }
 th { height: 52px; background: #17463f; color: #fff; font-size: 13px; font-weight: 650; }
+td { color: #173d37; font-size: 15px; font-weight: 500; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr { background: #fff; transition: background-color .15s ease; }
 tbody tr:hover { background: #f5f8f7; }
-tbody tr[data-place="1"] { background: #fffbeb; }
-tbody tr[data-place="1"]:hover { background: #faf4d9; }
 
 .place { text-align: center; }
 th.place { font-size: 13px; font-weight: 650; }
 .place span {
   display: inline-block;
   min-width: 34px;
-  color: #57706a;
-  font-size: 14px;
-  font-weight: 700;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
   font-variant-numeric: tabular-nums;
-  letter-spacing: .05em;
+  letter-spacing: 0;
 }
-.place .top-place { color: #173d37; }
-tr[data-place="1"] .place .top-place { color: #9b7210; }
-.student-name { color: #173d37; font-size: 15px; font-weight: 650; }
-th:nth-child(1), td:nth-child(1) { width: 9%; }
-th:nth-child(2), td:nth-child(2) { width: 52%; }
-th:nth-child(3), td:nth-child(3) { width: 13%; text-align: center; }
-th:nth-child(4), td:nth-child(4) { width: 14%; text-align: center; }
-th:nth-child(5), td:nth-child(5) { width: 12%; text-align: center; }
+.place .top-place { color: inherit; }
+.student-name { color: inherit; font-size: inherit; font-weight: inherit; }
+th:nth-child(1), td:nth-child(1) { width: 11%; }
+th:nth-child(2), td:nth-child(2) { width: 41%; }
+th:nth-child(3), td:nth-child(3) { width: 16%; text-align: center; }
+th:nth-child(4), td:nth-child(4) { width: 17%; text-align: center; }
+th:nth-child(5), td:nth-child(5) { width: 15%; text-align: center; }
 .achievements-column { text-align: center; }
-.points { text-align: center; color: #173d37; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.points { text-align: center; color: inherit; font-size: inherit; font-weight: inherit; font-variant-numeric: tabular-nums; }
 th.points { color: #fff; font-size: 13px; font-weight: 650; }
 .empty-state { padding: 44px 20px; text-align: center; color: #70807c; }
 
