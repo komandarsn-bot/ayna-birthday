@@ -419,7 +419,7 @@ function updateLeaderboard(data) {
       const matchesClassShift = shiftNumber === 1
         ? grade >= 8 && grade <= 11
         : grade >= 5 && grade <= 7;
-      return Number(item.shift_number) === shiftNumber && matchesClassShift;
+      return matchesClassShift;
     });
     if (!rows.length) return null;
     return {
