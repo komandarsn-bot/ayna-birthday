@@ -62,6 +62,11 @@ th, td { padding: 8px 7px; border-right: 1px solid #e1e8e6; border-bottom: 1px s
 th { position: sticky; top: 0; z-index: 2; background: #173f39; color: #fff; }
 tbody tr:nth-child(even) { background: #f7f9f8; }
 
+th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 3; width: 140px; min-width: 140px; background: #fff; }
+th:nth-child(2), td:nth-child(2) { position: sticky; left: 140px; z-index: 3; width: 120px; min-width: 120px; background: #fff; box-shadow: 5px 0 8px rgba(23, 58, 53, 0.1); }
+th:nth-child(1), th:nth-child(2) { z-index: 5; background: #173f39; }
+tbody tr:nth-child(even) td:nth-child(1), tbody tr:nth-child(even) td:nth-child(2) { background: #f7f9f8; }
+
 .sort-button { width: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
 .sort-button:hover { background: transparent; }
 td a { color: #176b5e; font-weight: 700; }

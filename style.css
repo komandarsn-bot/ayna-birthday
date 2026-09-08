@@ -1070,6 +1070,38 @@ input[type="file"] {
   background: #f8faf9;
 }
 
+.achievement-table th:nth-child(1),
+.achievement-table td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  width: 150px;
+  min-width: 150px;
+  background: #ffffff;
+}
+
+.achievement-table th:nth-child(2),
+.achievement-table td:nth-child(2) {
+  position: sticky;
+  left: 150px;
+  z-index: 3;
+  width: 125px;
+  min-width: 125px;
+  background: #ffffff;
+  box-shadow: 5px 0 8px rgba(23, 58, 53, 0.08);
+}
+
+.achievement-table th:nth-child(1),
+.achievement-table th:nth-child(2) {
+  z-index: 5;
+  background: #173a35;
+}
+
+.achievement-table tbody tr:nth-child(even) td:nth-child(1),
+.achievement-table tbody tr:nth-child(even) td:nth-child(2) {
+  background: #f8faf9;
+}
+
 .achievement-table a {
   color: #176b5e;
   font-weight: 700;
