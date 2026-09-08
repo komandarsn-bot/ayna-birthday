@@ -105,8 +105,8 @@ as $function$
   ), student_totals as (
     select
       case
-        when substring(student.class_name from '^\s*(\d+)')::integer between 5 and 7 then 1
-        when substring(student.class_name from '^\s*(\d+)')::integer between 8 and 11 then 2
+        when substring(student.class_name from '^\s*(\d+)')::integer between 8 and 11 then 1
+        when substring(student.class_name from '^\s*(\d+)')::integer between 5 and 7 then 2
       end as shift_number,
       student.id as student_id,
       concat_ws(' ', student.last_name, student.first_name) as student_name,

@@ -25,8 +25,8 @@ function classGrade(className) {
 function matchesShift(className) {
   if (!shiftControl.value) return true;
   const grade = classGrade(className);
-  if (shiftControl.value === "1") return grade >= 5 && grade <= 7;
-  return grade >= 8 && grade <= 11;
+  if (shiftControl.value === "1") return grade >= 8 && grade <= 11;
+  return grade >= 5 && grade <= 7;
 }
 
 function matchesPeriod(entry) {

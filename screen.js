@@ -257,7 +257,7 @@ function renderLeaderboard(slide) {
   period.textContent = slide.period_label;
   headingText.append(title, period);
   const classes = document.createElement("span");
-  classes.textContent = slide.shift_number === 1 ? "5–7 классы" : "8–11 классы";
+  classes.textContent = slide.shift_number === 1 ? "8–11 классы" : "5–7 классы";
   heading.append(headingText, classes);
 
   const table = document.createElement("table");
@@ -417,8 +417,8 @@ function updateLeaderboard(data) {
       const gradeMatch = String(item.class_name || "").match(/\d+/);
       const grade = gradeMatch ? Number(gradeMatch[0]) : null;
       const matchesClassShift = shiftNumber === 1
-        ? grade >= 5 && grade <= 7
-        : grade >= 8 && grade <= 11;
+        ? grade >= 8 && grade <= 11
+        : grade >= 5 && grade <= 7;
       return Number(item.shift_number) === shiftNumber && matchesClassShift;
     });
     if (!rows.length) return null;

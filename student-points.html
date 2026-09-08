@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — баллы учеников</title>
-    <link rel="stylesheet" href="student-points.css?v=7">
+    <link rel="stylesheet" href="student-points.css?v=8">
   </head>
   <body>
     <header class="page-header">
@@ -24,7 +24,7 @@
       <section class="filters" aria-label="Поиск и фильтры">
         <label>Поиск ученика<input type="search" id="points-search"></label>
         <label>Класс<select id="class-filter"><option value="">Все классы</option></select></label>
-        <label>Смена<select id="shift-filter"><option value="">Все смены</option><option value="1">1 смена · 5–7 классы</option><option value="2">2 смена · 8–11 классы</option></select></label>
+        <label>Смена<select id="shift-filter"><option value="">Все смены</option><option value="1">1 смена · 8–11 классы</option><option value="2">2 смена · 5–7 классы</option></select></label>
         <label>Начало периода<input type="date" id="period-start"></label>
         <label>Окончание периода<input type="date" id="period-end"></label>
         <button type="button" id="reset-points" class="secondary">Сбросить</button>
@@ -35,6 +35,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="student-points.js?v=6"></script>
+    <script src="student-points.js?v=7"></script>
   </body>
 </html>
