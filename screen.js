@@ -412,6 +412,7 @@ function startSequence() {
 }
 
 function updateLeaderboard(data) {
+  const hadLeaderboardSlides = leaderboardSlides.length > 0;
   const normalized = [1, 2].map(function (shiftNumber) {
     const rows = data.filter(function (item) {
       const gradeMatch = String(item.class_name || "").match(/\d+/);
@@ -438,6 +439,7 @@ function updateLeaderboard(data) {
   leaderboardSlides = normalized;
   if (!activeKind) startSequence();
   else if (activeKind === "leaderboard" && !leaderboardSlides.length) startSequence();
+  else if (!hadLeaderboardSlides && leaderboardSlides.length) scheduleNextSlide();
   else if (changed && activeKind === "leaderboard") {
     activeIndex = Math.min(activeIndex, leaderboardSlides.length - 1);
   }
