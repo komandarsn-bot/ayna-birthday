@@ -15,8 +15,10 @@ const recordsCount = document.querySelector("#records-count");
 const searchInput = document.querySelector("#table-search");
 const columnFilters = document.querySelector("#column-filters");
 let records = [];
+let students = [];
 let sortKey = "event_date";
 let sortDirection = "desc";
+const scopeOrder = ["Международный", "Республиканский", "Городской", "Районный", "Школьный"];
 
 function formatValue(key, value) {
   if (value === null || value === undefined || value === "") return "—";
@@ -79,6 +81,103 @@ function visibleRecords() {
   });
 }
 
+function makeEditControl(key, value) {
+  let control;
+  const selectValues = {
+    achievement_level: scopeOrder,
+    event_stage: scopeOrder,
+    academic_type: ["ACADEMIC", "NON ACADEMIC"],
+    event_format: ["Офлайн", "Онлайн"]
+  };
+  if (selectValues[key]) {
+    control = document.createElement("select");
+    control.append(new Option("Не выбрано", ""));
+    selectValues[key].forEach(option => control.append(new Option(option, option)));
+  } else {
+    control = document.createElement("input");
+    control.type = key === "cost" ? "number" : key === "event_date" || key === "event_end_date" ? "date" : key === "link_url" ? "url" : "text";
+    if (key === "cost") { control.min = "0"; control.step = "0.01"; }
+  }
+  control.className = "inline-edit-control";
+  control.dataset.key = key;
+  control.value = value ?? "";
+  return control;
+}
+
+function startInlineEdit(row, item) {
+  const cells = Array.from(row.children);
+  const studentListId = "student-options-" + item.id;
+  const studentInput = document.createElement("input");
+  studentInput.className = "inline-edit-control student-edit-control";
+  studentInput.setAttribute("list", studentListId);
+  studentInput.value = item.last_name + " " + item.first_name;
+  const studentList = document.createElement("datalist");
+  studentList.id = studentListId;
+  students.forEach(student => {
+    const option = document.createElement("option");
+    option.value = student.last_name + " " + student.first_name;
+    option.label = student.class_name;
+    studentList.append(option);
+  });
+  cells[0].replaceChildren(studentInput, studentList);
+  const firstNameInput = makeEditControl("first_name", item.first_name);
+  const classInput = makeEditControl("class_name", item.class_name);
+  firstNameInput.readOnly = true;
+  classInput.readOnly = true;
+  cells[1].replaceChildren(firstNameInput);
+  cells[2].replaceChildren(classInput);
+
+  function chooseStudent() {
+    const value = studentInput.value.trim().toLocaleLowerCase("ru");
+    const selected = students.find(student =>
+      (student.last_name + " " + student.first_name).toLocaleLowerCase("ru") === value ||
+      (student.first_name + " " + student.last_name).toLocaleLowerCase("ru") === value
+    );
+    studentInput.dataset.studentId = selected?.id || "";
+    firstNameInput.value = selected?.first_name || "";
+    classInput.value = selected?.class_name || "";
+  }
+  studentInput.addEventListener("input", chooseStudent);
+  chooseStudent();
+
+  columns.slice(3).forEach(([key], index) => cells[index + 3].replaceChildren(makeEditControl(key, item[key])));
+  const actionsCell = cells[cells.length - 1];
+  const saveButton = document.createElement("button");
+  saveButton.textContent = "Сохранить";
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "secondary";
+  cancelButton.textContent = "Отменить";
+  cancelButton.addEventListener("click", render);
+  saveButton.addEventListener("click", async () => {
+    chooseStudent();
+    const selectedStudent = students.find(student => String(student.id) === studentInput.dataset.studentId);
+    if (!selectedStudent) { alert("Выберите ученика из подсказок"); studentInput.focus(); return; }
+    const update = {
+      student_id: selectedStudent.id,
+      last_name: selectedStudent.last_name,
+      first_name: selectedStudent.first_name,
+      class_name: selectedStudent.class_name
+    };
+    row.querySelectorAll(".inline-edit-control[data-key]").forEach(control => {
+      const key = control.dataset.key;
+      if (key === "first_name" || key === "class_name") return;
+      update[key] = key === "cost" ? (control.value === "" ? null : Number(control.value)) : (control.value || null);
+    });
+    const levelRank = scopeOrder.indexOf(update.achievement_level);
+    const stageRank = scopeOrder.indexOf(update.event_stage);
+    if (stageRank > levelRank) { alert("Этап не может быть выше уровня мероприятия"); return; }
+    saveButton.disabled = true;
+    saveButton.textContent = "Сохраняем...";
+    const { error } = await client.from("achievements").update(update).eq("id", item.id);
+    if (error) { alert("Ошибка: " + error.message); saveButton.disabled = false; saveButton.textContent = "Сохранить"; return; }
+    Object.assign(item, update);
+    buildColumnFilters();
+    render();
+  });
+  actionsCell.replaceChildren(saveButton, cancelButton);
+  studentInput.focus();
+}
+
 function render() {
   const visible = visibleRecords();
   recordsCount.textContent = "Показано записей: " + visible.length + " из " + records.length;
@@ -93,6 +192,9 @@ function render() {
     button.addEventListener("click", () => { if (sortKey === key) sortDirection = sortDirection === "asc" ? "desc" : "asc"; else { sortKey = key; sortDirection = "asc"; } render(); });
     th.append(button); headRow.append(th);
   });
+  const actionsHead = document.createElement("th");
+  actionsHead.textContent = "Действия";
+  headRow.append(actionsHead);
   const thead = document.createElement("thead"); thead.append(headRow);
   const tbody = document.createElement("tbody");
   visible.forEach(item => {
@@ -103,6 +205,14 @@ function render() {
       else td.textContent = formatValue(key, item[key]);
       row.append(td);
     });
+    const actions = document.createElement("td");
+    actions.className = "row-actions";
+    const editButton = document.createElement("button");
+    editButton.className = "secondary";
+    editButton.textContent = "Редактировать";
+    editButton.addEventListener("click", () => startInlineEdit(row, item));
+    actions.append(editButton);
+    row.append(actions);
     tbody.append(row);
   });
   table.append(thead, tbody); tableWrap.replaceChildren(table);
@@ -112,9 +222,15 @@ async function load() {
   tableWrap.textContent = "Загрузка данных…";
   const { data: sessionData } = await client.auth.getSession();
   if (!sessionData.session) { location.replace("index.html"); return; }
-  const { data, error } = await client.from("achievements").select("*").order("event_date", { ascending: false });
+  const [achievementsResult, studentsResult] = await Promise.all([
+    client.from("achievements").select("*").order("event_date", { ascending: false }),
+    client.from("students").select("id,last_name,first_name,class_name").order("last_name")
+  ]);
+  const { data, error } = achievementsResult;
   if (error) { tableWrap.textContent = "Ошибка: " + error.message; return; }
+  if (studentsResult.error) { tableWrap.textContent = "Ошибка загрузки учеников: " + studentsResult.error.message; return; }
   records = data || [];
+  students = studentsResult.data || [];
   buildColumnFilters();
   render();
 }
