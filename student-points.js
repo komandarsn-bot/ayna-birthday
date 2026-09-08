@@ -38,7 +38,7 @@ function renderPoints() {
     place.className = "place";
     const placeMark = document.createElement("span");
     placeMark.className = item.place <= 3 ? "top-place" : "";
-    placeMark.textContent = item.place;
+    placeMark.textContent = String(item.place).padStart(2, "0");
     place.append(placeMark);
 
     const name = document.createElement("td");
