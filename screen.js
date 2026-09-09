@@ -258,7 +258,7 @@ function renderLeaderboard(slide) {
   heading.className = "leaderboard-heading";
   const headingText = document.createElement("div");
   const title = document.createElement("h1");
-  title.textContent = `Топ-10 учеников · ${slide.shift_number} смена`;
+  title.textContent = `Топ-10 · ${slide.shift_number} смена`;
   const period = document.createElement("p");
   period.textContent = slide.period_label;
   headingText.append(title, period);
@@ -267,16 +267,23 @@ function renderLeaderboard(slide) {
   heading.append(headingText, classes);
 
   const table = document.createElement("table");
-  table.innerHTML = "<thead><tr><th>Место</th><th>Ученик</th><th>Класс</th><th>Достижений</th><th>Баллы</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th>Место</th><th>Ученик</th><th>Класс</th><th>Наград</th><th>Баллы</th></tr></thead>";
   const body = document.createElement("tbody");
   slide.rows.forEach(function (item) {
     const row = document.createElement("tr");
     if (item.place_number === 1) row.classList.add("rank-gold");
     if (item.place_number === 2) row.classList.add("rank-silver");
     if (item.place_number === 3) row.classList.add("rank-bronze");
-    [item.place_number, item.student_name, item.class_name, item.achievements_count, item.total_points].forEach(function (value) {
+    [item.place_number, item.student_name, item.class_name, item.achievements_count, item.total_points].forEach(function (value, index) {
       const cell = document.createElement("td");
-      cell.textContent = value;
+      if (index === 0 && item.place_number <= 3) {
+        const badge = document.createElement("span");
+        badge.className = "rank-badge";
+        badge.textContent = value;
+        cell.append(badge);
+      } else {
+        cell.textContent = value;
+      }
       row.append(cell);
     });
     body.append(row);
