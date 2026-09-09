@@ -293,7 +293,7 @@ body {
 }
 
 #app-content #settings-panel .screen-access-row > div { min-width: 0; }
-#app-content #settings-panel .screen-access-row strong { font-size: 14px; }
+#app-content #settings-panel .screen-access-row strong { display: block; font-size: 14px; line-height: 40px; }
 #app-content #settings-panel .screen-access-row button { flex: 0 0 auto; padding: 8px 12px; }
 #app-content #settings-panel .screen-access-row .screen-link-row { margin: 3px 0 0; font-size: 12px; overflow-wrap: anywhere; }
 
@@ -340,9 +340,28 @@ body {
 
 #settings-panel .tv-content-toggles {
   display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
   gap: 8px;
 }
+
+#settings-panel .tv-content-settings {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+#settings-panel .tv-content-settings > button { width: auto; margin: 0; }
+
+#settings-panel .tv-ranking-manager .tv-leaderboard-settings {
+  display: grid;
+  grid-template-columns: minmax(240px, 360px) 1fr;
+  align-items: end;
+  gap: 14px;
+}
+
+#settings-panel .tv-ranking-manager .quarter-date-settings { grid-column: 1 / -1; }
+#settings-panel .tv-ranking-manager .tv-settings-actions { grid-column: 1 / -1; }
 
 #settings-panel .tv-content-toggles .tv-setting-toggle {
   min-height: 42px;
@@ -375,6 +394,8 @@ body {
   #settings-panel .tv-settings-section,
   #settings-panel .tv-ranking-section { grid-template-columns: 1fr; }
   #settings-panel .tv-content-toggles { grid-template-columns: 1fr; }
+  #settings-panel .tv-content-settings,
+  #settings-panel .tv-ranking-manager .tv-leaderboard-settings { grid-template-columns: 1fr; }
   #settings-panel .tv-settings-actions { align-items: stretch; flex-direction: column; }
   #settings-panel .tv-settings-actions button { width: 100%; }
 }

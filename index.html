@@ -80,14 +80,34 @@
     <div class="screen-access-row">
       <div>
         <strong>Ссылка для телевизора</strong>
-        <p id="screen-copy-status" class="screen-link-row" aria-live="polite"></p>
       </div>
       <button type="button" id="create-screen-button">Копировать ссылку</button>
     </div>
 
-    <details class="card settings-manager achievement-reference-manager">
+    <details class="card settings-manager achievement-reference-manager tv-content-manager">
       <summary class="achievement-reference-summary">
-        <span><strong>Экран и рейтинг</strong></span>
+        <span><strong>Разделы на ТВ</strong></span>
+        <span class="reference-summary-action" aria-hidden="true">
+          <span class="reference-open-label">Настроить</span>
+          <span class="reference-close-label">Скрыть</span>
+        </span>
+      </summary>
+      <div class="achievement-reference-content compact-reference-content">
+        <div class="tv-content-settings">
+          <div class="tv-content-toggles">
+            <label class="tv-setting-toggle"><input type="checkbox" id="tv-birthdays-enabled" checked><span>Дни рождения</span></label>
+            <label class="tv-setting-toggle"><input type="checkbox" id="tv-announcements-enabled" checked><span>Объявления</span></label>
+            <label class="tv-setting-toggle"><input type="checkbox" id="tv-events-enabled" checked><span>События</span></label>
+            <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked><span>Рейтинг учеников</span></label>
+          </div>
+          <button type="button" id="save-tv-content-settings">Сохранить</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="card settings-manager achievement-reference-manager tv-ranking-manager">
+      <summary class="achievement-reference-summary">
+        <span><strong>Настройка рейтинга учеников</strong></span>
         <span class="reference-summary-action" aria-hidden="true">
           <span class="reference-open-label">Настроить</span>
           <span class="reference-close-label">Скрыть</span>
@@ -95,46 +115,26 @@
       </summary>
       <div class="achievement-reference-content compact-reference-content">
         <div class="tv-leaderboard-settings">
-          <section class="tv-settings-section tv-screen-section">
-            <div class="tv-section-heading">
-              <strong>Содержимое экрана</strong>
-              <small>Выберите разделы для показа на телевизоре</small>
+          <label class="tv-period-field">Период рейтинга
+            <select id="tv-leaderboard-period">
+              <option value="week">Текущая неделя</option>
+              <option value="month">Текущий месяц</option>
+              <option value="quarter">Текущая четверть</option>
+              <option value="school_year" selected>Текущий учебный год</option>
+            </select>
+          </label>
+          <details class="quarter-date-settings">
+            <summary>Даты учебных четвертей</summary>
+            <div class="quarter-date-grid">
+              <fieldset><legend>1 четверть</legend><label>Начало<input type="date" id="quarter-1-start"></label><label>Окончание<input type="date" id="quarter-1-end"></label></fieldset>
+              <fieldset><legend>2 четверть</legend><label>Начало<input type="date" id="quarter-2-start"></label><label>Окончание<input type="date" id="quarter-2-end"></label></fieldset>
+              <fieldset><legend>3 четверть</legend><label>Начало<input type="date" id="quarter-3-start"></label><label>Окончание<input type="date" id="quarter-3-end"></label></fieldset>
+              <fieldset><legend>4 четверть</legend><label>Начало<input type="date" id="quarter-4-start"></label><label>Окончание<input type="date" id="quarter-4-end"></label></fieldset>
             </div>
-            <div class="tv-content-toggles">
-              <label class="tv-setting-toggle"><input type="checkbox" id="tv-birthdays-enabled" checked><span>Дни рождения</span></label>
-              <label class="tv-setting-toggle"><input type="checkbox" id="tv-announcements-enabled" checked><span>Объявления</span></label>
-              <label class="tv-setting-toggle"><input type="checkbox" id="tv-events-enabled" checked><span>События</span></label>
-            </div>
-          </section>
-
-          <section class="tv-settings-section tv-ranking-section">
-            <div class="tv-section-heading">
-              <strong>Рейтинг учеников</strong>
-              <small>Период применяется только к рейтингу</small>
-            </div>
-            <label class="tv-setting-toggle tv-ranking-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked><span>Показывать рейтинг</span></label>
-            <label class="tv-period-field">Период рейтинга
-              <select id="tv-leaderboard-period">
-                <option value="week">Текущая неделя</option>
-                <option value="month">Текущий месяц</option>
-                <option value="quarter">Текущая четверть</option>
-                <option value="school_year" selected>Текущий учебный год</option>
-              </select>
-            </label>
-            <details class="quarter-date-settings">
-              <summary>Даты учебных четвертей</summary>
-              <div class="quarter-date-grid">
-                <fieldset><legend>1 четверть</legend><label>Начало<input type="date" id="quarter-1-start"></label><label>Окончание<input type="date" id="quarter-1-end"></label></fieldset>
-                <fieldset><legend>2 четверть</legend><label>Начало<input type="date" id="quarter-2-start"></label><label>Окончание<input type="date" id="quarter-2-end"></label></fieldset>
-                <fieldset><legend>3 четверть</legend><label>Начало<input type="date" id="quarter-3-start"></label><label>Окончание<input type="date" id="quarter-3-end"></label></fieldset>
-                <fieldset><legend>4 четверть</legend><label>Начало<input type="date" id="quarter-4-start"></label><label>Окончание<input type="date" id="quarter-4-end"></label></fieldset>
-              </div>
-            </details>
-          </section>
-
+          </details>
           <div class="tv-settings-actions">
             <p id="tv-leaderboard-message" class="form-message" aria-live="polite"></p>
-            <button type="button" id="save-tv-leaderboard-settings">Сохранить настройки</button>
+            <button type="button" id="save-tv-leaderboard-settings">Сохранить</button>
           </div>
         </div>
       </div>
@@ -480,6 +480,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=56"></script>
+    <script src="script.js?v=57"></script>
   </body>
 </html>

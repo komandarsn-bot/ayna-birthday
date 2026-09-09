@@ -55,13 +55,12 @@ const logoutButton =
 const createScreenButton =
   document.querySelector("#create-screen-button");
 
-const screenCopyStatus =
-  document.querySelector("#screen-copy-status");
 const tvBirthdaysEnabled = document.querySelector("#tv-birthdays-enabled");
 const tvAnnouncementsEnabled = document.querySelector("#tv-announcements-enabled");
 const tvEventsEnabled = document.querySelector("#tv-events-enabled");
 const tvLeaderboardEnabled = document.querySelector("#tv-leaderboard-enabled");
 const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
+const saveTvContentSettingsButton = document.querySelector("#save-tv-content-settings");
 const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
 const tvLeaderboardMessage = document.querySelector("#tv-leaderboard-message");
 const quarterDateControls = [1, 2, 3, 4].map(number => ({
@@ -393,7 +392,6 @@ function updateAuthView(session) {
     loadTvLeaderboardSettings();
   } else {
     currentUserEmail.textContent = "";
-    screenCopyStatus.textContent = "";
   }
 }
 
@@ -521,14 +519,15 @@ const link = screenPageUrl.toString();
 
     try {
       await navigator.clipboard.writeText(link);
-      screenCopyStatus.textContent = "Ссылка скопирована";
       createScreenButton.textContent = "Скопировано";
       window.setTimeout(function () {
         createScreenButton.textContent = "Копировать ссылку";
-        screenCopyStatus.textContent = "";
       }, 2200);
     } catch (error) {
-      screenCopyStatus.textContent = "Не удалось скопировать ссылку";
+      createScreenButton.textContent = "Не удалось скопировать";
+      window.setTimeout(function () {
+        createScreenButton.textContent = "Копировать ссылку";
+      }, 2200);
     }
   }
 );
@@ -578,7 +577,7 @@ async function loadTvLeaderboardSettings() {
   fillDefaultQuarterDates();
 }
 
-saveTvLeaderboardSettingsButton.addEventListener("click", async function () {
+async function saveTvSettings(event) {
   const { data: sessionData } = await supabaseClient.auth.getSession();
   if (!sessionData.session) return;
   const invalidQuarter = quarterDateControls.find(controls => !controls.start.value || !controls.end.value || controls.end.value < controls.start.value);
@@ -586,7 +585,10 @@ saveTvLeaderboardSettingsButton.addEventListener("click", async function () {
     tvLeaderboardMessage.textContent = "Проверьте даты начала и окончания четвертей";
     return;
   }
-  saveTvLeaderboardSettingsButton.disabled = true;
+  const activeButton = event.currentTarget;
+  const originalButtonText = activeButton.textContent;
+  activeButton.disabled = true;
+  activeButton.textContent = "Сохраняем...";
   tvLeaderboardMessage.textContent = "Сохраняем...";
   const { error } = await supabaseClient
     .from("screen_leaderboard_settings")
@@ -607,9 +609,16 @@ saveTvLeaderboardSettingsButton.addEventListener("click", async function () {
       quarter_4_end: quarterDateControls[3].end.value,
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id" });
-  saveTvLeaderboardSettingsButton.disabled = false;
+  activeButton.disabled = false;
+  activeButton.textContent = error ? "Ошибка" : "Сохранено";
   tvLeaderboardMessage.textContent = error ? "Ошибка: " + error.message : "Настройка сохранена";
-});
+  window.setTimeout(function () {
+    activeButton.textContent = originalButtonText;
+  }, 1800);
+}
+
+saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
+saveTvLeaderboardSettingsButton.addEventListener("click", saveTvSettings);
 
 loadNewsButton.addEventListener("click", async function () {
   newsList.textContent = "Загрузка...";
