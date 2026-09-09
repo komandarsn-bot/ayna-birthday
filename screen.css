@@ -125,7 +125,8 @@ body {
   justify-content: space-between;
   gap: 24px;
   padding: clamp(13px, 1.5vh, 20px) clamp(24px, 2.2vw, 40px);
-  border-bottom: 1px solid #dce4e1;
+  border-bottom: 1px solid #c8d9d4;
+  background: linear-gradient(135deg, #edf4f1 0%, #f5f8f6 100%);
   text-align: left;
 }
 .leaderboard-heading h1 {
