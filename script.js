@@ -55,8 +55,8 @@ const logoutButton =
 const createScreenButton =
   document.querySelector("#create-screen-button");
 
-const screenUrl =
-  document.querySelector("#screen-url");
+const screenCopyStatus =
+  document.querySelector("#screen-copy-status");
 const tvBirthdaysEnabled = document.querySelector("#tv-birthdays-enabled");
 const tvAnnouncementsEnabled = document.querySelector("#tv-announcements-enabled");
 const tvEventsEnabled = document.querySelector("#tv-events-enabled");
@@ -393,8 +393,7 @@ function updateAuthView(session) {
     loadTvLeaderboardSettings();
   } else {
     currentUserEmail.textContent = "";
-    screenUrl.hidden = true;
-    screenUrl.textContent = "";
+    screenCopyStatus.textContent = "";
   }
 }
 
@@ -520,9 +519,17 @@ screenPageUrl.searchParams.set(
 
 const link = screenPageUrl.toString();
 
-    screenUrl.href = link;
-    screenUrl.textContent = link;
-    screenUrl.hidden = false;
+    try {
+      await navigator.clipboard.writeText(link);
+      screenCopyStatus.textContent = "Ссылка скопирована";
+      createScreenButton.textContent = "Скопировано";
+      window.setTimeout(function () {
+        createScreenButton.textContent = "Копировать ссылку";
+        screenCopyStatus.textContent = "";
+      }, 2200);
+    } catch (error) {
+      screenCopyStatus.textContent = "Не удалось скопировать ссылку";
+    }
   }
 );
 

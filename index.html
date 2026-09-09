@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=62">
+    <link rel="stylesheet" href="style.css?v=63">
   </head>
 
   <body>
@@ -80,9 +80,9 @@
     <div class="screen-access-row">
       <div>
         <strong>Ссылка для телевизора</strong>
-        <p class="screen-link-row"><a id="screen-url" target="_blank" hidden></a></p>
+        <p id="screen-copy-status" class="screen-link-row" aria-live="polite"></p>
       </div>
-      <button type="button" id="create-screen-button">Получить ссылку</button>
+      <button type="button" id="create-screen-button">Копировать ссылку</button>
     </div>
 
     <details class="card settings-manager achievement-reference-manager">
@@ -469,6 +469,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=54"></script>
+    <script src="script.js?v=55"></script>
   </body>
 </html>

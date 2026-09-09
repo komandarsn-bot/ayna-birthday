@@ -174,8 +174,12 @@ body {
   padding: 9px 14px;
 }
 
-#settings-panel .screen-link-row { margin: 8px 0 0; }
-#settings-panel .screen-link-row:has(#screen-url[hidden]) { display: none; }
+#settings-panel .screen-link-row {
+  min-height: 16px;
+  margin: 3px 0 0;
+  color: #55716c;
+  font-size: 12px;
+}
 
 #settings-panel .tv-leaderboard-settings {
   gap: 10px;
