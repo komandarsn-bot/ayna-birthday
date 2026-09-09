@@ -383,6 +383,8 @@ body {
   border-radius: 9px;
   background: #f5f8f7;
   font-size: 13px;
+  justify-content: center;
+  text-align: center;
   white-space: nowrap;
 }
 
