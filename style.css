@@ -703,6 +703,12 @@ body {
   padding-bottom: 0;
   box-sizing: border-box;
 }
+#app-content #settings-panel .standalone-quarter-settings .quarter-date-grid input,
+#app-content #settings-panel .quarter-settings-footer button {
+  height: 40px;
+  min-height: 40px;
+  box-sizing: border-box;
+}
 
 /* Компактная панель хранения Excel */
 #app-content #settings-panel #achievement-export-panel .achievement-reference-content {
