@@ -377,15 +377,31 @@ body {
 }
 
 #settings-panel .tv-content-toggles .tv-setting-toggle {
-  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 38px;
+  min-height: 38px;
   padding: 6px 9px;
+  box-sizing: border-box;
   border: 1px solid #d6e2de;
   border-radius: 9px;
   background: #f5f8f7;
   font-size: 13px;
-  justify-content: center;
   text-align: center;
   white-space: nowrap;
+}
+
+#settings-panel .tv-content-toggles .tv-setting-toggle input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  margin: 0;
+}
+
+#settings-panel .tv-content-toggles .tv-setting-toggle span {
+  line-height: 1.2;
 }
 
 #settings-panel .tv-ranking-toggle {
