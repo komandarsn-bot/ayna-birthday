@@ -552,14 +552,40 @@ body {
 }
 #settings-panel .school-upload-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) 112px;
   align-items: center;
   gap: 8px;
 }
+#settings-panel .school-upload-row input[type="file"] {
+  height: 42px;
+  min-height: 42px;
+  padding: 5px 7px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid #c7d8d3;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+}
+#settings-panel .school-upload-row input[type="file"]::file-selector-button {
+  height: 30px;
+  margin: 0 8px 0 0;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 6px;
+  background: #e9f0ee;
+  color: #173f39;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
 #settings-panel .school-upload-row button {
-  width: auto;
+  width: 112px;
+  height: 42px;
+  min-height: 42px;
   margin: 0;
-  padding: 9px 12px;
+  padding: 0 10px;
+  box-sizing: border-box;
   white-space: nowrap;
 }
 #settings-panel .school-person-form {
@@ -570,16 +596,21 @@ body {
 }
 #settings-panel .school-person-form label { gap: 4px; }
 #settings-panel .school-person-form input {
+  height: 44px;
   min-height: 40px;
   padding: 8px 10px;
+  box-sizing: border-box;
 }
 #settings-panel .school-person-form button {
   grid-column: 1 / -1;
   justify-self: end;
   width: auto;
   min-width: 180px;
+  height: 42px;
+  min-height: 42px;
   margin: 0;
-  padding: 9px 12px;
+  padding: 0 14px;
+  box-sizing: border-box;
 }
 #settings-panel .school-base-content .form-message:empty { display: none; }
 
