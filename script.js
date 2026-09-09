@@ -607,39 +607,44 @@ async function saveTvSettings(event) {
   if (!sessionData.session) return;
   const invalidQuarter = quarterDateControls.find(controls => !controls.start.value || !controls.end.value || controls.end.value < controls.start.value);
   if (invalidQuarter) {
-    tvLeaderboardMessage.textContent = "Проверьте даты начала и окончания четвертей";
+    alert("Проверьте даты начала и окончания четвертей");
     return;
   }
   const activeButton = event.currentTarget;
   const originalButtonText = activeButton.textContent;
   activeButton.disabled = true;
   activeButton.textContent = "Сохраняем...";
-  tvLeaderboardMessage.textContent = "Сохраняем...";
-  const { error } = await supabaseClient
-    .from("screen_leaderboard_settings")
-    .upsert({
-      user_id: sessionData.session.user.id,
-      is_enabled: tvLeaderboardEnabled.checked,
-      show_birthdays: tvBirthdaysEnabled.checked,
-      show_announcements: tvAnnouncementsEnabled.checked,
-      show_events: tvEventsEnabled.checked,
-      period_type: tvLeaderboardPeriod.value,
-      quarter_1_start: quarterDateControls[0].start.value,
-      quarter_1_end: quarterDateControls[0].end.value,
-      quarter_2_start: quarterDateControls[1].start.value,
-      quarter_2_end: quarterDateControls[1].end.value,
-      quarter_3_start: quarterDateControls[2].start.value,
-      quarter_3_end: quarterDateControls[2].end.value,
-      quarter_4_start: quarterDateControls[3].start.value,
-      quarter_4_end: quarterDateControls[3].end.value,
-      updated_at: new Date().toISOString()
-    }, { onConflict: "user_id" });
-  activeButton.disabled = false;
-  activeButton.textContent = error ? "Ошибка" : "Сохранено";
-  if (error) alert("Ошибка сохранения: " + error.message);
-  window.setTimeout(function () {
-    activeButton.textContent = originalButtonText;
-  }, 1800);
+  try {
+    const { error } = await supabaseClient
+      .from("screen_leaderboard_settings")
+      .upsert({
+        user_id: sessionData.session.user.id,
+        is_enabled: tvLeaderboardEnabled.checked,
+        show_birthdays: tvBirthdaysEnabled.checked,
+        show_announcements: tvAnnouncementsEnabled.checked,
+        show_events: tvEventsEnabled.checked,
+        period_type: tvLeaderboardPeriod.value,
+        quarter_1_start: quarterDateControls[0].start.value,
+        quarter_1_end: quarterDateControls[0].end.value,
+        quarter_2_start: quarterDateControls[1].start.value,
+        quarter_2_end: quarterDateControls[1].end.value,
+        quarter_3_start: quarterDateControls[2].start.value,
+        quarter_3_end: quarterDateControls[2].end.value,
+        quarter_4_start: quarterDateControls[3].start.value,
+        quarter_4_end: quarterDateControls[3].end.value,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id" });
+    if (error) throw error;
+    activeButton.textContent = "Сохранено";
+  } catch (error) {
+    activeButton.textContent = "Ошибка";
+    alert("Ошибка сохранения: " + (error.message || "не удалось сохранить настройки"));
+  } finally {
+    activeButton.disabled = false;
+    window.setTimeout(function () {
+      activeButton.textContent = originalButtonText;
+    }, 1800);
+  }
 }
 
 saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
