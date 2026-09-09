@@ -233,6 +233,69 @@ body {
   overflow: hidden;
 }
 
+/* Настройки собраны в одну общую панель */
+#app-content #settings-panel {
+  display: block;
+  padding: 8px 16px;
+  border: 1px solid #d0ddda;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 14px 38px rgba(23, 58, 53, 0.09);
+}
+
+#app-content #settings-panel[hidden] { display: none; }
+
+#app-content #settings-panel::before {
+  content: "Настройки системы";
+  display: block;
+  padding: 10px 12px 12px;
+  color: #173f39;
+  font-size: 20px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+#app-content #settings-panel > .card,
+#app-content #settings-panel > details.card {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-top: 1px solid #e1e8e6;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#app-content #settings-panel .school-base-summary,
+#app-content #settings-panel .achievement-reference-summary {
+  min-height: 44px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: transparent;
+}
+
+#app-content #settings-panel .school-base-summary:hover,
+#app-content #settings-panel .achievement-reference-summary:hover {
+  background: #f3f7f5;
+}
+
+#app-content #settings-panel .school-base-summary-action,
+#app-content #settings-panel .reference-summary-action {
+  padding: 0;
+  background: transparent;
+  color: #37685f;
+  font-size: 12px;
+}
+
+#app-content #settings-panel .school-base-content,
+#app-content #settings-panel .achievement-reference-content {
+  margin: 0 6px 8px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f7faf9;
+}
+
 .admin-site-logo {
   display: block;
   width: clamp(165px, 20vw, 230px);
