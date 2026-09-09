@@ -693,6 +693,16 @@ body {
   box-sizing: border-box;
   line-height: 1;
 }
+#app-content #settings-panel .tv-ranking-manager .tv-settings-actions {
+  min-height: 40px;
+}
+#app-content #settings-panel #tv-leaderboard-period {
+  height: 40px;
+  min-height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+  box-sizing: border-box;
+}
 
 /* Компактная панель хранения Excel */
 #app-content #settings-panel #achievement-export-panel .achievement-reference-content {
