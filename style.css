@@ -537,6 +537,52 @@ body {
 #settings-panel .school-base-section h3 { font-size: 16px; }
 #settings-panel .school-base-content .form-hint { font-size: 12px; }
 
+/* Максимально компактная база школы */
+#app-content #settings-panel .school-base-content {
+  gap: 10px;
+  padding: 10px 12px 12px;
+}
+#settings-panel .school-base-columns { gap: 12px; }
+#settings-panel .school-base-section { padding: 12px; border-radius: 10px; }
+#settings-panel .school-base-section h3 { margin: 0 0 4px; }
+#settings-panel .school-base-content .form-hint {
+  min-height: 0;
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+#settings-panel .school-upload-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+#settings-panel .school-upload-row button {
+  width: auto;
+  margin: 0;
+  padding: 9px 12px;
+  white-space: nowrap;
+}
+#settings-panel .school-person-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+#settings-panel .school-person-form label { gap: 4px; }
+#settings-panel .school-person-form input {
+  min-height: 40px;
+  padding: 8px 10px;
+}
+#settings-panel .school-person-form button {
+  grid-column: 1 / -1;
+  justify-self: end;
+  width: auto;
+  min-width: 180px;
+  margin: 0;
+  padding: 9px 12px;
+}
+#settings-panel .school-base-content .form-message:empty { display: none; }
+
 @media (max-width: 900px) {
   #settings-panel .tv-settings-section,
   #settings-panel .tv-ranking-section { grid-template-columns: 1fr; }
@@ -547,6 +593,13 @@ body {
   #settings-panel .standalone-quarter-settings .quarter-date-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #settings-panel .tv-settings-actions { align-items: stretch; flex-direction: column; }
   #settings-panel .tv-settings-actions button { width: 100%; }
+}
+
+@media (max-width: 620px) {
+  #settings-panel .school-upload-row,
+  #settings-panel .school-person-form { grid-template-columns: 1fr; }
+  #settings-panel .school-upload-row button,
+  #settings-panel .school-person-form button { width: 100%; }
 }
 
 .admin-site-logo {
