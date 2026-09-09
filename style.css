@@ -413,7 +413,7 @@ body {
   justify-content: flex-start;
 }
 #settings-panel .tv-ranking-manager .tv-settings-actions button,
-#settings-panel .standalone-quarter-settings > button {
+#settings-panel .quarter-settings-footer button {
   height: 46px;
   min-height: 46px;
   margin: 0;
@@ -476,9 +476,9 @@ body {
 
 #settings-panel .standalone-quarter-settings {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   align-items: end;
-  gap: 12px;
+  gap: 10px;
   padding-top: 0;
   border-top: 0;
 }
@@ -516,9 +516,15 @@ body {
   background: #fff;
   font-size: 13px;
 }
-#settings-panel .standalone-quarter-settings > button {
+#settings-panel .quarter-settings-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid #dbe5e2;
+}
+#settings-panel .quarter-settings-footer button {
   width: auto;
-  align-self: end;
+  min-width: 150px;
   margin: 0;
 }
 
