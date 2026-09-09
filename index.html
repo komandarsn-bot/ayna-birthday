@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=90">
+    <link rel="stylesheet" href="style.css?v=91">
   </head>
 
   <body>
@@ -190,16 +190,17 @@
 
         <section class="school-base-section" aria-labelledby="teachers-heading">
           <h3 id="teachers-heading">Учителя</h3>
-          <p class="form-hint">Excel: «Фамилия», «Имя», «Должность», «Дата рождения».</p>
+          <p class="form-hint">Excel: «Фамилия», «Имя», «Отчество», «Должность», «Дата рождения».</p>
           <div class="action-group school-upload-row">
             <input type="file" id="teachers-excel-file" accept=".xlsx,.xls">
             <button type="button" id="upload-teachers-button">Загрузить</button>
           </div>
           <p id="teachers-upload-message" class="form-message"></p>
 
-          <form id="teacher-form" class="school-person-form">
+          <form id="teacher-form" class="school-person-form teacher-person-form">
             <label>Фамилия<input type="text" id="teacher-last-name" required></label>
             <label>Имя<input type="text" id="teacher-first-name" required></label>
+            <label>Отчество<input type="text" id="teacher-middle-name"></label>
             <label>Должность<input type="text" id="teacher-position" required></label>
             <label>Дата рождения<input type="date" id="teacher-birth-date" required></label>
             <button type="submit" id="add-teacher-button">Добавить учителя</button>
@@ -501,6 +502,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=64"></script>
+    <script src="script.js?v=65"></script>
   </body>
 </html>

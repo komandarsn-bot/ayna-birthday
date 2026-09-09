@@ -585,7 +585,7 @@ async function loadTvLeaderboardSettings() {
     .select("is_enabled,show_birthdays,show_announcements,show_events,period_type,quarter_1_start,quarter_1_end,quarter_2_start,quarter_2_end,quarter_3_start,quarter_3_end,quarter_4_start,quarter_4_end")
     .maybeSingle();
   if (error) {
-    tvLeaderboardMessage.textContent = "Сначала выполните SQL настройки рейтинга";
+    console.warn("Не удалось загрузить настройки рейтинга:", error.message);
     return;
   }
   if (data) {
@@ -1108,7 +1108,9 @@ function createSchoolPersonRow(person, detail, tableName, reload) {
   row.className = "person-row";
   const information = document.createElement("div");
   const name = document.createElement("strong");
-  name.textContent = person.last_name + " " + person.first_name;
+  name.textContent = [person.last_name, person.first_name, person.middle_name]
+    .filter(Boolean)
+    .join(" ");
   const description = document.createElement("span");
   description.textContent = detail;
   information.append(name, description);
@@ -1368,7 +1370,7 @@ async function loadTeachers() {
   teachersList.textContent = "Загрузка...";
   const { data, error } = await supabaseClient
     .from("teachers")
-    .select("id,last_name,first_name,position,birth_date");
+    .select("id,last_name,first_name,middle_name,position,birth_date");
   if (error) {
     teachersList.textContent = "Ошибка: " + error.message;
     return;
@@ -1389,11 +1391,17 @@ async function loadTeachers() {
   }));
 }
 
+function teacherFullName(teacher) {
+  return [teacher.last_name, teacher.first_name, teacher.middle_name]
+    .filter(Boolean)
+    .join(" ");
+}
+
 function chooseAchievementSupervisor() {
   const value = achievementSupervisor.value.trim().toLocaleLowerCase("ru");
   selectedAchievementSupervisor = achievementTeachers.find(function (teacher) {
-    const fullName = teacher.last_name + " " + teacher.first_name;
-    const reverseName = teacher.first_name + " " + teacher.last_name;
+    const fullName = teacherFullName(teacher);
+    const reverseName = [teacher.first_name, teacher.middle_name, teacher.last_name].filter(Boolean).join(" ");
     return fullName.toLocaleLowerCase("ru") === value ||
       reverseName.toLocaleLowerCase("ru") === value;
   }) || null;
@@ -1403,14 +1411,14 @@ function showSupervisorSuggestions() {
   const query = achievementSupervisor.value.trim().toLocaleLowerCase("ru");
   const matches = achievementTeachers
     .filter(function (teacher) {
-      const fullName = teacher.last_name + " " + teacher.first_name;
-      const reverseName = teacher.first_name + " " + teacher.last_name;
+      const fullName = teacherFullName(teacher);
+      const reverseName = [teacher.first_name, teacher.middle_name, teacher.last_name].filter(Boolean).join(" ");
       return fullName.toLocaleLowerCase("ru").includes(query) ||
         reverseName.toLocaleLowerCase("ru").includes(query);
     })
     .sort(function (a, b) {
-      return (a.last_name + " " + a.first_name).localeCompare(
-        b.last_name + " " + b.first_name,
+      return teacherFullName(a).localeCompare(
+        teacherFullName(b),
         "ru"
       );
     });
@@ -1420,7 +1428,7 @@ function showSupervisorSuggestions() {
     achievementSupervisors,
     matches.map(function (teacher) {
       return {
-        label: teacher.last_name + " " + teacher.first_name,
+        label: teacherFullName(teacher),
         detail: teacher.position,
         teacher: teacher
       };
@@ -1529,6 +1537,7 @@ teacherForm.addEventListener("submit", async function (event) {
     user_id: userId,
     last_name: document.querySelector("#teacher-last-name").value.trim(),
     first_name: document.querySelector("#teacher-first-name").value.trim(),
+    middle_name: document.querySelector("#teacher-middle-name").value.trim() || null,
     position: document.querySelector("#teacher-position").value.trim(),
     birth_date: document.querySelector("#teacher-birth-date").value
   };
@@ -1650,6 +1659,7 @@ uploadTeachersButton.addEventListener("click", function () {
         user_id: userId,
         last_name: excelText(row, "Фамилия"),
         first_name: excelText(row, "Имя"),
+        middle_name: excelText(row, "Отчество") || null,
         position: excelText(row, "Должность"),
         birth_date: excelDate(row, "Дата рождения")
       };
@@ -3050,7 +3060,7 @@ achievementForm.addEventListener("submit", async function (event) {
     event_format: achievementValue("#achievement-format"),
     result: selectedAchievementResult ? selectedAchievementResult.name : null,
     supervisor_name: selectedAchievementSupervisor
-      ? selectedAchievementSupervisor.last_name + " " + selectedAchievementSupervisor.first_name
+      ? teacherFullName(selectedAchievementSupervisor)
       : null,
     organizers: achievementOrganizerReference.selected ? achievementOrganizerReference.selected.name : null,
     event_date: achievementValue("#achievement-date"),

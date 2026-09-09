@@ -16,6 +16,7 @@ create table if not exists public.teachers (
   user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
   last_name text not null,
   first_name text not null,
+  middle_name text,
   position text not null,
   birth_date date not null,
   created_at timestamptz not null default now(),
@@ -25,6 +26,7 @@ create table if not exists public.teachers (
 -- Обновление таблиц, если предыдущая версия этого файла уже выполнялась.
 alter table public.students add column if not exists birth_date date;
 alter table public.teachers add column if not exists birth_date date;
+alter table public.teachers add column if not exists middle_name text;
 
 alter table public.students enable row level security;
 alter table public.teachers enable row level security;
@@ -69,7 +71,7 @@ as $$
 
   union all
 
-  select concat_ws(' ', teacher.last_name, teacher.first_name), teacher.position
+  select concat_ws(' ', teacher.last_name, teacher.first_name, nullif(teacher.middle_name, '')), teacher.position
   from public.teachers teacher
   join screen_owner owner on owner.user_id = teacher.user_id
   cross join today_in_school today
