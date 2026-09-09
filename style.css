@@ -245,15 +245,30 @@ body {
 
 #app-content #settings-panel[hidden] { display: none; }
 
-#app-content #settings-panel::before {
-  content: "Настройки системы";
-  display: block;
+#app-content #settings-panel .settings-panel-heading {
   padding: 10px 12px 12px;
   color: #173f39;
   font-size: 20px;
   font-weight: 750;
   letter-spacing: -0.02em;
 }
+
+#app-content #settings-panel .screen-access-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+  padding: 10px 12px;
+  border: 1px solid #d5e1de;
+  border-radius: 11px;
+  background: #f5f8f7;
+}
+
+#app-content #settings-panel .screen-access-row > div { min-width: 0; }
+#app-content #settings-panel .screen-access-row strong { font-size: 14px; }
+#app-content #settings-panel .screen-access-row button { flex: 0 0 auto; padding: 8px 12px; }
+#app-content #settings-panel .screen-access-row .screen-link-row { margin: 3px 0 0; font-size: 12px; overflow-wrap: anywhere; }
 
 #app-content #settings-panel > .card,
 #app-content #settings-panel > details.card {
@@ -272,7 +287,7 @@ body {
   min-height: 44px;
   padding: 9px 12px;
   border-radius: 9px;
-  background: transparent;
+  background: #f7faf9;
 }
 
 #app-content #settings-panel .school-base-summary:hover,
@@ -294,6 +309,20 @@ body {
   padding: 14px;
   border-radius: 10px;
   background: #f7faf9;
+}
+
+#settings-panel .tv-content-toggles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 6px 12px;
+}
+
+#settings-panel .tv-content-toggles .tv-setting-toggle {
+  min-height: 28px;
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: #edf3f1;
+  font-size: 13px;
 }
 
 .admin-site-logo {

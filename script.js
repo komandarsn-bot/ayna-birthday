@@ -57,6 +57,9 @@ const createScreenButton =
 
 const screenUrl =
   document.querySelector("#screen-url");
+const tvBirthdaysEnabled = document.querySelector("#tv-birthdays-enabled");
+const tvAnnouncementsEnabled = document.querySelector("#tv-announcements-enabled");
+const tvEventsEnabled = document.querySelector("#tv-events-enabled");
 const tvLeaderboardEnabled = document.querySelector("#tv-leaderboard-enabled");
 const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
 const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
@@ -548,7 +551,7 @@ function sortPeopleByUpcomingBirthday(people, today = new Date()) {
 async function loadTvLeaderboardSettings() {
   const { data, error } = await supabaseClient
     .from("screen_leaderboard_settings")
-    .select("is_enabled,period_type,quarter_1_start,quarter_1_end,quarter_2_start,quarter_2_end,quarter_3_start,quarter_3_end,quarter_4_start,quarter_4_end")
+    .select("is_enabled,show_birthdays,show_announcements,show_events,period_type,quarter_1_start,quarter_1_end,quarter_2_start,quarter_2_end,quarter_3_start,quarter_3_end,quarter_4_start,quarter_4_end")
     .maybeSingle();
   if (error) {
     tvLeaderboardMessage.textContent = "Сначала выполните SQL настройки рейтинга";
@@ -556,6 +559,9 @@ async function loadTvLeaderboardSettings() {
   }
   if (data) {
     tvLeaderboardEnabled.checked = data.is_enabled;
+    tvBirthdaysEnabled.checked = data.show_birthdays !== false;
+    tvAnnouncementsEnabled.checked = data.show_announcements !== false;
+    tvEventsEnabled.checked = data.show_events !== false;
     tvLeaderboardPeriod.value = data.period_type;
     quarterDateControls.forEach((controls, index) => {
       controls.start.value = data[`quarter_${index + 1}_start`] || "";
@@ -580,6 +586,9 @@ saveTvLeaderboardSettingsButton.addEventListener("click", async function () {
     .upsert({
       user_id: sessionData.session.user.id,
       is_enabled: tvLeaderboardEnabled.checked,
+      show_birthdays: tvBirthdaysEnabled.checked,
+      show_announcements: tvAnnouncementsEnabled.checked,
+      show_events: tvEventsEnabled.checked,
       period_type: tvLeaderboardPeriod.value,
       quarter_1_start: quarterDateControls[0].start.value,
       quarter_1_end: quarterDateControls[0].end.value,

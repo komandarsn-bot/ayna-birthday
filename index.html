@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=61">
+    <link rel="stylesheet" href="style.css?v=62">
   </head>
 
   <body>
@@ -76,6 +76,15 @@
     </div>
 
     <div id="settings-panel" role="tabpanel" aria-labelledby="settings-tab" hidden>
+    <div class="settings-panel-heading">Настройки системы</div>
+    <div class="screen-access-row">
+      <div>
+        <strong>Ссылка для телевизора</strong>
+        <p class="screen-link-row"><a id="screen-url" target="_blank" hidden></a></p>
+      </div>
+      <button type="button" id="create-screen-button">Получить ссылку</button>
+    </div>
+
     <details class="card settings-manager achievement-reference-manager">
       <summary class="achievement-reference-summary">
         <span><strong>Экран и рейтинг</strong></span>
@@ -86,24 +95,17 @@
       </summary>
       <div class="achievement-reference-content compact-reference-content">
 
-      <button type="button" id="create-screen-button">
-        Получить ссылку для телевизора
-      </button>
-
-      <p class="screen-link-row">
-        <a
-          id="screen-url"
-          target="_blank"
-          hidden
-        ></a>
-      </p>
-
       <div class="tv-leaderboard-settings">
         <div>
-          <strong>Топ-10 учеников на ТВ</strong>
-          <small>Первая и вторая смены показываются отдельно</small>
+          <strong>Разделы на ТВ</strong>
+          <small>Выберите, что включать в общий цикл</small>
         </div>
-        <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked> Показывать</label>
+        <div class="tv-content-toggles">
+          <label class="tv-setting-toggle"><input type="checkbox" id="tv-birthdays-enabled" checked> Дни рождения</label>
+          <label class="tv-setting-toggle"><input type="checkbox" id="tv-announcements-enabled" checked> Объявления</label>
+          <label class="tv-setting-toggle"><input type="checkbox" id="tv-events-enabled" checked> События</label>
+          <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked> Рейтинг</label>
+        </div>
         <label>Период
           <select id="tv-leaderboard-period">
             <option value="week">Текущая неделя</option>
@@ -467,6 +469,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=53"></script>
+    <script src="script.js?v=54"></script>
   </body>
 </html>

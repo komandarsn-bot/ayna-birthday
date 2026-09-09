@@ -515,14 +515,31 @@ async function loadContent() {
   if (isLoading) return;
   isLoading = true;
   try {
-    const [birthdayResult, newsResult, leaderboardResult] = await Promise.all([
+    const [birthdayResult, newsResult, leaderboardResult, settingsResult] = await Promise.all([
       supabaseClient.rpc("get_screen_birthdays", { p_access_token: screenKey }),
       supabaseClient.rpc("get_screen_news", { p_access_token: screenKey }),
-      supabaseClient.rpc("get_screen_leaderboard", { p_access_token: screenKey })
+      supabaseClient.rpc("get_screen_leaderboard", { p_access_token: screenKey }),
+      supabaseClient.rpc("get_screen_content_settings", { p_access_token: screenKey })
     ]);
-    if (!birthdayResult.error) updateBirthdays(birthdayResult.data || []);
-    if (!newsResult.error) updateNews(newsResult.data || []);
-    if (!leaderboardResult.error) updateLeaderboard(leaderboardResult.data || []);
+    const rawSettings = !settingsResult.error && Array.isArray(settingsResult.data)
+      ? settingsResult.data[0]
+      : null;
+    const displaySettings = {
+      birthdays: rawSettings?.show_birthdays !== false,
+      announcements: rawSettings?.show_announcements !== false,
+      events: rawSettings?.show_events !== false,
+      leaderboard: rawSettings?.show_leaderboard !== false
+    };
+    if (!birthdayResult.error) updateBirthdays(displaySettings.birthdays ? (birthdayResult.data || []) : []);
+    if (!newsResult.error) {
+      const visibleNews = (newsResult.data || []).filter(function (item) {
+        const paths = Array.isArray(item.news_image_paths) ? item.news_image_paths.filter(Boolean) : [];
+        const isAnnouncement = !paths.length && !item.news_image_path && Boolean(item.news_link_url);
+        return isAnnouncement ? displaySettings.announcements : displaySettings.events;
+      });
+      updateNews(visibleNews);
+    }
+    if (!leaderboardResult.error) updateLeaderboard(displaySettings.leaderboard ? (leaderboardResult.data || []) : []);
     if (birthdayResult.error && newsResult.error && leaderboardResult.error && !activeKind) showScreenState("Восстанавливаем связь", "Повторим попытку через несколько секунд.");
   } finally {
     isLoading = false;
