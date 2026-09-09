@@ -301,10 +301,21 @@ body {
   justify-content: flex-end;
   gap: 8px;
 }
+#app-content #settings-panel .screen-access-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 42px;
+  min-height: 42px;
+  margin: 0;
+  padding: 0 14px;
+  box-sizing: border-box;
+  line-height: 1;
+}
 #app-content #settings-panel .screen-access-actions .secondary-button {
   width: auto;
   min-width: 0;
-  padding: 8px 12px;
   border: 1px solid #bfd0cc;
   background: #fff;
   color: #173f39;
