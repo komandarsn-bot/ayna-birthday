@@ -182,16 +182,39 @@ body {
 }
 
 #settings-panel .tv-leaderboard-settings {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 10px;
-  margin-top: 12px;
-  padding: 12px 14px;
+  margin-top: 0;
+  padding: 0;
+  border: 0;
   border-radius: 10px;
+  background: transparent;
 }
 
 #settings-panel .tv-leaderboard-settings strong { font-size: 15px; }
 #settings-panel .tv-leaderboard-settings small { font-size: 12px; }
 #settings-panel .tv-leaderboard-settings select { min-height: 40px; padding: 8px 10px; }
 #settings-panel .tv-leaderboard-settings button { padding: 9px 12px; }
+
+#settings-panel .tv-settings-section {
+  display: grid;
+  grid-template-columns: minmax(190px, .8fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 14px 22px;
+  padding: 14px 16px;
+  border: 1px solid #d5e1dd;
+  border-radius: 11px;
+  background: #fff;
+}
+
+#settings-panel .tv-ranking-section {
+  grid-template-columns: minmax(190px, .8fr) minmax(170px, .7fr) minmax(220px, 1fr);
+}
+
+#settings-panel .tv-section-heading strong,
+#settings-panel .tv-section-heading small { display: block; }
+#settings-panel .tv-section-heading small { margin-top: 3px; color: #71827e; line-height: 1.35; }
 
 #settings-panel .school-base-summary,
 #settings-panel .achievement-reference-summary {
@@ -317,16 +340,43 @@ body {
 
 #settings-panel .tv-content-toggles {
   display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
-  gap: 6px 12px;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 8px;
 }
 
 #settings-panel .tv-content-toggles .tv-setting-toggle {
-  min-height: 28px;
-  padding: 4px 8px;
-  border-radius: 7px;
-  background: #edf3f1;
+  min-height: 42px;
+  padding: 8px 11px;
+  border: 1px solid #d6e2de;
+  border-radius: 9px;
+  background: #f5f8f7;
   font-size: 13px;
+}
+
+#settings-panel .tv-ranking-toggle {
+  min-height: 42px;
+  padding: 8px 11px;
+  border: 1px solid #d6e2de;
+  border-radius: 9px;
+  background: #f5f8f7;
+}
+
+#settings-panel .tv-period-field { gap: 5px; font-size: 13px; }
+#settings-panel .tv-settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+#settings-panel .tv-settings-actions .form-message { margin: 0 auto 0 0; }
+#settings-panel .quarter-date-settings { grid-column: 1 / -1; }
+
+@media (max-width: 900px) {
+  #settings-panel .tv-settings-section,
+  #settings-panel .tv-ranking-section { grid-template-columns: 1fr; }
+  #settings-panel .tv-content-toggles { grid-template-columns: 1fr; }
+  #settings-panel .tv-settings-actions { align-items: stretch; flex-direction: column; }
+  #settings-panel .tv-settings-actions button { width: 100%; }
 }
 
 .admin-site-logo {
