@@ -682,6 +682,39 @@ body {
   font-size: 14px;
 }
 
+/* Единая геометрия кнопок общих настроек */
+#app-content #settings-panel button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+/* Компактная панель хранения Excel */
+#app-content #settings-panel #achievement-export-panel .achievement-reference-content {
+  margin: 0 0 6px;
+  padding: 8px 12px;
+  background: #f7faf9;
+}
+#app-content #settings-panel #achievement-export-panel .achievement-export-row {
+  min-height: 40px;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+#app-content #settings-panel #achievement-export-panel .achievement-export-row .form-message {
+  margin: 0;
+  font-size: 13px;
+}
+#app-content #settings-panel #achievement-export-panel .achievement-export-row .secondary-button {
+  min-width: 150px;
+}
+
 @media (max-width: 900px) {
   #settings-panel .tv-settings-section,
   #settings-panel .tv-ranking-section { grid-template-columns: 1fr; }
