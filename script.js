@@ -64,6 +64,7 @@ const tvLeaderboardEnabled = document.querySelector("#tv-leaderboard-enabled");
 const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
 const saveTvContentSettingsButton = document.querySelector("#save-tv-content-settings");
 const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
+const saveQuarterSettingsButton = document.querySelector("#save-quarter-settings");
 const tvLeaderboardMessage = document.querySelector("#tv-leaderboard-message");
 const quarterDateControls = [1, 2, 3, 4].map(number => ({
   start: document.querySelector(`#quarter-${number}-start`),
@@ -642,6 +643,7 @@ async function saveTvSettings(event) {
 
 saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
 saveTvLeaderboardSettingsButton.addEventListener("click", saveTvSettings);
+saveQuarterSettingsButton.addEventListener("click", saveTvSettings);
 
 loadNewsButton.addEventListener("click", async function () {
   newsList.textContent = "Загрузка...";

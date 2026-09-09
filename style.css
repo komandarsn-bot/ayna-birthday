@@ -456,6 +456,31 @@ body {
 #settings-panel .tv-settings-actions .form-message:empty { display: none; }
 #settings-panel .quarter-date-settings { grid-column: 1 / -1; }
 
+#settings-panel .standalone-quarter-settings {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 12px;
+  padding-top: 0;
+  border-top: 0;
+}
+#settings-panel .standalone-quarter-settings .quarter-date-grid {
+  margin-top: 0;
+}
+#settings-panel .standalone-quarter-settings > button {
+  width: auto;
+  margin: 0;
+}
+
+#settings-panel .school-base-content,
+#settings-panel .school-base-content label,
+#settings-panel .school-base-content input,
+#settings-panel .school-base-content button {
+  font-size: 14px;
+}
+#settings-panel .school-base-section h3 { font-size: 16px; }
+#settings-panel .school-base-content .form-hint { font-size: 12px; }
+
 @media (max-width: 900px) {
   #settings-panel .tv-settings-section,
   #settings-panel .tv-ranking-section { grid-template-columns: 1fr; }

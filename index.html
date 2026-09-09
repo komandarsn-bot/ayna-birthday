@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=72">
+    <link rel="stylesheet" href="style.css?v=73">
   </head>
 
   <body>
@@ -72,7 +72,7 @@
       <button type="button" id="achievements-tab" role="tab" aria-selected="false" aria-controls="achievements-panel">База достижений</button>
       <button type="button" id="publications-tab" role="tab" aria-selected="false" aria-controls="publications-panel" tabindex="-1">Публикации</button>
       <button type="button" id="birthdays-tab" role="tab" aria-selected="false" aria-controls="birthdays-panel" tabindex="-1">Дни рождения</button>
-      <button type="button" id="settings-tab" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">Настройки</button>
+      <button type="button" id="settings-tab" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">Общие настройки</button>
     </div>
 
     <div id="settings-panel" role="tabpanel" aria-labelledby="settings-tab" hidden>
@@ -125,19 +125,31 @@
               <option value="school_year" selected>Текущий учебный год</option>
             </select>
           </label>
-          <details class="quarter-date-settings">
-            <summary>Даты учебных четвертей</summary>
-            <div class="quarter-date-grid">
-              <fieldset><legend>1 четверть</legend><label>Начало<input type="date" id="quarter-1-start"></label><label>Окончание<input type="date" id="quarter-1-end"></label></fieldset>
-              <fieldset><legend>2 четверть</legend><label>Начало<input type="date" id="quarter-2-start"></label><label>Окончание<input type="date" id="quarter-2-end"></label></fieldset>
-              <fieldset><legend>3 четверть</legend><label>Начало<input type="date" id="quarter-3-start"></label><label>Окончание<input type="date" id="quarter-3-end"></label></fieldset>
-              <fieldset><legend>4 четверть</legend><label>Начало<input type="date" id="quarter-4-start"></label><label>Окончание<input type="date" id="quarter-4-end"></label></fieldset>
-            </div>
-          </details>
           <div class="tv-settings-actions">
             <p id="tv-leaderboard-message" class="form-message" aria-live="polite"></p>
             <button type="button" id="save-tv-leaderboard-settings">Сохранить</button>
           </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="card settings-manager achievement-reference-manager tv-quarter-manager">
+      <summary class="achievement-reference-summary">
+        <span><strong>Даты учебных четвертей</strong></span>
+        <span class="reference-summary-action" aria-hidden="true">
+          <span class="reference-open-label">Настроить</span>
+          <span class="reference-close-label">Скрыть</span>
+        </span>
+      </summary>
+      <div class="achievement-reference-content compact-reference-content">
+        <div class="quarter-date-settings standalone-quarter-settings">
+          <div class="quarter-date-grid">
+            <fieldset><legend>1 четверть</legend><label>Начало<input type="date" id="quarter-1-start"></label><label>Окончание<input type="date" id="quarter-1-end"></label></fieldset>
+            <fieldset><legend>2 четверть</legend><label>Начало<input type="date" id="quarter-2-start"></label><label>Окончание<input type="date" id="quarter-2-end"></label></fieldset>
+            <fieldset><legend>3 четверть</legend><label>Начало<input type="date" id="quarter-3-start"></label><label>Окончание<input type="date" id="quarter-3-end"></label></fieldset>
+            <fieldset><legend>4 четверть</legend><label>Начало<input type="date" id="quarter-4-start"></label><label>Окончание<input type="date" id="quarter-4-end"></label></fieldset>
+          </div>
+          <button type="button" id="save-quarter-settings">Сохранить</button>
         </div>
       </div>
     </details>
@@ -478,6 +490,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=58"></script>
+    <script src="script.js?v=59"></script>
   </body>
 </html>
