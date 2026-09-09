@@ -264,7 +264,10 @@
         <section class="birthday-database-group">
           <div class="birthday-list-heading">
             <h3>Ученики</h3>
-            <button type="button" id="load-students-button" class="secondary-button compact-button">Обновить</button>
+            <div class="birthday-list-actions">
+              <button type="button" id="load-students-button" class="secondary-button compact-button">Обновить</button>
+              <button type="button" id="delete-all-students-button" class="delete-button compact-button">Удалить всех</button>
+            </div>
           </div>
           <div id="students-list" class="school-person-list"><p>Загрузка…</p></div>
         </section>
@@ -272,7 +275,10 @@
         <section class="birthday-database-group">
           <div class="birthday-list-heading">
             <h3>Учителя</h3>
-            <button type="button" id="load-teachers-button" class="secondary-button compact-button">Обновить</button>
+            <div class="birthday-list-actions">
+              <button type="button" id="load-teachers-button" class="secondary-button compact-button">Обновить</button>
+              <button type="button" id="delete-all-teachers-button" class="delete-button compact-button">Удалить всех</button>
+            </div>
           </div>
           <div id="teachers-list" class="school-person-list"><p>Загрузка…</p></div>
         </section>
@@ -496,6 +502,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=62"></script>
+    <script src="script.js?v=63"></script>
   </body>
 </html>

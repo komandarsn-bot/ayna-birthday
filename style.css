@@ -1105,6 +1105,17 @@ input[type="file"] {
   margin: 0;
 }
 
+.birthday-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.birthday-list-actions .delete-button {
+  width: auto;
+  margin: 0;
+}
+
 /* Единая компактная типографика вкладки «Дни рождения». */
 #birthdays-panel,
 #birthdays-panel button {

@@ -123,6 +123,7 @@ const studentsUploadMessage = document.querySelector("#students-upload-message")
 const studentForm = document.querySelector("#student-form");
 const studentMessage = document.querySelector("#student-message");
 const loadStudentsButton = document.querySelector("#load-students-button");
+const deleteAllStudentsButton = document.querySelector("#delete-all-students-button");
 const studentsList = document.querySelector("#students-list");
 const teachersExcelFile = document.querySelector("#teachers-excel-file");
 const uploadTeachersButton = document.querySelector("#upload-teachers-button");
@@ -130,6 +131,7 @@ const teachersUploadMessage = document.querySelector("#teachers-upload-message")
 const teacherForm = document.querySelector("#teacher-form");
 const teacherMessage = document.querySelector("#teacher-message");
 const loadTeachersButton = document.querySelector("#load-teachers-button");
+const deleteAllTeachersButton = document.querySelector("#delete-all-teachers-button");
 const teachersList = document.querySelector("#teachers-list");
 const achievementLastName = document.querySelector("#achievement-last-name");
 const achievementFirstName = document.querySelector("#achievement-first-name");
@@ -1461,6 +1463,37 @@ function formatBirthdayDate(value) {
 
 loadStudentsButton.addEventListener("click", loadStudents);
 loadTeachersButton.addEventListener("click", loadTeachers);
+
+async function deleteAllSchoolPeople(tableName, label, button, list, reload) {
+  if (!confirm("Удалить всех " + label + "? Это действие нельзя отменить.")) return;
+
+  const defaultText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Удаляем…";
+
+  const { error } = await supabaseClient
+    .from(tableName)
+    .delete()
+    .not("id", "is", null);
+
+  if (error) {
+    alert("Ошибка удаления: " + error.message);
+  } else {
+    list.textContent = label.charAt(0).toUpperCase() + label.slice(1) + " удалены";
+    await reload();
+  }
+
+  button.disabled = false;
+  button.textContent = defaultText;
+}
+
+deleteAllStudentsButton.addEventListener("click", function () {
+  deleteAllSchoolPeople("students", "учеников", deleteAllStudentsButton, studentsList, loadStudents);
+});
+
+deleteAllTeachersButton.addEventListener("click", function () {
+  deleteAllSchoolPeople("teachers", "учителей", deleteAllTeachersButton, teachersList, loadTeachers);
+});
 
 studentForm.addEventListener("submit", async function (event) {
   event.preventDefault();
