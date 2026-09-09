@@ -105,7 +105,7 @@ body {
 .news-slide.is-leaving { animation: card-disappear 0.65s ease both; }
 
 .leaderboard-slide {
-  width: min(960px, 96%);
+  width: min(760px, 96%);
   height: auto;
   max-height: 100%;
   min-height: 0;
@@ -188,11 +188,12 @@ body {
 .leaderboard-slide tbody tr.rank-bronze td:nth-child(5) { font-weight: 800; }
 .birthday-stage.is-leaderboard { padding: clamp(6px, .8vh, 12px) 0 0; }
 .birthday-stage.is-leaderboard #tv-birthday-list { align-items: center; }
-.leaderboard-slide th:nth-child(1), .leaderboard-slide td:nth-child(1) { width: 11%; text-align: center; white-space: nowrap; }
-.leaderboard-slide th:nth-child(2), .leaderboard-slide td:nth-child(2) { width: 32%; }
-.leaderboard-slide th:nth-child(3), .leaderboard-slide td:nth-child(3) { width: 13%; text-align: center; white-space: nowrap; }
-.leaderboard-slide th:nth-child(4), .leaderboard-slide td:nth-child(4) { width: 26%; text-align: center; white-space: nowrap; }
-.leaderboard-slide th:nth-child(5), .leaderboard-slide td:nth-child(5) { width: 18%; text-align: center; font-weight: 700; white-space: nowrap; }
+.leaderboard-slide th:nth-child(1), .leaderboard-slide td:nth-child(1) { width: 12%; text-align: center; white-space: nowrap; }
+.leaderboard-slide th:nth-child(2), .leaderboard-slide td:nth-child(2) { width: 40%; }
+.leaderboard-slide th:nth-child(3), .leaderboard-slide td:nth-child(3),
+.leaderboard-slide th:nth-child(4), .leaderboard-slide td:nth-child(4),
+.leaderboard-slide th:nth-child(5), .leaderboard-slide td:nth-child(5) { width: 16%; text-align: center; white-space: nowrap; }
+.leaderboard-slide th:nth-child(5), .leaderboard-slide td:nth-child(5) { font-weight: 700; }
 
 .news-photo {
   position: relative;
