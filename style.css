@@ -616,6 +616,72 @@ body {
 }
 #settings-panel .school-base-content .form-message:empty { display: none; }
 
+/* Компактные служебные блоки внизу общих настроек */
+#settings-panel .achievement-upload-card .achievement-reference-content {
+  gap: 8px;
+  padding: 10px 12px 12px;
+  font-size: 14px;
+}
+#settings-panel .achievement-upload-card .reference-upload-hint {
+  margin: 0;
+  color: #687a75;
+  font-size: 12px;
+  line-height: 1.35;
+}
+#settings-panel .achievement-upload-card .achievement-event-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  gap: 8px;
+  max-width: 570px;
+}
+#settings-panel .achievement-upload-card .achievement-event-actions input[type="file"] {
+  height: 42px;
+  min-height: 42px;
+  padding: 5px 7px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #fff;
+  font-size: 12px;
+}
+#settings-panel .achievement-upload-card .achievement-event-actions input[type="file"]::file-selector-button {
+  height: 30px;
+  margin: 0 8px 0 0;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 6px;
+  background: #e9f0ee;
+  color: #173f39;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+#settings-panel .achievement-upload-card .achievement-event-actions button {
+  width: 112px;
+  height: 42px;
+  min-height: 42px;
+  margin: 0;
+  padding: 0 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+#settings-panel .achievement-export-row {
+  gap: 12px;
+  min-height: 42px;
+  padding: 0;
+}
+#settings-panel .achievement-export-row .form-message {
+  font-size: 13px;
+  line-height: 1.4;
+}
+#settings-panel .achievement-export-row .secondary-button {
+  height: 42px;
+  min-height: 42px;
+  margin: 0;
+  padding: 0 13px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
 @media (max-width: 900px) {
   #settings-panel .tv-settings-section,
   #settings-panel .tv-ranking-section { grid-template-columns: 1fr; }
@@ -633,6 +699,8 @@ body {
   #settings-panel .school-person-form { grid-template-columns: 1fr; }
   #settings-panel .school-upload-row button,
   #settings-panel .school-person-form button { width: 100%; }
+  #settings-panel .achievement-upload-card .achievement-event-actions { grid-template-columns: 1fr; }
+  #settings-panel .achievement-upload-card .achievement-event-actions button { width: 100%; }
 }
 
 .admin-site-logo {
