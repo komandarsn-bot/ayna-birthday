@@ -295,6 +295,18 @@ body {
 #app-content #settings-panel .screen-access-row > div { min-width: 0; }
 #app-content #settings-panel .screen-access-row strong { display: block; font-size: 14px; line-height: 40px; }
 #app-content #settings-panel .screen-access-row button { flex: 0 0 auto; padding: 8px 12px; }
+#app-content #settings-panel .screen-access-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+#app-content #settings-panel .screen-access-actions .secondary-button {
+  border: 1px solid #bfd0cc;
+  background: #fff;
+  color: #173f39;
+  box-shadow: none;
+}
 #app-content #settings-panel .screen-access-row .screen-link-row { margin: 3px 0 0; font-size: 12px; overflow-wrap: anywhere; }
 
 #app-content #settings-panel > .card,

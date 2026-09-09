@@ -54,6 +54,8 @@ const logoutButton =
 
 const createScreenButton =
   document.querySelector("#create-screen-button");
+const openScreenButton =
+  document.querySelector("#open-screen-button");
 
 const tvBirthdaysEnabled = document.querySelector("#tv-birthdays-enabled");
 const tvAnnouncementsEnabled = document.querySelector("#tv-announcements-enabled");
@@ -458,15 +460,13 @@ function formatDateForDatabase(date) {
   return `${year}-${month}-${day}`;
 }
 
-createScreenButton.addEventListener(
-  "click",
-  async function () {
+async function getScreenLink() {
     const { data: sessionData } =
       await supabaseClient.auth.getSession();
 
     if (!sessionData.session) {
       alert("Сначала войдите в аккаунт");
-      return;
+      return null;
     }
 
     const userId = sessionData.session.user.id;
@@ -483,7 +483,7 @@ createScreenButton.addEventListener(
         "Ошибка получения экрана: " +
         selectError.message
       );
-      return;
+      return null;
     }
 
     if (!existingScreen) {
@@ -501,7 +501,7 @@ createScreenButton.addEventListener(
           "Ошибка создания экрана: " +
           insertError.message
         );
-        return;
+        return null;
       }
 
       existingScreen = newScreen;
@@ -517,6 +517,15 @@ screenPageUrl.searchParams.set(
 
 const link = screenPageUrl.toString();
 
+    return link;
+}
+
+createScreenButton.addEventListener(
+  "click",
+  async function () {
+    const link = await getScreenLink();
+    if (!link) return;
+
     try {
       await navigator.clipboard.writeText(link);
       createScreenButton.textContent = "Скопировано";
@@ -531,6 +540,20 @@ const link = screenPageUrl.toString();
     }
   }
 );
+
+openScreenButton.addEventListener("click", async function () {
+  const screenTab = window.open("about:blank", "_blank");
+  const link = await getScreenLink();
+  if (!link) {
+    if (screenTab) screenTab.close();
+    return;
+  }
+  if (screenTab) {
+    screenTab.location.replace(link);
+  } else {
+    window.open(link, "_blank", "noopener");
+  }
+});
 
 
 function sortPeopleByUpcomingBirthday(people, today = new Date()) {
@@ -1065,6 +1088,7 @@ deleteAllButton.disabled = true;
 deleteAllButton.disabled = false;
   }
 );
+
 }
 
 async function getCurrentUserId(messageElement) {
