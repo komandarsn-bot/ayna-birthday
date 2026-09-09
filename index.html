@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=58">
+    <link rel="stylesheet" href="style.css?v=59">
   </head>
 
   <body>
@@ -76,8 +76,15 @@
     </div>
 
     <div id="settings-panel" role="tabpanel" aria-labelledby="settings-tab" hidden>
-    <section class="card">
-      <h2>Настройки экрана</h2>
+    <details class="card settings-manager achievement-reference-manager">
+      <summary class="achievement-reference-summary">
+        <span><strong>Экран и рейтинг</strong></span>
+        <span class="reference-summary-action" aria-hidden="true">
+          <span class="reference-open-label">Настроить</span>
+          <span class="reference-close-label">Скрыть</span>
+        </span>
+      </summary>
+      <div class="achievement-reference-content compact-reference-content">
 
       <button type="button" id="create-screen-button">
         Получить ссылку для телевизора
@@ -117,7 +124,8 @@
         </details>
         <p id="tv-leaderboard-message" class="form-message" aria-live="polite"></p>
       </div>
-    </section>
+      </div>
+    </details>
 
     <details class="card school-base-card school-base-manager">
       <summary class="school-base-summary">

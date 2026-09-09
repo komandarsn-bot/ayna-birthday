@@ -148,7 +148,7 @@ body {
 /* Компактные служебные панели настроек */
 #settings-panel {
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 #settings-panel[hidden] { display: none; }
@@ -189,13 +189,13 @@ body {
 
 #settings-panel .school-base-summary,
 #settings-panel .achievement-reference-summary {
-  min-height: 52px;
-  padding: 12px 18px;
+  min-height: 42px;
+  padding: 8px 14px;
 }
 
 #settings-panel .school-base-summary strong,
 #settings-panel .achievement-reference-summary strong {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 #settings-panel .school-base-summary small,
@@ -207,7 +207,18 @@ body {
 
 #settings-panel .school-base-content,
 #settings-panel .achievement-reference-content {
-  padding: 14px 18px 18px;
+  padding: 10px 14px 14px;
+}
+
+#settings-panel .settings-manager,
+#settings-panel .school-base-manager,
+#settings-panel .achievement-upload-card {
+  border-radius: 12px;
+}
+
+#settings-panel > .settings-manager {
+  padding: 0;
+  overflow: hidden;
 }
 
 .admin-site-logo {
