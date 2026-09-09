@@ -388,9 +388,10 @@ body {
 
 #settings-panel .tv-ranking-manager .tv-leaderboard-settings {
   display: grid;
-  grid-template-columns: minmax(280px, 420px) minmax(210px, auto) 1fr;
-  align-items: center;
-  gap: 10px 16px;
+  grid-template-columns: minmax(280px, 420px) auto;
+  align-items: end;
+  justify-content: start;
+  gap: 12px;
 }
 
 #settings-panel .tv-ranking-manager .quarter-date-settings {
@@ -406,7 +407,9 @@ body {
 }
 #settings-panel .tv-ranking-manager .tv-settings-actions {
   grid-column: auto;
-  min-height: 40px;
+  min-height: 46px;
+  align-items: flex-end;
+  justify-content: flex-start;
 }
 
 #settings-panel .tv-content-toggles .tv-setting-toggle {
