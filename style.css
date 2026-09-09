@@ -338,6 +338,13 @@ body {
   background: #f7faf9;
 }
 
+#app-content #settings-panel .tv-content-manager .achievement-reference-content,
+#app-content #settings-panel .tv-ranking-manager .achievement-reference-content {
+  width: 100%;
+  margin: 0 0 8px;
+  box-sizing: border-box;
+}
+
 #settings-panel .tv-content-toggles {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
