@@ -2553,7 +2553,7 @@ Promise.all([loadStoredAchievementDirectory(), loadStoredAchievementExportSessio
     achievementExportFileName = session?.fileName || "";
     lastAchievementExportAt = Number(session?.lastExportAt) || 0;
     if (directory) {
-      achievementExportMessage.textContent = "Автоматическое сохранение включено";
+      achievementExportMessage.textContent = "";
       achievementExportSummary.textContent = directory.name;
       finishAchievementsButton.textContent = "Изменить папку";
     }
@@ -2573,7 +2573,7 @@ finishAchievementsButton.addEventListener("click", async function () {
     await storeAchievementDirectory(achievementExportDirectory);
     await storeAchievementExportSession();
     achievementExportPanel.classList.remove("needs-attention");
-    achievementExportMessage.textContent = "Автоматическое сохранение включено";
+    achievementExportMessage.textContent = "";
     achievementExportSummary.textContent = achievementExportDirectory.name;
     finishAchievementsButton.textContent = "Изменить папку";
   } catch (error) {

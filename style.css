@@ -745,20 +745,35 @@ body {
 }
 #app-content #settings-panel #achievement-export-panel .achievement-export-status {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 2px 10px;
+  gap: 4px;
   min-width: 0;
 }
+#app-content #settings-panel #achievement-export-panel .achievement-export-folder {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border: 1px solid #d4e0dd;
+  border-radius: 8px;
+  background: #fff;
+}
 #app-content #settings-panel #achievement-export-panel .achievement-export-status-label {
-  color: #687a75;
-  font-size: 12px;
+  color: #536d67;
+  font-size: 13px;
+}
+#app-content #settings-panel #achievement-export-panel .achievement-export-status-label::after {
+  content: ":";
 }
 #app-content #settings-panel #achievement-export-panel #achievement-export-summary {
   min-width: 0;
   overflow: hidden;
   color: #173f39;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

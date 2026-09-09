@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=88">
+    <link rel="stylesheet" href="style.css?v=89">
   </head>
 
   <body>
@@ -235,7 +235,7 @@
       <details id="achievement-export-details" class="achievement-reference-manager">
         <summary class="achievement-reference-summary">
           <span>
-            <strong>Автоматическое сохранение в Excel</strong>
+            <strong>Сохранение достижений в Excel</strong>
           </span>
           <span class="reference-summary-action" aria-hidden="true">
             <span class="reference-open-label">Настроить</span>
@@ -245,8 +245,10 @@
         <div class="achievement-reference-content compact-reference-content">
           <div class="achievement-export-row">
             <div class="achievement-export-status">
-              <span class="achievement-export-status-label">Папка для сохранения</span>
-              <strong id="achievement-export-summary">Папка не выбрана</strong>
+              <div class="achievement-export-folder">
+                <span class="achievement-export-status-label">Папка для сохранения</span>
+                <strong id="achievement-export-summary">Не выбрана</strong>
+              </div>
               <p id="achievement-export-message" class="form-message" aria-live="polite">Выберите папку для автоматического сохранения Excel-файлов.</p>
             </div>
             <button type="button" id="finish-achievements-button" class="secondary-button compact-button">Выбрать папку</button>
@@ -494,6 +496,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=61"></script>
+    <script src="script.js?v=62"></script>
   </body>
 </html>
