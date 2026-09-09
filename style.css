@@ -340,7 +340,7 @@ body {
 
 #settings-panel .tv-content-toggles {
   display: grid;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -355,21 +355,35 @@ body {
 
 #settings-panel .tv-ranking-manager .tv-leaderboard-settings {
   display: grid;
-  grid-template-columns: minmax(240px, 360px) 1fr;
-  align-items: end;
-  gap: 14px;
+  grid-template-columns: minmax(280px, 420px) minmax(210px, auto) 1fr;
+  align-items: center;
+  gap: 10px 16px;
 }
 
-#settings-panel .tv-ranking-manager .quarter-date-settings { grid-column: 1 / -1; }
-#settings-panel .tv-ranking-manager .tv-settings-actions { grid-column: 1 / -1; }
+#settings-panel .tv-ranking-manager .quarter-date-settings {
+  grid-column: auto;
+  padding: 0;
+  border-top: 0;
+}
+#settings-panel .tv-ranking-manager .quarter-date-settings[open] { grid-column: 1 / -1; }
+#settings-panel .tv-ranking-manager .quarter-date-settings summary {
+  padding: 9px 0;
+  font-size: 13px;
+  line-height: 1.25;
+}
+#settings-panel .tv-ranking-manager .tv-settings-actions {
+  grid-column: auto;
+  min-height: 40px;
+}
 
 #settings-panel .tv-content-toggles .tv-setting-toggle {
-  min-height: 42px;
-  padding: 8px 11px;
+  min-height: 36px;
+  padding: 6px 9px;
   border: 1px solid #d6e2de;
   border-radius: 9px;
   background: #f5f8f7;
   font-size: 13px;
+  white-space: nowrap;
 }
 
 #settings-panel .tv-ranking-toggle {
@@ -388,6 +402,7 @@ body {
   gap: 12px;
 }
 #settings-panel .tv-settings-actions .form-message { margin: 0 auto 0 0; }
+#settings-panel .tv-settings-actions .form-message:empty { display: none; }
 #settings-panel .quarter-date-settings { grid-column: 1 / -1; }
 
 @media (max-width: 900px) {
