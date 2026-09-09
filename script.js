@@ -65,7 +65,6 @@ const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
 const saveTvContentSettingsButton = document.querySelector("#save-tv-content-settings");
 const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
 const saveQuarterSettingsButton = document.querySelector("#save-quarter-settings");
-const tvLeaderboardMessage = document.querySelector("#tv-leaderboard-message");
 const quarterDateControls = [1, 2, 3, 4].map(number => ({
   start: document.querySelector(`#quarter-${number}-start`),
   end: document.querySelector(`#quarter-${number}-end`)
@@ -637,7 +636,7 @@ async function saveTvSettings(event) {
     }, { onConflict: "user_id" });
   activeButton.disabled = false;
   activeButton.textContent = error ? "Ошибка" : "Сохранено";
-  tvLeaderboardMessage.textContent = error ? "Ошибка: " + error.message : "Настройка сохранена";
+  if (error) alert("Ошибка сохранения: " + error.message);
   window.setTimeout(function () {
     activeButton.textContent = originalButtonText;
   }, 1800);
