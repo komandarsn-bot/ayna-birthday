@@ -407,9 +407,18 @@ body {
 }
 #settings-panel .tv-ranking-manager .tv-settings-actions {
   grid-column: auto;
-  min-height: 46px;
+  min-height: 50px;
+  align-self: end;
   align-items: flex-end;
   justify-content: flex-start;
+}
+#settings-panel .tv-ranking-manager .tv-settings-actions button,
+#settings-panel .standalone-quarter-settings > button {
+  height: 50px;
+  min-height: 50px;
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 #settings-panel .tv-content-toggles .tv-setting-toggle {
@@ -502,6 +511,7 @@ body {
 }
 #settings-panel .standalone-quarter-settings > button {
   width: auto;
+  align-self: end;
   margin: 0;
 }
 
