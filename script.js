@@ -2554,7 +2554,7 @@ Promise.all([loadStoredAchievementDirectory(), loadStoredAchievementExportSessio
     lastAchievementExportAt = Number(session?.lastExportAt) || 0;
     if (directory) {
       achievementExportMessage.textContent = "Автоматическое сохранение включено";
-      achievementExportSummary.textContent = "Выбрана папка: " + directory.name;
+      achievementExportSummary.textContent = directory.name;
       finishAchievementsButton.textContent = "Изменить папку";
     }
   })
@@ -2574,7 +2574,7 @@ finishAchievementsButton.addEventListener("click", async function () {
     await storeAchievementExportSession();
     achievementExportPanel.classList.remove("needs-attention");
     achievementExportMessage.textContent = "Автоматическое сохранение включено";
-    achievementExportSummary.textContent = "Выбрана папка: " + achievementExportDirectory.name;
+    achievementExportSummary.textContent = achievementExportDirectory.name;
     finishAchievementsButton.textContent = "Изменить папку";
   } catch (error) {
     if (error.name !== "AbortError") achievementExportMessage.textContent = "Ошибка выбора папки: " + error.message;

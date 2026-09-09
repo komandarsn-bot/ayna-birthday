@@ -743,6 +743,30 @@ body {
   margin: 0;
   font-size: 13px;
 }
+#app-content #settings-panel #achievement-export-panel .achievement-export-status {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 2px 10px;
+  min-width: 0;
+}
+#app-content #settings-panel #achievement-export-panel .achievement-export-status-label {
+  color: #687a75;
+  font-size: 12px;
+}
+#app-content #settings-panel #achievement-export-panel #achievement-export-summary {
+  min-width: 0;
+  overflow: hidden;
+  color: #173f39;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#app-content #settings-panel #achievement-export-panel .achievement-export-status .form-message {
+  grid-column: 1 / -1;
+  color: #4d6a64;
+  font-size: 12px;
+}
 #app-content #settings-panel #achievement-export-panel .achievement-export-row .secondary-button {
   min-width: 150px;
 }
