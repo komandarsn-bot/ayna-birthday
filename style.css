@@ -156,10 +156,12 @@ body {
 #settings-panel > .card,
 #settings-panel > details.card {
   margin-bottom: 0;
-}
-
-#settings-panel > .card:not(.school-base-card):not(.achievement-upload-card) {
-  padding: 18px 20px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #b9cec8;
+  border-left: 4px solid #28675d;
+  background: #ffffff;
+  box-shadow: 0 7px 20px rgba(23, 58, 53, 0.08);
 }
 
 #settings-panel > .card > h2 {
@@ -189,8 +191,9 @@ body {
 
 #settings-panel .school-base-summary,
 #settings-panel .achievement-reference-summary {
-  min-height: 42px;
-  padding: 8px 14px;
+  min-height: 36px;
+  padding: 6px 12px;
+  background: #f7faf9;
 }
 
 #settings-panel .school-base-summary strong,
@@ -202,7 +205,16 @@ body {
 #settings-panel .achievement-reference-summary small,
 #settings-panel .school-base-summary-action,
 #settings-panel .reference-summary-action {
-  font-size: 12px;
+  font-size: 11px;
+}
+
+#settings-panel .school-base-summary-action,
+#settings-panel .reference-summary-action {
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: #e7f0ed;
+  color: #1f5a50;
+  font-weight: 700;
 }
 
 #settings-panel .school-base-content,
@@ -213,7 +225,7 @@ body {
 #settings-panel .settings-manager,
 #settings-panel .school-base-manager,
 #settings-panel .achievement-upload-card {
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 #settings-panel > .settings-manager {
