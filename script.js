@@ -2940,6 +2940,8 @@ achievementForm.addEventListener("submit", async function (event) {
     achievementExportMessage.textContent = "Сначала выберите папку для сохранения Excel-файлов";
     achievementExportPanel.classList.add("needs-attention");
     achievementExportDetails.open = true;
+    const settingsTab = document.querySelector("#settings-tab");
+    if (settingsTab) selectAdminTab(settingsTab);
     achievementExportPanel.scrollIntoView({ behavior: "smooth", block: "center" });
     finishAchievementsButton.focus();
     return;

@@ -78,6 +78,10 @@ body {
 #app-content button,
 #app-content .button-link {
   border-radius: 10px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
   transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease;
 }
 
@@ -172,6 +176,13 @@ button {
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
 button:hover {
