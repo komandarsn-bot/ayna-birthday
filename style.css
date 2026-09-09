@@ -1105,6 +1105,57 @@ input[type="file"] {
   margin: 0;
 }
 
+/* Единая компактная типографика вкладки «Дни рождения». */
+#birthdays-panel,
+#birthdays-panel button {
+  font-size: 14px;
+}
+
+#birthdays-panel .birthday-database-columns {
+  margin-top: 0;
+  gap: 14px;
+}
+
+#birthdays-panel .birthday-database-group {
+  padding: 14px;
+}
+
+#birthdays-panel .birthday-list-heading h3 {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+#birthdays-panel .birthday-list-heading .compact-button,
+#birthdays-panel .person-row .compact-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 12px;
+  line-height: 1;
+}
+
+#birthdays-panel .school-person-list {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+#birthdays-panel .person-row {
+  min-height: 54px;
+  padding: 8px 0;
+}
+
+#birthdays-panel .person-row strong {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+#birthdays-panel .person-row span {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
 .cabinet-header {
   display: flex;
   align-items: center;
