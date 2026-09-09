@@ -145,6 +145,71 @@ body {
   #app-content button, #app-content .button-link { transition: none; }
 }
 
+/* Компактные служебные панели настроек */
+#settings-panel {
+  display: grid;
+  gap: 10px;
+}
+
+#settings-panel[hidden] { display: none; }
+
+#settings-panel > .card,
+#settings-panel > details.card {
+  margin-bottom: 0;
+}
+
+#settings-panel > .card:not(.school-base-card):not(.achievement-upload-card) {
+  padding: 18px 20px;
+}
+
+#settings-panel > .card > h2 {
+  margin-bottom: 12px;
+  font-size: 21px;
+}
+
+#settings-panel #create-screen-button {
+  width: auto;
+  padding: 9px 14px;
+}
+
+#settings-panel .screen-link-row { margin: 8px 0 0; }
+#settings-panel .screen-link-row:has(#screen-url[hidden]) { display: none; }
+
+#settings-panel .tv-leaderboard-settings {
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+
+#settings-panel .tv-leaderboard-settings strong { font-size: 15px; }
+#settings-panel .tv-leaderboard-settings small { font-size: 12px; }
+#settings-panel .tv-leaderboard-settings select { min-height: 40px; padding: 8px 10px; }
+#settings-panel .tv-leaderboard-settings button { padding: 9px 12px; }
+
+#settings-panel .school-base-summary,
+#settings-panel .achievement-reference-summary {
+  min-height: 52px;
+  padding: 12px 18px;
+}
+
+#settings-panel .school-base-summary strong,
+#settings-panel .achievement-reference-summary strong {
+  font-size: 16px;
+}
+
+#settings-panel .school-base-summary small,
+#settings-panel .achievement-reference-summary small,
+#settings-panel .school-base-summary-action,
+#settings-panel .reference-summary-action {
+  font-size: 12px;
+}
+
+#settings-panel .school-base-content,
+#settings-panel .achievement-reference-content {
+  padding: 14px 18px 18px;
+}
+
 .admin-site-logo {
   display: block;
   width: clamp(165px, 20vw, 230px);
