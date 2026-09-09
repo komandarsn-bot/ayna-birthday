@@ -262,7 +262,8 @@ body {
 
 /* Настройки собраны в одну общую панель */
 #app-content #settings-panel {
-  display: block;
+  display: flex;
+  flex-direction: column;
   padding: 8px 16px;
   border: 1px solid #d0ddda;
   border-radius: 18px;
@@ -271,6 +272,15 @@ body {
 }
 
 #app-content #settings-panel[hidden] { display: none; }
+
+/* Логический порядок: доступ → данные → периоды → показ → хранение */
+#settings-panel > .screen-access-row { order: 1; }
+#settings-panel > .school-base-manager { order: 2; }
+#settings-panel > .achievement-upload-card:not(#achievement-export-panel) { order: 3; }
+#settings-panel > .tv-quarter-manager { order: 4; }
+#settings-panel > .tv-ranking-manager { order: 5; }
+#settings-panel > .tv-content-manager { order: 6; }
+#settings-panel > #achievement-export-panel { order: 7; }
 
 #app-content #settings-panel .settings-panel-heading {
   padding: 10px 12px 12px;
