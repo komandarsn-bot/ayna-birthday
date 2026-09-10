@@ -73,7 +73,13 @@ as $$
 
   union all
 
-  select concat_ws(' ', teacher.last_name, teacher.first_name, nullif(teacher.middle_name, '')), teacher.position
+  select
+    case
+      when teacher.gender = 'Ж' then concat_ws(' ', 'Мисс', teacher.first_name)
+      when teacher.gender = 'М' then concat_ws(' ', 'Мистер', teacher.first_name)
+      else concat_ws(' ', teacher.last_name, teacher.first_name, nullif(teacher.middle_name, ''))
+    end,
+    teacher.position
   from public.teachers teacher
   join screen_owner owner on owner.user_id = teacher.user_id
   cross join today_in_school today

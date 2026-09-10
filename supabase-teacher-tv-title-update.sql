@@ -1,9 +1,6 @@
 -- Выполните этот файл один раз в Supabase: SQL Editor -> New query -> Run.
 
 alter table public.teachers
-  add column if not exists middle_name text;
-
-alter table public.teachers
   add column if not exists gender text;
 
 drop function if exists public.get_screen_birthdays(uuid);
