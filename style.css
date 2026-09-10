@@ -2197,45 +2197,6 @@ input[type="file"] {
   gap: 8px;
 }
 
-.achievement-inline-points-cell {
-  min-width: 150px;
-  padding: 7px 8px !important;
-  vertical-align: middle !important;
-}
-.achievement-inline-points {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.achievement-inline-points input {
-  width: 52px;
-  min-width: 52px;
-  height: 34px;
-  padding: 5px 6px;
-  box-sizing: border-box;
-  border: 1px solid #c7d8d3;
-  border-radius: 7px;
-  background: #fff;
-  color: #173a35;
-  font: inherit;
-  font-weight: 700;
-  text-align: center;
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-.achievement-inline-points input::-webkit-outer-spin-button,
-.achievement-inline-points input::-webkit-inner-spin-button {
-  margin: 0;
-  appearance: none;
-  -webkit-appearance: none;
-}
-.achievement-inline-points button {
-  min-width: 88px;
-  margin: 0;
-  padding: 7px 9px;
-  white-space: nowrap;
-}
-
 .compact-button {
   padding: 8px 12px;
   font-size: 14px;

@@ -342,16 +342,6 @@ function updateAutomaticAchievementPoints() {
   achievementPoints.value = ruleInput ? ruleInput.value : "";
 }
 
-function calculatedPointsForAchievement(achievement) {
-  if (achievement.manual_points !== null && achievement.manual_points !== undefined) {
-    return Number(achievement.manual_points);
-  }
-  const stage = String(achievement.event_stage || "").trim().toLocaleLowerCase("ru-RU");
-  const category = achievementResultCategory(achievement.result);
-  const ruleInput = scoringInputs.find(input => input.dataset.stage === stage && input.dataset.category === category);
-  return ruleInput ? Number(ruleInput.value) : null;
-}
-
 achievementLevel.addEventListener("change", function () {
   syncAchievementStageOptions();
   achievementPointsManuallyEdited = false;
@@ -719,11 +709,6 @@ async function loadScoringSettings() {
     if (value !== undefined) input.value = value;
   });
   updateAutomaticAchievementPoints();
-  if (loadedAchievements.length) {
-    loadedAchievements.forEach(item => { item.points = calculatedPointsForAchievement(item); });
-    refreshAchievementFilterOptions();
-    renderAchievementsTable();
-  }
 }
 
 saveScoringSettingsButton.addEventListener("click", async function () {
@@ -2571,7 +2556,6 @@ const achievementColumns = [
   ["academic_type", "Academic / Non Academic"],
   ["event_format", "Формат"],
   ["result", "Место / результат"],
-  ["points", "Баллы"],
   ["supervisor_name", "ФИО руководителя"],
   ["organizers", "Организаторы"],
   ["event_date", "Начало"],
@@ -2969,60 +2953,7 @@ function renderAchievementsTable() {
     const row = document.createElement("tr");
     achievementColumns.forEach(function ([key]) {
       const cell = document.createElement("td");
-      if (key === "points") {
-        cell.className = "achievement-inline-points-cell";
-        const editor = document.createElement("div");
-        editor.className = "achievement-inline-points";
-        const input = document.createElement("input");
-        input.type = "number";
-        input.min = "0";
-        input.max = "1000";
-        input.step = "1";
-        input.value = achievement.points ?? "";
-        input.setAttribute("aria-label", "Баллы за достижение");
-        const saveButton = document.createElement("button");
-        saveButton.type = "button";
-        saveButton.className = "secondary-button compact-button";
-        saveButton.textContent = "Сохранить";
-        const savePoints = async function () {
-          const value = Number(input.value);
-          if (!Number.isInteger(value) || value < 0 || value > 1000) {
-            input.focus();
-            alert("Введите целое количество баллов от 0 до 1000");
-            return;
-          }
-          saveButton.disabled = true;
-          saveButton.textContent = "Сохраняем...";
-          const { error } = await supabaseClient
-            .from("achievements")
-            .update({ manual_points: value })
-            .eq("id", achievement.id);
-          if (error) {
-            saveButton.disabled = false;
-            saveButton.textContent = "Сохранить";
-            alert("Ошибка сохранения баллов: " + error.message);
-            return;
-          }
-          achievement.manual_points = value;
-          achievement.points = value;
-          try { localStorage.setItem("ayna-achievements-updated", String(Date.now())); } catch (_error) {}
-          saveButton.textContent = "Сохранено";
-          await syncAchievementExportIfReady();
-          window.setTimeout(function () {
-            saveButton.disabled = false;
-            saveButton.textContent = "Сохранить";
-          }, 1400);
-        };
-        saveButton.addEventListener("click", savePoints);
-        input.addEventListener("keydown", function (event) {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            savePoints();
-          }
-        });
-        editor.append(input, saveButton);
-        cell.append(editor);
-      } else if (key === "link_url" && achievement[key]) {
+      if (key === "link_url" && achievement[key]) {
         const link = document.createElement("a");
         link.href = achievement[key];
         link.target = "_blank";
@@ -3090,9 +3021,7 @@ async function loadAchievements() {
     achievementsList.textContent = "Ошибка: " + error.message;
     return;
   }
-  loadedAchievements = (data || []).map(function (achievement) {
-    return { ...achievement, points: calculatedPointsForAchievement(achievement) };
-  });
+  loadedAchievements = data || [];
   refreshAchievementFilterOptions();
   renderAchievementsTable();
 }
