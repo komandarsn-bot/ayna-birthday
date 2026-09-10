@@ -9,6 +9,16 @@ const ADMIN_EMAIL = "rus11999944@gmail.com";
 const loginButton = document.querySelector("#login-button");
 const authMessage = document.querySelector("#auth-message");
 
+function normalizePersonName(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLocaleLowerCase("ru-RU")
+    .replace(/(^|[\s\-‐‑–—'’])(\p{L})/gu, function (_match, separator, letter) {
+      return separator + letter.toLocaleUpperCase("ru-RU");
+    });
+}
+
 const authSection =
   document.querySelector("#auth-section");
 
@@ -1115,6 +1125,7 @@ function createSchoolPersonRow(person, detail, tableName, reload) {
   const name = document.createElement("strong");
   name.textContent = [person.last_name, person.first_name, person.middle_name]
     .filter(Boolean)
+    .map(normalizePersonName)
     .join(" ");
   const description = document.createElement("span");
   description.textContent = detail;
@@ -1149,13 +1160,18 @@ async function loadStudents() {
     studentsList.textContent = "Ошибка: " + error.message;
     return;
   }
-  achievementStudents = data;
+  const normalizedStudents = data.map(student => ({
+    ...student,
+    last_name: normalizePersonName(student.last_name),
+    first_name: normalizePersonName(student.first_name)
+  }));
+  achievementStudents = normalizedStudents;
   updateAchievementStudentSuggestions();
   if (!data.length) {
     studentsList.textContent = "Ученики пока не добавлены";
     return;
   }
-  studentsList.replaceChildren(...sortPeopleByUpcomingBirthday(data).map(function (student) {
+  studentsList.replaceChildren(...sortPeopleByUpcomingBirthday(normalizedStudents).map(function (student) {
     return createSchoolPersonRow(
       student,
       student.class_name + " · " + formatBirthdayDate(student.birth_date),
@@ -1380,13 +1396,19 @@ async function loadTeachers() {
     teachersList.textContent = "Ошибка: " + error.message;
     return;
   }
-  achievementTeachers = data;
+  const normalizedTeachers = data.map(teacher => ({
+    ...teacher,
+    last_name: normalizePersonName(teacher.last_name),
+    first_name: normalizePersonName(teacher.first_name),
+    middle_name: normalizePersonName(teacher.middle_name) || null
+  }));
+  achievementTeachers = normalizedTeachers;
   if (document.activeElement === achievementSupervisor) showSupervisorSuggestions();
   if (!data.length) {
     teachersList.textContent = "Учителя пока не добавлены";
     return;
   }
-  teachersList.replaceChildren(...sortPeopleByUpcomingBirthday(data).map(function (teacher) {
+  teachersList.replaceChildren(...sortPeopleByUpcomingBirthday(normalizedTeachers).map(function (teacher) {
     return createSchoolPersonRow(
       teacher,
       teacher.position + " · " + formatBirthdayDate(teacher.birth_date),
@@ -1399,6 +1421,7 @@ async function loadTeachers() {
 function teacherFullName(teacher) {
   return [teacher.last_name, teacher.first_name, teacher.middle_name]
     .filter(Boolean)
+    .map(normalizePersonName)
     .join(" ");
 }
 
@@ -1513,8 +1536,8 @@ studentForm.addEventListener("submit", async function (event) {
   if (!userId) return;
   const row = {
     user_id: userId,
-    last_name: document.querySelector("#student-last-name").value.trim(),
-    first_name: document.querySelector("#student-first-name").value.trim(),
+    last_name: normalizePersonName(document.querySelector("#student-last-name").value),
+    first_name: normalizePersonName(document.querySelector("#student-first-name").value),
     class_name: document.querySelector("#student-class").value.trim(),
     birth_date: document.querySelector("#student-birth-date").value
   };
@@ -1540,9 +1563,9 @@ teacherForm.addEventListener("submit", async function (event) {
   if (!userId) return;
   const row = {
     user_id: userId,
-    last_name: document.querySelector("#teacher-last-name").value.trim(),
-    first_name: document.querySelector("#teacher-first-name").value.trim(),
-    middle_name: document.querySelector("#teacher-middle-name").value.trim() || null,
+    last_name: normalizePersonName(document.querySelector("#teacher-last-name").value),
+    first_name: normalizePersonName(document.querySelector("#teacher-first-name").value),
+    middle_name: normalizePersonName(document.querySelector("#teacher-middle-name").value) || null,
     position: document.querySelector("#teacher-position").value.trim(),
     birth_date: document.querySelector("#teacher-birth-date").value,
     gender: document.querySelector("#teacher-gender").value
@@ -1649,8 +1672,8 @@ uploadStudentsButton.addEventListener("click", function () {
     mapRow: function (row, userId) {
       return {
         user_id: userId,
-        last_name: excelText(row, "Фамилия"),
-        first_name: excelText(row, "Имя"),
+        last_name: normalizePersonName(excelText(row, "Фамилия")),
+        first_name: normalizePersonName(excelText(row, "Имя")),
         class_name: excelText(row, "Класс"),
         birth_date: excelDate(row, "Дата рождения")
       };
@@ -1670,9 +1693,9 @@ uploadTeachersButton.addEventListener("click", function () {
     mapRow: function (row, userId) {
       return {
         user_id: userId,
-        last_name: excelText(row, "Фамилия"),
-        first_name: excelText(row, "Имя"),
-        middle_name: excelText(row, "Отчество") || null,
+        last_name: normalizePersonName(excelText(row, "Фамилия")),
+        first_name: normalizePersonName(excelText(row, "Имя")),
+        middle_name: normalizePersonName(excelText(row, "Отчество")) || null,
         position: excelText(row, "Должность"),
         birth_date: excelDate(row, "Дата рождения"),
         gender: normalizeTeacherGender(excelText(row, "Пол"))
@@ -2657,6 +2680,9 @@ function formatAchievementCell(key, value) {
   }
   if (key === "event_date" || key === "event_end_date") {
     return new Date(value + "T00:00:00").toLocaleDateString("ru-RU");
+  }
+  if (key === "last_name" || key === "first_name" || key === "supervisor_name") {
+    return normalizePersonName(value);
   }
   return String(value);
 }

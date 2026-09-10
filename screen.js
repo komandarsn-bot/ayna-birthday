@@ -6,6 +6,16 @@ const birthdayTitle = document.querySelector("#birthday-title");
 const birthdayStage = document.querySelector(".birthday-stage");
 const screenKey = new URLSearchParams(window.location.search).get("key");
 
+function normalizePersonName(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLocaleLowerCase("ru-RU")
+    .replace(/(^|[\s\-‐‑–—'’])(\p{L})/gu, function (_match, separator, letter) {
+      return separator + letter.toLocaleUpperCase("ru-RU");
+    });
+}
+
 let birthdays = [], newsItems = [], leaderboardSlides = [];
 let activeKind = null, activeIndex = 0;
 let activeNewsSlide = 0;
@@ -444,7 +454,7 @@ function updateLeaderboard(data) {
       period_label: rows[0].period_label || "",
       rows: rows.map(item => ({
         place_number: Number(item.place_number),
-        student_name: item.student_name,
+        student_name: normalizePersonName(item.student_name),
         class_name: item.class_name,
         achievements_count: Number(item.achievements_count),
         total_points: Number(item.total_points)
@@ -463,7 +473,7 @@ function updateLeaderboard(data) {
 
 function updateBirthdays(data) {
   const normalized = data.map(person => ({
-    full_name: person.full_name,
+    full_name: normalizePersonName(person.full_name),
     person_position: person.person_position || ""
   })).sort((a, b) => (a.full_name + a.person_position).localeCompare(b.full_name + b.person_position, "ru"));
   const changed = JSON.stringify(normalized) !== JSON.stringify(birthdays);
