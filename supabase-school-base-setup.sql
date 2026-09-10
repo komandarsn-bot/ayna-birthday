@@ -19,6 +19,7 @@ create table if not exists public.teachers (
   middle_name text,
   position text not null,
   birth_date date not null,
+  gender text check (gender in ('М', 'Ж')),
   created_at timestamptz not null default now(),
   unique (user_id, last_name, first_name, position)
 );
@@ -27,6 +28,7 @@ create table if not exists public.teachers (
 alter table public.students add column if not exists birth_date date;
 alter table public.teachers add column if not exists birth_date date;
 alter table public.teachers add column if not exists middle_name text;
+alter table public.teachers add column if not exists gender text;
 
 alter table public.students enable row level security;
 alter table public.teachers enable row level security;

@@ -1375,7 +1375,7 @@ async function loadTeachers() {
   teachersList.textContent = "Загрузка...";
   const { data, error } = await supabaseClient
     .from("teachers")
-    .select("id,last_name,first_name,middle_name,position,birth_date");
+    .select("id,last_name,first_name,middle_name,position,birth_date,gender");
   if (error) {
     teachersList.textContent = "Ошибка: " + error.message;
     return;
@@ -1544,7 +1544,8 @@ teacherForm.addEventListener("submit", async function (event) {
     first_name: document.querySelector("#teacher-first-name").value.trim(),
     middle_name: document.querySelector("#teacher-middle-name").value.trim() || null,
     position: document.querySelector("#teacher-position").value.trim(),
-    birth_date: document.querySelector("#teacher-birth-date").value
+    birth_date: document.querySelector("#teacher-birth-date").value,
+    gender: document.querySelector("#teacher-gender").value
   };
   const button = document.querySelector("#add-teacher-button");
   button.disabled = true;
@@ -1577,6 +1578,13 @@ function excelRawValue(row, heading) {
 
 function excelText(row, heading) {
   return String(excelRawValue(row, heading) || "").trim();
+}
+
+function normalizeTeacherGender(value) {
+  const normalized = String(value || "").trim().toLocaleUpperCase("ru");
+  if (normalized === "М" || normalized === "M" || normalized === "МУЖСКОЙ") return "М";
+  if (normalized === "Ж" || normalized === "F" || normalized === "ЖЕНСКИЙ") return "Ж";
+  return null;
 }
 
 function excelDate(row, heading) {
@@ -1666,7 +1674,8 @@ uploadTeachersButton.addEventListener("click", function () {
         first_name: excelText(row, "Имя"),
         middle_name: excelText(row, "Отчество") || null,
         position: excelText(row, "Должность"),
-        birth_date: excelDate(row, "Дата рождения")
+        birth_date: excelDate(row, "Дата рождения"),
+        gender: normalizeTeacherGender(excelText(row, "Пол"))
       };
     },
     isValid: row => Boolean(row.last_name && row.first_name && row.position && row.birth_date),

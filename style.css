@@ -613,11 +613,17 @@ body {
   padding-top: 10px;
 }
 #settings-panel .school-person-form label { gap: 4px; }
-#settings-panel .school-person-form input {
+#settings-panel .school-person-form input,
+#settings-panel .school-person-form select {
   height: 44px;
   min-height: 40px;
   padding: 8px 10px;
   box-sizing: border-box;
+  border: 1px solid #c7d8d3;
+  border-radius: 8px;
+  background: #fff;
+  color: #173a35;
+  font: inherit;
 }
 #settings-panel .school-person-form button {
   grid-column: 1 / -1;
@@ -632,11 +638,11 @@ body {
 }
 
 #settings-panel .teacher-person-form button {
-  grid-column: auto;
+  grid-column: 1 / -1;
   align-self: end;
-  justify-self: stretch;
-  width: 100%;
-  min-width: 0;
+  justify-self: end;
+  width: auto;
+  min-width: 180px;
   height: 44px;
 }
 #settings-panel .school-base-content .form-message:empty { display: none; }
