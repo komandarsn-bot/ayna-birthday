@@ -5,7 +5,7 @@ create table if not exists public.screen_leaderboard_settings (
   user_id uuid primary key references auth.users(id) on delete cascade default auth.uid(),
   is_enabled boolean not null default true,
   period_type text not null default 'school_year'
-    check (period_type in ('week', 'month', 'quarter', 'school_year')),
+    check (period_type in ('week', 'month', 'quarter', 'school_year', 'all_time')),
   quarter_1_start date,
   quarter_1_end date,
   quarter_2_start date,
@@ -16,6 +16,12 @@ create table if not exists public.screen_leaderboard_settings (
   quarter_4_end date,
   updated_at timestamptz not null default now()
 );
+
+alter table public.screen_leaderboard_settings
+  drop constraint if exists screen_leaderboard_settings_period_type_check;
+alter table public.screen_leaderboard_settings
+  add constraint screen_leaderboard_settings_period_type_check
+  check (period_type in ('week', 'month', 'quarter', 'school_year', 'all_time'));
 
 alter table public.screen_leaderboard_settings add column if not exists quarter_1_start date;
 alter table public.screen_leaderboard_settings add column if not exists quarter_1_end date;
@@ -72,6 +78,7 @@ as $function$
     select
       settings.*,
       case settings.period_type
+        when 'all_time' then date '1900-01-01'
         when 'week' then date_trunc('week', settings.today::timestamp)::date
         when 'month' then date_trunc('month', settings.today::timestamp)::date
         when 'quarter' then case
@@ -87,6 +94,7 @@ as $function$
         )
       end as date_from,
       case settings.period_type
+        when 'all_time' then date '9999-12-31'
         when 'week' then (date_trunc('week', settings.today::timestamp)::date + 6)
         when 'month' then (date_trunc('month', settings.today::timestamp) + interval '1 month - 1 day')::date
         when 'quarter' then case
@@ -150,6 +158,7 @@ as $function$
       when 'week' then 'За текущую неделю'
       when 'month' then 'За текущий месяц'
       when 'quarter' then 'За текущую четверть'
+      when 'all_time' then 'За всё время'
       else 'За текущий учебный год'
     end as period_label
   from ranked
