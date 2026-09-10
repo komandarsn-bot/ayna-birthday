@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayna — экран дней рождения</title>
-    <link rel="stylesheet" href="style.css?v=93">
+    <link rel="stylesheet" href="style.css?v=94">
   </head>
 
   <body>
@@ -103,6 +103,42 @@
             <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked><span>Рейтинг учеников</span></label>
           </div>
           <button type="button" id="save-tv-content-settings">Сохранить</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="card settings-manager achievement-reference-manager scoring-manager">
+      <summary class="achievement-reference-summary">
+        <span><strong>Начисление баллов</strong></span>
+        <span class="reference-summary-action" aria-hidden="true">
+          <span class="reference-open-label">Настроить</span>
+          <span class="reference-close-label">Скрыть</span>
+        </span>
+      </summary>
+      <div class="achievement-reference-content compact-reference-content">
+        <div class="scoring-table-wrap">
+          <table class="scoring-table">
+            <thead>
+              <tr>
+                <th scope="col">Уровень</th>
+                <th scope="col">1 место<br><span>или абсолютный чемпион</span></th>
+                <th scope="col">2 место</th>
+                <th scope="col">3 место</th>
+                <th scope="col">Номинация<br><span>или грамота</span></th>
+                <th scope="col">Сертификат</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Школьный этап</th><td><input type="number" min="0" max="1000" value="5" data-stage="школьный" data-category="1 место / абсолютный чемпион" aria-label="Школьный этап, 1 место"></td><td><input type="number" min="0" max="1000" value="4" data-stage="школьный" data-category="2 место" aria-label="Школьный этап, 2 место"></td><td><input type="number" min="0" max="1000" value="3" data-stage="школьный" data-category="3 место" aria-label="Школьный этап, 3 место"></td><td><input type="number" min="0" max="1000" value="2" data-stage="школьный" data-category="номинация / грамота" aria-label="Школьный этап, номинация или грамота"></td><td><input type="number" min="0" max="1000" value="1" data-stage="школьный" data-category="сертификат" aria-label="Школьный этап, сертификат"></td></tr>
+              <tr><th scope="row">Районный этап</th><td><input type="number" min="0" max="1000" value="6" data-stage="районный" data-category="1 место / абсолютный чемпион" aria-label="Районный этап, 1 место"></td><td><input type="number" min="0" max="1000" value="5" data-stage="районный" data-category="2 место" aria-label="Районный этап, 2 место"></td><td><input type="number" min="0" max="1000" value="4" data-stage="районный" data-category="3 место" aria-label="Районный этап, 3 место"></td><td><input type="number" min="0" max="1000" value="3" data-stage="районный" data-category="номинация / грамота" aria-label="Районный этап, номинация или грамота"></td><td><input type="number" min="0" max="1000" value="2" data-stage="районный" data-category="сертификат" aria-label="Районный этап, сертификат"></td></tr>
+              <tr><th scope="row">Городской этап</th><td><input type="number" min="0" max="1000" value="8" data-stage="городской" data-category="1 место / абсолютный чемпион" aria-label="Городской этап, 1 место"></td><td><input type="number" min="0" max="1000" value="7" data-stage="городской" data-category="2 место" aria-label="Городской этап, 2 место"></td><td><input type="number" min="0" max="1000" value="6" data-stage="городской" data-category="3 место" aria-label="Городской этап, 3 место"></td><td><input type="number" min="0" max="1000" value="5" data-stage="городской" data-category="номинация / грамота" aria-label="Городской этап, номинация или грамота"></td><td><input type="number" min="0" max="1000" value="4" data-stage="городской" data-category="сертификат" aria-label="Городской этап, сертификат"></td></tr>
+              <tr><th scope="row">Республиканский этап</th><td><input type="number" min="0" max="1000" value="12" data-stage="республиканский" data-category="1 место / абсолютный чемпион" aria-label="Республиканский этап, 1 место"></td><td><input type="number" min="0" max="1000" value="11" data-stage="республиканский" data-category="2 место" aria-label="Республиканский этап, 2 место"></td><td><input type="number" min="0" max="1000" value="10" data-stage="республиканский" data-category="3 место" aria-label="Республиканский этап, 3 место"></td><td><input type="number" min="0" max="1000" value="9" data-stage="республиканский" data-category="номинация / грамота" aria-label="Республиканский этап, номинация или грамота"></td><td><input type="number" min="0" max="1000" value="8" data-stage="республиканский" data-category="сертификат" aria-label="Республиканский этап, сертификат"></td></tr>
+              <tr><th scope="row">Международный этап</th><td><input type="number" min="0" max="1000" value="16" data-stage="международный" data-category="1 место / абсолютный чемпион" aria-label="Международный этап, 1 место"></td><td><input type="number" min="0" max="1000" value="15" data-stage="международный" data-category="2 место" aria-label="Международный этап, 2 место"></td><td><input type="number" min="0" max="1000" value="14" data-stage="международный" data-category="3 место" aria-label="Международный этап, 3 место"></td><td><input type="number" min="0" max="1000" value="13" data-stage="международный" data-category="номинация / грамота" aria-label="Международный этап, номинация или грамота"></td><td><input type="number" min="0" max="1000" value="12" data-stage="международный" data-category="сертификат" aria-label="Международный этап, сертификат"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="scoring-settings-footer">
+          <button type="button" id="save-scoring-settings">Сохранить баллы</button>
         </div>
       </div>
     </details>
@@ -510,6 +546,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=69"></script>
+    <script src="script.js?v=70"></script>
   </body>
 </html>

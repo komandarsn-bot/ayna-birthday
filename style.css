@@ -279,8 +279,9 @@ body {
 #settings-panel > .achievement-upload-card:not(#achievement-export-panel) { order: 3; }
 #settings-panel > .tv-quarter-manager { order: 4; }
 #settings-panel > .tv-ranking-manager { order: 5; }
-#settings-panel > .tv-content-manager { order: 6; }
-#settings-panel > #achievement-export-panel { order: 7; }
+#settings-panel > .scoring-manager { order: 6; }
+#settings-panel > .tv-content-manager { order: 7; }
+#settings-panel > #achievement-export-panel { order: 8; }
 
 #app-content #settings-panel .settings-panel-heading {
   padding: 10px 12px 12px;
@@ -381,10 +382,81 @@ body {
 }
 
 #app-content #settings-panel .tv-content-manager .achievement-reference-content,
-#app-content #settings-panel .tv-ranking-manager .achievement-reference-content {
+#app-content #settings-panel .tv-ranking-manager .achievement-reference-content,
+#app-content #settings-panel .scoring-manager .achievement-reference-content {
   width: 100%;
   margin: 0 0 8px;
   box-sizing: border-box;
+}
+
+#settings-panel .scoring-manager .achievement-reference-content {
+  padding: 10px 12px 12px;
+}
+#settings-panel .scoring-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #d4e0dd;
+  border-radius: 9px;
+  background: #fff;
+}
+#settings-panel .scoring-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: #173f39;
+  font-size: 13px;
+}
+#settings-panel .scoring-table th,
+#settings-panel .scoring-table td {
+  height: 48px;
+  padding: 6px 8px;
+  border-right: 1px solid #e0e8e6;
+  border-bottom: 1px solid #e0e8e6;
+  text-align: center;
+  vertical-align: middle;
+}
+#settings-panel .scoring-table tr:last-child > * { border-bottom: 0; }
+#settings-panel .scoring-table tr > *:last-child { border-right: 0; }
+#settings-panel .scoring-table thead th {
+  height: 52px;
+  background: #edf3f1;
+  font-weight: 750;
+  line-height: 1.15;
+}
+#settings-panel .scoring-table thead th:first-child { width: 168px; }
+#settings-panel .scoring-table thead span {
+  color: #607772;
+  font-size: 11px;
+  font-weight: 600;
+}
+#settings-panel .scoring-table tbody th {
+  background: #f8faf9;
+  text-align: left;
+  font-weight: 700;
+}
+#settings-panel .scoring-table input {
+  width: 62px;
+  height: 34px;
+  min-height: 34px;
+  margin: 0 auto;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  border: 1px solid #c6d7d2;
+  border-radius: 7px;
+  background: #fff;
+  color: #173f39;
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+}
+#settings-panel .scoring-table input:focus {
+  border-color: #2c7367;
+  outline: 3px solid rgba(44, 115, 103, 0.12);
+}
+#settings-panel .scoring-settings-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
 }
 
 #settings-panel .tv-content-toggles {

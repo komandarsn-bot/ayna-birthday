@@ -75,6 +75,8 @@ const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
 const saveTvContentSettingsButton = document.querySelector("#save-tv-content-settings");
 const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
 const saveQuarterSettingsButton = document.querySelector("#save-quarter-settings");
+const saveScoringSettingsButton = document.querySelector("#save-scoring-settings");
+const scoringInputs = Array.from(document.querySelectorAll(".scoring-table input[data-stage]"));
 const quarterDateControls = [1, 2, 3, 4].map(number => ({
   start: document.querySelector(`#quarter-${number}-start`),
   end: document.querySelector(`#quarter-${number}-end`)
@@ -404,6 +406,7 @@ function updateAuthView(session) {
     loadLocationReference(achievementCityReference);
     loadLocationReference(achievementOrganizerReference);
     loadTvLeaderboardSettings();
+    loadScoringSettings();
   } else {
     currentUserEmail.textContent = "";
   }
@@ -660,6 +663,59 @@ async function saveTvSettings(event) {
 saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
 saveTvLeaderboardSettingsButton.addEventListener("click", saveTvSettings);
 saveQuarterSettingsButton.addEventListener("click", saveTvSettings);
+
+async function loadScoringSettings() {
+  const { data, error } = await supabaseClient
+    .from("achievement_scoring_rules")
+    .select("event_stage,result_category,points");
+  if (error) {
+    console.warn("Не удалось загрузить настройки баллов:", error.message);
+    return;
+  }
+  const values = new Map((data || []).map(rule => [rule.event_stage + "|" + rule.result_category, rule.points]));
+  scoringInputs.forEach(input => {
+    const value = values.get(input.dataset.stage + "|" + input.dataset.category);
+    if (value !== undefined) input.value = value;
+  });
+}
+
+saveScoringSettingsButton.addEventListener("click", async function () {
+  const invalidInput = scoringInputs.find(input => input.value === "" || !Number.isInteger(Number(input.value)) || Number(input.value) < 0 || Number(input.value) > 1000);
+  if (invalidInput) {
+    invalidInput.focus();
+    alert("Введите целое количество баллов от 0 до 1000");
+    return;
+  }
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) return;
+  const originalText = saveScoringSettingsButton.textContent;
+  saveScoringSettingsButton.disabled = true;
+  saveScoringSettingsButton.textContent = "Сохраняем...";
+  try {
+    const rules = scoringInputs.map(input => ({
+      user_id: sessionData.session.user.id,
+      event_stage: input.dataset.stage,
+      result_category: input.dataset.category,
+      points: Number(input.value),
+      updated_at: new Date().toISOString()
+    }));
+    const { error: saveError } = await supabaseClient
+      .from("achievement_scoring_rules")
+      .upsert(rules, { onConflict: "user_id,event_stage,result_category" });
+    if (saveError) throw saveError;
+    const { error: recalculateError } = await supabaseClient.rpc("recalculate_my_achievement_points");
+    if (recalculateError) throw recalculateError;
+    saveScoringSettingsButton.textContent = "Сохранено";
+  } catch (error) {
+    saveScoringSettingsButton.textContent = "Ошибка";
+    alert("Ошибка сохранения баллов: " + (error.message || "не удалось сохранить настройки"));
+  } finally {
+    saveScoringSettingsButton.disabled = false;
+    window.setTimeout(function () {
+      saveScoringSettingsButton.textContent = originalText;
+    }, 1800);
+  }
+});
 
 loadNewsButton.addEventListener("click", async function () {
   newsList.textContent = "Загрузка...";
