@@ -462,6 +462,11 @@ body {
   border-color: #2c7367;
   outline: 3px solid rgba(44, 115, 103, 0.12);
 }
+
+.achievement-points-field input {
+  text-align: center;
+  font-weight: 750;
+}
 #settings-panel .scoring-settings-footer {
   display: flex;
   justify-content: flex-end;

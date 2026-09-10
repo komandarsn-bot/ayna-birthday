@@ -166,6 +166,7 @@ const achievementType = document.querySelector("#achievement-type");
 const achievementTypesMenu = document.querySelector("#achievement-types");
 const achievementResult = document.querySelector("#achievement-result");
 const achievementResultsMenu = document.querySelector("#achievement-results");
+const achievementPoints = document.querySelector("#achievement-points");
 const achievementCountry = document.querySelector("#achievement-country");
 const achievementCountriesMenu = document.querySelector("#achievement-countries");
 const achievementCity = document.querySelector("#achievement-city");
@@ -189,6 +190,7 @@ let achievementTypes = [];
 let selectedAchievementType = null;
 let achievementResults = [];
 let selectedAchievementResult = null;
+let achievementPointsManuallyEdited = false;
 let achievementFormDraft = null;
 let editingAchievementId = null;
 const achievementCountryReference = {
@@ -322,7 +324,35 @@ function syncAchievementStageOptions() {
   if (achievementStage.selectedOptions[0]?.disabled) achievementStage.value = "";
 }
 
-achievementLevel.addEventListener("change", syncAchievementStageOptions);
+function achievementResultCategory(value) {
+  const normalized = String(value || "").trim().toLocaleLowerCase("ru-RU");
+  if (normalized === "1 место" || normalized === "абсолютный чемпион") return "1 место / абсолютный чемпион";
+  if (normalized === "2 место") return "2 место";
+  if (normalized === "3 место") return "3 место";
+  if (normalized === "сертификат") return "сертификат";
+  return normalized ? "номинация / грамота" : "";
+}
+
+function updateAutomaticAchievementPoints() {
+  if (achievementPointsManuallyEdited) return;
+  const stage = achievementStage.value.trim().toLocaleLowerCase("ru-RU");
+  const category = achievementResultCategory(achievementResult.value);
+  const ruleInput = scoringInputs.find(input => input.dataset.stage === stage && input.dataset.category === category);
+  achievementPoints.value = ruleInput ? ruleInput.value : "";
+}
+
+achievementLevel.addEventListener("change", function () {
+  syncAchievementStageOptions();
+  achievementPointsManuallyEdited = false;
+  updateAutomaticAchievementPoints();
+});
+achievementStage.addEventListener("change", function () {
+  achievementPointsManuallyEdited = false;
+  updateAutomaticAchievementPoints();
+});
+achievementPoints.addEventListener("input", function () {
+  achievementPointsManuallyEdited = true;
+});
 syncAchievementStageOptions();
 
 function syncAchievementDateRange() {
@@ -677,6 +707,7 @@ async function loadScoringSettings() {
     const value = values.get(input.dataset.stage + "|" + input.dataset.category);
     if (value !== undefined) input.value = value;
   });
+  updateAutomaticAchievementPoints();
 }
 
 saveScoringSettingsButton.addEventListener("click", async function () {
@@ -2319,6 +2350,7 @@ function chooseAchievementResult() {
   selectedAchievementResult = achievementResults.find(function (item) {
     return item.name.toLocaleLowerCase("ru") === value;
   }) || null;
+  updateAutomaticAchievementPoints();
 }
 
 function showAchievementResultSuggestions() {
@@ -2335,6 +2367,8 @@ function showAchievementResultSuggestions() {
     function (item) {
       achievementResult.value = item.result.name;
       selectedAchievementResult = item.result;
+      achievementPointsManuallyEdited = false;
+      updateAutomaticAchievementPoints();
     },
     function (item, button) {
       deleteAchievementResult(item.result, button);
@@ -2779,6 +2813,9 @@ function fillAchievementForm(achievement) {
   document.querySelector("#achievement-academic-type").value = achievement.academic_type || "";
   selectedAchievementResult = achievementResults.find(item => item.name === achievement.result) || { name: achievement.result };
   achievementResult.value = achievement.result || "";
+  achievementPointsManuallyEdited = achievement.manual_points !== null && achievement.manual_points !== undefined;
+  achievementPoints.value = achievementPointsManuallyEdited ? achievement.manual_points : "";
+  updateAutomaticAchievementPoints();
   document.querySelector("#achievement-format").value = achievement.event_format || "";
   achievementSupervisor.value = achievement.supervisor_name || "";
   chooseAchievementSupervisor();
@@ -3031,6 +3068,7 @@ cancelAchievementEditButton.addEventListener("click", function () {
   syncAchievementStageOptions();
   syncAchievementDateRange();
   resetAchievementStudentSelection();
+  achievementPointsManuallyEdited = false;
   stopAchievementEditing();
   achievementMessage.textContent = "Редактирование отменено";
 });
@@ -3159,6 +3197,7 @@ achievementForm.addEventListener("submit", async function (event) {
     academic_type: achievementValue("#achievement-academic-type"),
     event_format: achievementValue("#achievement-format"),
     result: selectedAchievementResult ? selectedAchievementResult.name : null,
+    manual_points: achievementPointsManuallyEdited ? Number(achievementPoints.value) : null,
     supervisor_name: selectedAchievementSupervisor
       ? teacherFullName(selectedAchievementSupervisor)
       : null,
@@ -3191,6 +3230,7 @@ achievementForm.addEventListener("submit", async function (event) {
   }
 
   achievementForm.reset();
+  achievementPointsManuallyEdited = false;
   achievementFormDraft = null;
   syncAchievementStageOptions();
   syncAchievementDateRange();
