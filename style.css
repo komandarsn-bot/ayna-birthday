@@ -467,6 +467,30 @@ body {
   text-align: center;
   font-weight: 750;
 }
+.achievement-points-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 8px;
+}
+.achievement-points-control input,
+.achievement-points-control button {
+  height: 46px;
+  min-height: 46px;
+  box-sizing: border-box;
+}
+.achievement-points-control button {
+  width: auto;
+  min-width: 118px;
+  margin: 0;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+.achievement-points-control input[readonly] {
+  background: #f5f8f7;
+  color: #173f39;
+  cursor: default;
+}
 #settings-panel .scoring-settings-footer {
   display: flex;
   justify-content: flex-end;

@@ -469,7 +469,10 @@
             </span>
           </label>
           <label class="half-field achievement-points-field"><span class="required-caption">Баллы за достижение</span>
-            <input type="number" id="achievement-points" min="0" max="1000" step="1" inputmode="numeric" required>
+            <span class="achievement-points-control">
+              <input type="number" id="achievement-points" min="0" max="1000" step="1" inputmode="numeric" required readonly>
+              <button type="button" id="edit-achievement-points" class="secondary-button">Редактировать</button>
+            </span>
           </label>
           <label class="half-field"><span class="required-caption">Формат</span>
             <select id="achievement-format" required>
@@ -550,6 +553,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=75"></script>
+    <script src="script.js?v=76"></script>
   </body>
 </html>

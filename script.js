@@ -167,6 +167,7 @@ const achievementTypesMenu = document.querySelector("#achievement-types");
 const achievementResult = document.querySelector("#achievement-result");
 const achievementResultsMenu = document.querySelector("#achievement-results");
 const achievementPoints = document.querySelector("#achievement-points");
+const editAchievementPointsButton = document.querySelector("#edit-achievement-points");
 const achievementCountry = document.querySelector("#achievement-country");
 const achievementCountriesMenu = document.querySelector("#achievement-countries");
 const achievementCity = document.querySelector("#achievement-city");
@@ -353,6 +354,14 @@ achievementStage.addEventListener("change", function () {
 });
 achievementPoints.addEventListener("input", function () {
   achievementPointsManuallyEdited = true;
+});
+editAchievementPointsButton.addEventListener("click", function () {
+  achievementPoints.readOnly = !achievementPoints.readOnly;
+  editAchievementPointsButton.textContent = achievementPoints.readOnly ? "Редактировать" : "Готово";
+  if (!achievementPoints.readOnly) {
+    achievementPoints.focus();
+    achievementPoints.select();
+  }
 });
 syncAchievementStageOptions();
 
@@ -2816,6 +2825,8 @@ function fillAchievementForm(achievement) {
   achievementResult.value = achievement.result || "";
   achievementPointsManuallyEdited = achievement.manual_points !== null && achievement.manual_points !== undefined;
   achievementPoints.value = achievementPointsManuallyEdited ? achievement.manual_points : "";
+  achievementPoints.readOnly = true;
+  editAchievementPointsButton.textContent = "Редактировать";
   updateAutomaticAchievementPoints();
   document.querySelector("#achievement-format").value = achievement.event_format || "";
   achievementSupervisor.value = achievement.supervisor_name || "";
@@ -3070,6 +3081,8 @@ cancelAchievementEditButton.addEventListener("click", function () {
   syncAchievementDateRange();
   resetAchievementStudentSelection();
   achievementPointsManuallyEdited = false;
+  achievementPoints.readOnly = true;
+  editAchievementPointsButton.textContent = "Редактировать";
   stopAchievementEditing();
   achievementMessage.textContent = "Редактирование отменено";
 });
@@ -3232,6 +3245,8 @@ achievementForm.addEventListener("submit", async function (event) {
 
   achievementForm.reset();
   achievementPointsManuallyEdited = false;
+  achievementPoints.readOnly = true;
+  editAchievementPointsButton.textContent = "Редактировать";
   achievementFormDraft = null;
   syncAchievementStageOptions();
   syncAchievementDateRange();
