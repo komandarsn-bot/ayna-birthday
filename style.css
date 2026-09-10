@@ -645,6 +645,15 @@ body {
   min-width: 180px;
   height: 44px;
 }
+
+#settings-panel .student-person-form button {
+  grid-column: auto;
+  align-self: end;
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+}
 #settings-panel .school-base-content .form-message:empty { display: none; }
 
 /* Компактные служебные блоки внизу общих настроек */
@@ -819,6 +828,7 @@ body {
   #settings-panel .school-upload-row button,
   #settings-panel .school-person-form button { width: 100%; }
   #settings-panel .teacher-person-form button { grid-column: 1; }
+  #settings-panel .student-person-form button { grid-column: 1; }
   #settings-panel .achievement-upload-card .achievement-event-actions { grid-template-columns: 1fr; }
   #settings-panel .achievement-upload-card .achievement-event-actions button { width: 100%; }
 }

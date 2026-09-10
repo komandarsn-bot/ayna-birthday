@@ -1118,12 +1118,12 @@ async function getCurrentUserId(messageElement) {
   return data.session.user.id;
 }
 
-function createSchoolPersonRow(person, detail, tableName, reload) {
+function createSchoolPersonRow(person, detail, tableName, reload, showMiddleName = true) {
   const row = document.createElement("div");
   row.className = "person-row";
   const information = document.createElement("div");
   const name = document.createElement("strong");
-  name.textContent = [person.last_name, person.first_name, person.middle_name]
+  name.textContent = [person.last_name, person.first_name, showMiddleName ? person.middle_name : null]
     .filter(Boolean)
     .map(normalizePersonName)
     .join(" ");
@@ -1155,7 +1155,7 @@ async function loadStudents() {
   studentsList.textContent = "Загрузка...";
   const { data, error } = await supabaseClient
     .from("students")
-    .select("id,last_name,first_name,class_name,birth_date");
+    .select("id,last_name,first_name,middle_name,class_name,birth_date");
   if (error) {
     studentsList.textContent = "Ошибка: " + error.message;
     return;
@@ -1163,7 +1163,8 @@ async function loadStudents() {
   const normalizedStudents = data.map(student => ({
     ...student,
     last_name: normalizePersonName(student.last_name),
-    first_name: normalizePersonName(student.first_name)
+    first_name: normalizePersonName(student.first_name),
+    middle_name: normalizePersonName(student.middle_name) || null
   }));
   achievementStudents = normalizedStudents;
   updateAchievementStudentSuggestions();
@@ -1176,7 +1177,8 @@ async function loadStudents() {
       student,
       student.class_name + " · " + formatBirthdayDate(student.birth_date),
       "students",
-      loadStudents
+      loadStudents,
+      false
     );
   }));
 }
@@ -1538,6 +1540,7 @@ studentForm.addEventListener("submit", async function (event) {
     user_id: userId,
     last_name: normalizePersonName(document.querySelector("#student-last-name").value),
     first_name: normalizePersonName(document.querySelector("#student-first-name").value),
+    middle_name: normalizePersonName(document.querySelector("#student-middle-name").value) || null,
     class_name: document.querySelector("#student-class").value.trim(),
     birth_date: document.querySelector("#student-birth-date").value
   };
@@ -1674,6 +1677,7 @@ uploadStudentsButton.addEventListener("click", function () {
         user_id: userId,
         last_name: normalizePersonName(excelText(row, "Фамилия")),
         first_name: normalizePersonName(excelText(row, "Имя")),
+        middle_name: normalizePersonName(excelText(row, "Отчество")) || null,
         class_name: excelText(row, "Класс"),
         birth_date: excelDate(row, "Дата рождения")
       };

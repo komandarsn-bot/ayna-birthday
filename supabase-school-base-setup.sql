@@ -5,6 +5,7 @@ create table if not exists public.students (
   user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
   last_name text not null,
   first_name text not null,
+  middle_name text,
   class_name text not null,
   birth_date date not null,
   created_at timestamptz not null default now(),
@@ -26,6 +27,7 @@ create table if not exists public.teachers (
 
 -- Обновление таблиц, если предыдущая версия этого файла уже выполнялась.
 alter table public.students add column if not exists birth_date date;
+alter table public.students add column if not exists middle_name text;
 alter table public.teachers add column if not exists birth_date date;
 alter table public.teachers add column if not exists middle_name text;
 alter table public.teachers add column if not exists gender text;
