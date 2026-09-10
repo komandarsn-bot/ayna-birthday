@@ -336,7 +336,8 @@ function achievementResultCategory(value) {
 function updateAutomaticAchievementPoints() {
   if (achievementPointsManuallyEdited) return;
   const stage = achievementStage.value.trim().toLocaleLowerCase("ru-RU");
-  const category = achievementResultCategory(achievementResult.value);
+  const category = achievementResultCategory(achievementResult.value) ||
+    (stage ? "1 место / абсолютный чемпион" : "");
   const ruleInput = scoringInputs.find(input => input.dataset.stage === stage && input.dataset.category === category);
   achievementPoints.value = ruleInput ? ruleInput.value : "";
 }
