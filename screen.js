@@ -62,7 +62,7 @@ function renderCurrentSchedule(now = new Date()) {
       if (currentMinutes >= intervals[index].end && currentMinutes < intervals[index + 1].start) {
         currentState = {
           shift,
-          label: (index + 1) + "-я перемена",
+          label: "Перемена после " + (index + 1) + "-го урока",
           time: intervals[index].label.split("-")[1] + "-" + intervals[index + 1].label.split("-")[0]
         };
         break;
