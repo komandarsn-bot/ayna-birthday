@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рейтинг учеников - Ayna</title>
     <link rel="icon" href="ayna-favicon-v2.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="student-points.css?v=8">
+    <link rel="stylesheet" href="student-points.css?v=9">
   </head>
   <body>
     <header class="page-header">
       <a href="index.html" class="back-link">← Вернуться в админ-панель</a>
       <img src="ayna-logo.png" alt="Ayna">
-      <button type="button" id="refresh-points">Обновить</button>
+      <div class="page-header-actions"><button type="button" id="refresh-points">Обновить</button></div>
     </header>
 
     <main>
@@ -36,6 +36,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
+    <script src="admin-i18n.js?v=1"></script>
     <script src="student-points.js?v=7"></script>
   </body>
 </html>

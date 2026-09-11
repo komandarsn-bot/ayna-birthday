@@ -19,6 +19,10 @@ body {
   line-height: 1.45;
 }
 
+.admin-language-switcher { display: inline-flex; align-items: center; gap: 8px; margin: 0; color: #60756f; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.admin-language-switcher select { width: auto; min-width: 112px; height: 40px; min-height: 40px; margin: 0; padding: 0 32px 0 11px; border: 1px solid #c9d9d5; border-radius: 10px; background-color: #fff; color: #143f39; font: inherit; cursor: pointer; }
+@media (max-width: 700px) { .admin-language-switcher span { display: none; } .admin-language-switcher select { min-width: 104px; } }
+
 #app-content > [role="tabpanel"] {
   animation: admin-panel-appear .24s ease both;
 }
