@@ -71,6 +71,8 @@ body {
   white-space: nowrap;
 }
 
+#screen-date { font-weight: 700; }
+
 .birthday-stage {
   position: relative;
   flex: 1;
