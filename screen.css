@@ -43,10 +43,17 @@ body {
 }
 
 .screen-datetime {
-  grid-column: 3;
-  justify-self: end;
-  text-align: right;
+  grid-column: 1;
+  justify-self: start;
+  text-align: left;
 }
+
+.screen-schedule { grid-column: 3; justify-self: end; display: grid; gap: 6px; min-width: min(300px, 28vw); }
+.screen-schedule:empty { display: none; }
+.screen-schedule-row { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; padding: 7px 11px; border: 1px solid #d9e3df; border-radius: 10px; background: #fff; color: #244943; text-align: left; }
+.screen-schedule-row strong { font-size: clamp(13px, .95vw, 18px); white-space: nowrap; }
+.screen-schedule-row span { font-size: clamp(13px, .95vw, 18px); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.screen-schedule-row.is-current { border-color: #e1c65f; background: #fff9df; }
 
 #screen-date,
 #screen-clock {
@@ -626,6 +633,7 @@ body {
   .screen-header { grid-template-columns: 1fr; gap: 16px; }
   .school-logo { grid-column: 1; justify-self: center; }
   .screen-datetime { grid-column: 1; justify-self: center; text-align: center; }
+  .screen-schedule { grid-column: 1; justify-self: center; min-width: min(360px, 100%); }
   #screen-date, #screen-clock { font-size: 24px; }
   .tv-person h2 { font-size: clamp(40px, 10vw, 60px); }
   .tv-person h2.long-name { font-size: 36px; }

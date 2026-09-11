@@ -75,6 +75,12 @@ const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
 const saveTvContentSettingsButton = document.querySelector("#save-tv-content-settings");
 const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
 const saveQuarterSettingsButton = document.querySelector("#save-quarter-settings");
+const schoolShiftCount = document.querySelector("#school-shift-count");
+const scheduleWeekday = document.querySelector("#schedule-weekday");
+const shiftScheduleEditors = document.querySelector("#shift-schedule-editors");
+const saveSchoolScheduleButton = document.querySelector("#save-school-schedule");
+let scheduleDraft = {};
+let renderedScheduleDay = "1";
 const saveScoringSettingsButton = document.querySelector("#save-scoring-settings");
 const scoringInputs = Array.from(document.querySelectorAll(".scoring-table input[data-stage]"));
 const quarterDateControls = [1, 2, 3, 4].map(number => ({
@@ -447,6 +453,7 @@ function updateAuthView(session) {
     loadLocationReference(achievementOrganizerReference);
     loadTvLeaderboardSettings();
     loadScoringSettings();
+    loadSchoolSchedule();
   } else {
     currentUserEmail.textContent = "";
   }
@@ -703,6 +710,87 @@ async function saveTvSettings(event) {
 saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
 saveTvLeaderboardSettingsButton.addEventListener("click", saveTvSettings);
 saveQuarterSettingsButton.addEventListener("click", saveTvSettings);
+
+function storeVisibleScheduleDay() {
+  const day = renderedScheduleDay;
+  scheduleDraft[day] = {};
+  shiftScheduleEditors.querySelectorAll("textarea[data-shift]").forEach(function (textarea) {
+    scheduleDraft[day][textarea.dataset.shift] = textarea.value.trim();
+  });
+}
+
+function renderScheduleEditors() {
+  renderedScheduleDay = scheduleWeekday.value;
+  const daySchedule = scheduleDraft[renderedScheduleDay] || {};
+  const cards = [];
+  for (let shift = 1; shift <= Number(schoolShiftCount.value); shift += 1) {
+    const card = document.createElement("div");
+    card.className = "shift-schedule-card";
+    const title = document.createElement("strong");
+    title.textContent = shift + " смена";
+    const textarea = document.createElement("textarea");
+    textarea.dataset.shift = String(shift);
+    textarea.value = daySchedule[String(shift)] || "";
+    textarea.placeholder = "08:00-08:40\n08:50-09:30\n09:40-10:20";
+    textarea.setAttribute("aria-label", "Расписание " + shift + " смены");
+    card.append(title, textarea);
+    cards.push(card);
+  }
+  shiftScheduleEditors.replaceChildren(...cards);
+}
+
+scheduleWeekday.addEventListener("change", function () {
+  storeVisibleScheduleDay();
+  renderScheduleEditors();
+});
+schoolShiftCount.addEventListener("change", function () {
+  storeVisibleScheduleDay();
+  renderScheduleEditors();
+});
+
+async function loadSchoolSchedule() {
+  const { data, error } = await supabaseClient.from("school_schedule_settings").select("shift_count,schedules").maybeSingle();
+  if (data) {
+    schoolShiftCount.value = String(data.shift_count || 1);
+    scheduleDraft = data.schedules && typeof data.schedules === "object" ? data.schedules : {};
+  }
+  renderScheduleEditors();
+}
+
+saveSchoolScheduleButton.addEventListener("click", async function () {
+  storeVisibleScheduleDay();
+  const linePattern = /^([01]\d|2[0-3]):[0-5]\d\s*-\s*([01]\d|2[0-3]):[0-5]\d$/;
+  for (const daySchedule of Object.values(scheduleDraft)) {
+    for (const value of Object.values(daySchedule || {})) {
+      const invalid = String(value || "").split(/\r?\n/).map(line => line.trim()).filter(Boolean).find(line => !linePattern.test(line));
+      if (invalid) {
+        alert("Проверьте интервал «" + invalid + "». Используйте формат 08:00-08:40");
+        return;
+      }
+    }
+  }
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) return;
+  const originalText = saveSchoolScheduleButton.textContent;
+  saveSchoolScheduleButton.disabled = true;
+  saveSchoolScheduleButton.textContent = "Сохраняем...";
+  const { error } = await supabaseClient.from("school_schedule_settings").upsert({
+    user_id: sessionData.session.user.id,
+    shift_count: Number(schoolShiftCount.value),
+    schedules: scheduleDraft,
+    updated_at: new Date().toISOString()
+  }, { onConflict: "user_id" });
+  saveSchoolScheduleButton.disabled = false;
+  if (error) {
+    saveSchoolScheduleButton.textContent = originalText;
+    alert("Ошибка сохранения расписания: " + error.message);
+    return;
+  }
+  saveSchoolScheduleButton.textContent = "Сохранено";
+  window.setTimeout(() => { saveSchoolScheduleButton.textContent = originalText; }, 1600);
+});
+
+renderScheduleEditors();
 
 async function loadScoringSettings() {
   const { data, error } = await supabaseClient

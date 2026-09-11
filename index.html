@@ -87,6 +87,21 @@
       </div>
     </div>
 
+    <details class="card settings-manager achievement-reference-manager school-schedule-manager">
+      <summary class="achievement-reference-summary">
+        <span><strong>Расписание смен</strong></span>
+        <span class="reference-summary-action" aria-hidden="true"><span class="reference-open-label">Настроить</span><span class="reference-close-label">Скрыть</span></span>
+      </summary>
+      <div class="achievement-reference-content compact-reference-content">
+        <div class="schedule-toolbar">
+          <label>Количество смен<select id="school-shift-count"><option value="1">1 смена</option><option value="2" selected>2 смены</option><option value="3">3 смены</option></select></label>
+          <label>День недели<select id="schedule-weekday"><option value="1">Понедельник</option><option value="2">Вторник</option><option value="3">Среда</option><option value="4">Четверг</option><option value="5">Пятница</option><option value="6">Суббота</option><option value="0">Воскресенье</option></select></label>
+        </div>
+        <div id="shift-schedule-editors" class="shift-schedule-editors"></div>
+        <div class="schedule-footer"><button type="button" id="save-school-schedule">Сохранить расписание</button></div>
+      </div>
+    </details>
+
     <details class="card settings-manager achievement-reference-manager tv-content-manager">
       <summary class="achievement-reference-summary">
         <span><strong>Содержимое ТВ-экрана</strong></span>
@@ -554,6 +569,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=76"></script>
+    <script src="script.js?v=77"></script>
   </body>
 </html>

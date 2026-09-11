@@ -6,16 +6,17 @@
     <meta name="theme-color" content="#f7f7f5">
     <title>ТВ-экран - Ayna</title>
     <link rel="icon" href="ayna-favicon-v2.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="screen.css?v=60">
+    <link rel="stylesheet" href="screen.css?v=61">
   </head>
   <body>
     <main class="tv-screen">
       <header class="screen-header">
-        <img class="school-logo" src="skillset-logo.png" alt="Skillset" width="2172" height="724">
         <div class="screen-datetime">
           <time id="screen-date"></time>
           <time id="screen-clock" aria-label="Текущее время" aria-live="off"></time>
         </div>
+        <img class="school-logo" src="skillset-logo.png" alt="Skillset" width="2172" height="724">
+        <div id="screen-schedule" class="screen-schedule" aria-label="Расписание уроков"></div>
       </header>
 
       <section class="birthday-stage">
@@ -40,6 +41,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="screen.js?v=46"></script>
+    <script src="screen.js?v=47"></script>
   </body>
 </html>

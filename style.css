@@ -277,11 +277,12 @@ body {
 #settings-panel > .screen-access-row { order: 1; }
 #settings-panel > .school-base-manager { order: 2; }
 #settings-panel > .achievement-upload-card:not(#achievement-export-panel) { order: 3; }
-#settings-panel > .tv-quarter-manager { order: 4; }
-#settings-panel > .tv-ranking-manager { order: 5; }
-#settings-panel > .scoring-manager { order: 6; }
-#settings-panel > .tv-content-manager { order: 7; }
-#settings-panel > #achievement-export-panel { order: 8; }
+#settings-panel > .school-schedule-manager { order: 4; }
+#settings-panel > .tv-quarter-manager { order: 5; }
+#settings-panel > .tv-ranking-manager { order: 6; }
+#settings-panel > .scoring-manager { order: 7; }
+#settings-panel > .tv-content-manager { order: 8; }
+#settings-panel > #achievement-export-panel { order: 9; }
 
 #app-content #settings-panel .settings-panel-heading {
   padding: 10px 12px 12px;
@@ -495,6 +496,18 @@ body {
   display: flex;
   justify-content: flex-end;
   padding-top: 10px;
+}
+
+#settings-panel .schedule-toolbar { display: grid; grid-template-columns: repeat(2, minmax(220px, 320px)); gap: 10px; }
+#settings-panel .schedule-toolbar label { display: grid; gap: 5px; font-size: 13px; }
+#settings-panel .schedule-toolbar select { height: 40px; min-height: 40px; padding: 0 10px; }
+#settings-panel .shift-schedule-editors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+#settings-panel .shift-schedule-card { padding: 10px; border: 1px solid #d4e0dd; border-radius: 9px; background: #fff; }
+#settings-panel .shift-schedule-card strong { display: block; margin-bottom: 6px; font-size: 14px; }
+#settings-panel .shift-schedule-card textarea { width: 100%; min-height: 112px; resize: vertical; padding: 8px 10px; border: 1px solid #c7d8d3; border-radius: 8px; background: #fff; color: #173f39; font: 13px/1.45 "Segoe UI", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+#settings-panel .schedule-footer { display: flex; justify-content: flex-end; padding-top: 10px; }
+@media (max-width: 900px) {
+  #settings-panel .shift-schedule-editors, #settings-panel .schedule-toolbar { grid-template-columns: 1fr; }
 }
 
 #settings-panel .tv-content-toggles {

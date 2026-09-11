@@ -2,6 +2,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const tvBirthdayList = document.querySelector("#tv-birthday-list");
 const screenDate = document.querySelector("#screen-date");
 const screenClock = document.querySelector("#screen-clock");
+const screenSchedule = document.querySelector("#screen-schedule");
 const birthdayTitle = document.querySelector("#birthday-title");
 const birthdayStage = document.querySelector(".birthday-stage");
 const screenKey = new URLSearchParams(window.location.search).get("key");
@@ -17,6 +18,7 @@ function normalizePersonName(value) {
 }
 
 let birthdays = [], newsItems = [], leaderboardSlides = [];
+let schoolSchedule = null;
 let activeKind = null, activeIndex = 0;
 let activeNewsSlide = 0;
 let slideTimer, transitionTimer, isLoading = false;
@@ -28,6 +30,40 @@ function updateScreenDate() {
   const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(value => String(value).padStart(2, "0")).join(":");
   screenClock.textContent = time;
   screenClock.dateTime = time;
+  renderCurrentSchedule(now);
+}
+
+function scheduleIntervals(value) {
+  return String(value || "").split(/\r?\n/).map(function (line) {
+    const match = /^([0-2]\d):([0-5]\d)\s*-\s*([0-2]\d):([0-5]\d)$/.exec(line.trim());
+    if (!match) return null;
+    return { label: match[1] + ":" + match[2] + "-" + match[3] + ":" + match[4], start: Number(match[1]) * 60 + Number(match[2]), end: Number(match[3]) * 60 + Number(match[4]) };
+  }).filter(Boolean);
+}
+
+function renderCurrentSchedule(now = new Date()) {
+  if (!schoolSchedule) { screenSchedule.replaceChildren(); return; }
+  const day = String(now.getDay());
+  const daySchedule = schoolSchedule.schedules?.[day] || {};
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const rows = [];
+  for (let shift = 1; shift <= Number(schoolSchedule.shift_count || 1); shift += 1) {
+    const intervals = scheduleIntervals(daySchedule[String(shift)]);
+    if (!intervals.length) continue;
+    const currentIndex = intervals.findIndex(item => currentMinutes >= item.start && currentMinutes <= item.end);
+    const nextIndex = intervals.findIndex(item => currentMinutes < item.start);
+    const index = currentIndex >= 0 ? currentIndex : nextIndex;
+    if (index < 0) continue;
+    const row = document.createElement("div");
+    row.className = "screen-schedule-row" + (currentIndex >= 0 ? " is-current" : "");
+    const title = document.createElement("strong");
+    title.textContent = shift + " смена · " + (index + 1) + " урок";
+    const time = document.createElement("span");
+    time.textContent = intervals[index].label;
+    row.append(title, time);
+    rows.push(row);
+  }
+  screenSchedule.replaceChildren(...rows);
 }
 
 function imageUrl(path) {
@@ -532,11 +568,12 @@ async function loadContent() {
   if (isLoading) return;
   isLoading = true;
   try {
-    const [birthdayResult, newsResult, leaderboardResult, settingsResult] = await Promise.all([
+    const [birthdayResult, newsResult, leaderboardResult, settingsResult, scheduleResult] = await Promise.all([
       supabaseClient.rpc("get_screen_birthdays", { p_access_token: screenKey }),
       supabaseClient.rpc("get_screen_news", { p_access_token: screenKey }),
       supabaseClient.rpc("get_screen_leaderboard", { p_access_token: screenKey }),
-      supabaseClient.rpc("get_screen_content_settings", { p_access_token: screenKey })
+      supabaseClient.rpc("get_screen_content_settings", { p_access_token: screenKey }),
+      supabaseClient.rpc("get_screen_schedule", { p_access_token: screenKey })
     ]);
     const rawSettings = !settingsResult.error && Array.isArray(settingsResult.data)
       ? settingsResult.data[0]
@@ -557,6 +594,10 @@ async function loadContent() {
       updateNews(visibleNews);
     }
     if (!leaderboardResult.error) updateLeaderboard(displaySettings.leaderboard ? (leaderboardResult.data || []) : []);
+    if (!scheduleResult.error) {
+      schoolSchedule = Array.isArray(scheduleResult.data) ? (scheduleResult.data[0] || null) : scheduleResult.data;
+      renderCurrentSchedule();
+    }
     if (birthdayResult.error && newsResult.error && leaderboardResult.error && !activeKind) showScreenState("Восстанавливаем связь", "Повторим попытку через несколько секунд.");
   } finally {
     isLoading = false;
