@@ -1,6 +1,7 @@
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const tvBirthdayList = document.querySelector("#tv-birthday-list");
 const screenDate = document.querySelector("#screen-date");
+const screenWeekday = document.querySelector("#screen-weekday");
 const screenClock = document.querySelector("#screen-clock");
 const screenSchedule = document.querySelector("#screen-schedule");
 const birthdayTitle = document.querySelector("#birthday-title");
@@ -27,6 +28,8 @@ function updateScreenDate() {
   const now = new Date();
   screenDate.textContent = now.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
   screenDate.dateTime = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
+  const weekday = now.toLocaleDateString("ru-RU", { weekday: "long" });
+  screenWeekday.textContent = weekday.charAt(0).toLocaleUpperCase("ru-RU") + weekday.slice(1);
   const time = [now.getHours(), now.getMinutes(), now.getSeconds()].map(value => String(value).padStart(2, "0")).join(":");
   screenClock.textContent = time;
   screenClock.dateTime = time;
@@ -46,24 +49,35 @@ function renderCurrentSchedule(now = new Date()) {
   const day = String(now.getDay());
   const daySchedule = schoolSchedule.schedules?.[day] || {};
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const rows = [];
+  let currentState = null;
   for (let shift = 1; shift <= Number(schoolSchedule.shift_count || 1); shift += 1) {
     const intervals = scheduleIntervals(daySchedule[String(shift)]);
     if (!intervals.length) continue;
-    const currentIndex = intervals.findIndex(item => currentMinutes >= item.start && currentMinutes <= item.end);
-    const nextIndex = intervals.findIndex(item => currentMinutes < item.start);
-    const index = currentIndex >= 0 ? currentIndex : nextIndex;
-    if (index < 0) continue;
-    const row = document.createElement("div");
-    row.className = "screen-schedule-row" + (currentIndex >= 0 ? " is-current" : "");
-    const title = document.createElement("strong");
-    title.textContent = shift + " смена · " + (index + 1) + " урок";
-    const time = document.createElement("span");
-    time.textContent = intervals[index].label;
-    row.append(title, time);
-    rows.push(row);
+    const lessonIndex = intervals.findIndex(item => currentMinutes >= item.start && currentMinutes < item.end);
+    if (lessonIndex >= 0) {
+      currentState = { shift, label: (lessonIndex + 1) + " урок", time: intervals[lessonIndex].label };
+      break;
+    }
+    for (let index = 0; index < intervals.length - 1; index += 1) {
+      if (currentMinutes >= intervals[index].end && currentMinutes < intervals[index + 1].start) {
+        currentState = {
+          shift,
+          label: (index + 1) + "-я перемена",
+          time: intervals[index].label.split("-")[1] + "-" + intervals[index + 1].label.split("-")[0]
+        };
+        break;
+      }
+    }
+    if (currentState) break;
   }
-  screenSchedule.replaceChildren(...rows);
+  if (!currentState) { screenSchedule.replaceChildren(); return; }
+  const lines = [currentState.shift + " смена", currentState.label, currentState.time].map(function (value) {
+    const line = document.createElement("span");
+    line.className = "screen-schedule-line";
+    line.textContent = value;
+    return line;
+  });
+  screenSchedule.replaceChildren(...lines);
 }
 
 function imageUrl(path) {
