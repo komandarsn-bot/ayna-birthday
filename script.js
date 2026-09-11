@@ -81,6 +81,18 @@ const shiftScheduleEditors = document.querySelector("#shift-schedule-editors");
 const saveSchoolScheduleButton = document.querySelector("#save-school-schedule");
 let scheduleDraft = {};
 let renderedScheduleDay = "1";
+
+function defaultSchoolSchedule() {
+  const monday = {
+    "1": "08:00-08:40\n08:45-09:25\n09:30-10:10\n10:25-11:05\n11:10-11:50\n11:55-12:35\n12:40-13:20\n13:25-13:50",
+    "2": "13:55-14:25\n14:30-15:10\n15:15-15:55\n16:00-16:40\n16:55-17:35\n17:40-18:20\n18:25-19:05"
+  };
+  const regular = {
+    "1": "08:00-08:40\n08:45-09:25\n09:30-10:10\n10:30-11:10\n11:30-12:10\n12:15-12:55\n13:00-13:40",
+    "2": "14:00-14:40\n14:45-15:25\n15:30-16:10\n16:30-17:10\n17:30-18:10\n18:15-18:55"
+  };
+  return { "1": monday, "2": { ...regular }, "3": { ...regular }, "4": { ...regular }, "5": { ...regular } };
+}
 const saveScoringSettingsButton = document.querySelector("#save-scoring-settings");
 const scoringInputs = Array.from(document.querySelectorAll(".scoring-table input[data-stage]"));
 const quarterDateControls = [1, 2, 3, 4].map(number => ({
@@ -750,9 +762,22 @@ schoolShiftCount.addEventListener("change", function () {
 
 async function loadSchoolSchedule() {
   const { data, error } = await supabaseClient.from("school_schedule_settings").select("shift_count,schedules").maybeSingle();
-  if (data) {
+  if (data && data.schedules && Object.keys(data.schedules).length) {
     schoolShiftCount.value = String(data.shift_count || 1);
     scheduleDraft = data.schedules && typeof data.schedules === "object" ? data.schedules : {};
+  } else if (!error) {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    scheduleDraft = defaultSchoolSchedule();
+    schoolShiftCount.value = "2";
+    if (sessionData.session) {
+      const { error: seedError } = await supabaseClient.from("school_schedule_settings").upsert({
+        user_id: sessionData.session.user.id,
+        shift_count: 2,
+        schedules: scheduleDraft,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id" });
+      if (seedError) console.warn("Не удалось сохранить расписание по умолчанию:", seedError.message);
+    }
   }
   renderScheduleEditors();
 }
