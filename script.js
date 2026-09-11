@@ -736,8 +736,14 @@ function storeVisibleScheduleDay() {
 function renderScheduleEditors() {
   renderedScheduleDay = scheduleWeekday.value;
   const daySchedule = scheduleDraft[renderedScheduleDay] || {};
+  const shiftCount = Number(schoolShiftCount.value);
+  const maxLineCount = Math.max(5, ...Array.from({ length: shiftCount }, function (_, index) {
+    const value = daySchedule[String(index + 1)] || "";
+    return value ? value.split(/\r?\n/).length : 0;
+  }));
+  const editorHeight = Math.max(118, maxLineCount * 21 + 20);
   const cards = [];
-  for (let shift = 1; shift <= Number(schoolShiftCount.value); shift += 1) {
+  for (let shift = 1; shift <= shiftCount; shift += 1) {
     const card = document.createElement("div");
     card.className = "shift-schedule-card";
     const title = document.createElement("strong");
@@ -747,6 +753,11 @@ function renderScheduleEditors() {
     textarea.value = daySchedule[String(shift)] || "";
     textarea.placeholder = "08:00-08:40\n08:50-09:30\n09:40-10:20";
     textarea.readOnly = !schoolScheduleEditing;
+    textarea.style.height = editorHeight + "px";
+    textarea.addEventListener("input", function () {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    });
     textarea.setAttribute("aria-label", "Расписание " + shift + " смены");
     card.append(title, textarea);
     cards.push(card);

@@ -498,14 +498,17 @@ body {
   padding-top: 10px;
 }
 
-#settings-panel .schedule-toolbar { display: grid; grid-template-columns: repeat(2, minmax(220px, 320px)); gap: 10px; }
+#settings-panel .schedule-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 #settings-panel .schedule-toolbar label { display: grid; gap: 5px; font-size: 13px; }
 #settings-panel .schedule-toolbar select { height: 40px; min-height: 40px; padding: 0 10px; }
-#settings-panel .shift-schedule-editors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
-#settings-panel .shift-schedule-card { padding: 10px; border: 1px solid #d4e0dd; border-radius: 9px; background: #fff; }
+#settings-panel .shift-schedule-editors { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 12px; }
+#settings-panel .shift-schedule-card { display: flex; flex-direction: column; min-width: 0; padding: 12px; border: 1px solid #d4e0dd; border-radius: 10px; background: #fff; }
 #settings-panel .shift-schedule-card strong { display: block; margin-bottom: 6px; font-size: 14px; }
-#settings-panel .shift-schedule-card textarea { width: 100%; min-height: 112px; resize: vertical; padding: 8px 10px; border: 1px solid #c7d8d3; border-radius: 8px; background: #fff; color: #173f39; font: 13px/1.45 "Segoe UI", Arial, sans-serif; font-variant-numeric: tabular-nums; }
-#settings-panel .schedule-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; }
+#settings-panel .shift-schedule-card textarea { display: block; width: 100%; min-height: 118px; overflow: hidden; resize: none; box-sizing: border-box; padding: 9px 11px; border: 1px solid #c7d8d3; border-radius: 8px; background: #fff; color: #173f39; font: 13px/1.6 "Segoe UI", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+#settings-panel .schedule-footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding-top: 12px; }
+#app-content #settings-panel .schedule-footer button { flex: 0 0 auto; width: auto; min-width: 142px; min-height: 40px; margin: 0; padding: 0 18px; white-space: nowrap; }
+#app-content #settings-panel .schedule-footer #save-school-schedule { min-width: 190px; }
+#app-content #settings-panel .schedule-footer button[hidden] { display: none !important; }
 #settings-panel .shift-schedule-card textarea[readonly] { background: #f5f8f7; color: #45615b; cursor: default; }
 #settings-panel .schedule-toolbar select:disabled { opacity: 1; background: #f5f8f7; color: #45615b; cursor: default; }
 @media (max-width: 900px) {
