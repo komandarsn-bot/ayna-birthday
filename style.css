@@ -505,7 +505,9 @@ body {
 #settings-panel .shift-schedule-card { padding: 10px; border: 1px solid #d4e0dd; border-radius: 9px; background: #fff; }
 #settings-panel .shift-schedule-card strong { display: block; margin-bottom: 6px; font-size: 14px; }
 #settings-panel .shift-schedule-card textarea { width: 100%; min-height: 112px; resize: vertical; padding: 8px 10px; border: 1px solid #c7d8d3; border-radius: 8px; background: #fff; color: #173f39; font: 13px/1.45 "Segoe UI", Arial, sans-serif; font-variant-numeric: tabular-nums; }
-#settings-panel .schedule-footer { display: flex; justify-content: flex-end; padding-top: 10px; }
+#settings-panel .schedule-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; }
+#settings-panel .shift-schedule-card textarea[readonly] { background: #f5f8f7; color: #45615b; cursor: default; }
+#settings-panel .schedule-toolbar select:disabled { opacity: 1; background: #f5f8f7; color: #45615b; cursor: default; }
 @media (max-width: 900px) {
   #settings-panel .shift-schedule-editors, #settings-panel .schedule-toolbar { grid-template-columns: 1fr; }
 }

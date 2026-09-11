@@ -98,7 +98,10 @@
           <label>День недели<select id="schedule-weekday"><option value="1">Понедельник</option><option value="2">Вторник</option><option value="3">Среда</option><option value="4">Четверг</option><option value="5">Пятница</option><option value="6">Суббота</option><option value="0">Воскресенье</option></select></label>
         </div>
         <div id="shift-schedule-editors" class="shift-schedule-editors"></div>
-        <div class="schedule-footer"><button type="button" id="save-school-schedule">Сохранить расписание</button></div>
+        <div class="schedule-footer">
+          <button type="button" id="edit-school-schedule" class="secondary-button">Редактировать</button>
+          <button type="button" id="save-school-schedule" hidden>Сохранить расписание</button>
+        </div>
       </div>
     </details>
 
@@ -569,6 +572,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="script.js?v=78"></script>
+    <script src="script.js?v=79"></script>
   </body>
 </html>

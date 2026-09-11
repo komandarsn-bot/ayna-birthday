@@ -79,8 +79,10 @@ const schoolShiftCount = document.querySelector("#school-shift-count");
 const scheduleWeekday = document.querySelector("#schedule-weekday");
 const shiftScheduleEditors = document.querySelector("#shift-schedule-editors");
 const saveSchoolScheduleButton = document.querySelector("#save-school-schedule");
+const editSchoolScheduleButton = document.querySelector("#edit-school-schedule");
 let scheduleDraft = {};
 let renderedScheduleDay = "1";
+let schoolScheduleEditing = false;
 
 function defaultSchoolSchedule() {
   const monday = {
@@ -744,6 +746,7 @@ function renderScheduleEditors() {
     textarea.dataset.shift = String(shift);
     textarea.value = daySchedule[String(shift)] || "";
     textarea.placeholder = "08:00-08:40\n08:50-09:30\n09:40-10:20";
+    textarea.readOnly = !schoolScheduleEditing;
     textarea.setAttribute("aria-label", "Расписание " + shift + " смены");
     card.append(title, textarea);
     cards.push(card);
@@ -758,6 +761,20 @@ scheduleWeekday.addEventListener("change", function () {
 schoolShiftCount.addEventListener("change", function () {
   storeVisibleScheduleDay();
   renderScheduleEditors();
+});
+
+function setSchoolScheduleEditing(isEditing) {
+  schoolScheduleEditing = isEditing;
+  schoolShiftCount.disabled = !isEditing;
+  shiftScheduleEditors.querySelectorAll("textarea").forEach(textarea => { textarea.readOnly = !isEditing; });
+  editSchoolScheduleButton.hidden = isEditing;
+  saveSchoolScheduleButton.hidden = !isEditing;
+}
+
+editSchoolScheduleButton.addEventListener("click", function () {
+  setSchoolScheduleEditing(true);
+  const firstEditor = shiftScheduleEditors.querySelector("textarea");
+  if (firstEditor) firstEditor.focus();
 });
 
 async function loadSchoolSchedule() {
@@ -780,6 +797,7 @@ async function loadSchoolSchedule() {
     }
   }
   renderScheduleEditors();
+  setSchoolScheduleEditing(false);
 }
 
 saveSchoolScheduleButton.addEventListener("click", async function () {
@@ -812,10 +830,14 @@ saveSchoolScheduleButton.addEventListener("click", async function () {
     return;
   }
   saveSchoolScheduleButton.textContent = "Сохранено";
-  window.setTimeout(() => { saveSchoolScheduleButton.textContent = originalText; }, 1600);
+  window.setTimeout(() => {
+    saveSchoolScheduleButton.textContent = originalText;
+    setSchoolScheduleEditing(false);
+  }, 1000);
 });
 
 renderScheduleEditors();
+setSchoolScheduleEditing(false);
 
 async function loadScoringSettings() {
   const { data, error } = await supabaseClient
