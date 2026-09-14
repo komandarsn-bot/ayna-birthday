@@ -4,6 +4,7 @@ const screenDate = document.querySelector("#screen-date");
 const screenWeekday = document.querySelector("#screen-weekday");
 const screenClock = document.querySelector("#screen-clock");
 const screenSchedule = document.querySelector("#screen-schedule");
+const schoolLogo = document.querySelector("#school-logo");
 const birthdayTitle = document.querySelector("#birthday-title");
 const birthdayStage = document.querySelector(".birthday-stage");
 const screenKey = new URLSearchParams(window.location.search).get("key");
@@ -82,6 +83,11 @@ function renderCurrentSchedule(now = new Date()) {
 
 function imageUrl(path) {
   return supabaseClient.storage.from("news-images").getPublicUrl(path).data.publicUrl;
+}
+
+function renderSchoolLogo() {
+  const path = schoolSchedule?.schedules?._tv_logo_path;
+  schoolLogo.src = path ? imageUrl(path) : "skillset-logo.png";
 }
 
 function showScreenState(title, description) {
@@ -610,6 +616,7 @@ async function loadContent() {
     if (!leaderboardResult.error) updateLeaderboard(displaySettings.leaderboard ? (leaderboardResult.data || []) : []);
     if (!scheduleResult.error) {
       schoolSchedule = Array.isArray(scheduleResult.data) ? (scheduleResult.data[0] || null) : scheduleResult.data;
+      renderSchoolLogo();
       renderCurrentSchedule();
     }
     if (birthdayResult.error && newsResult.error && leaderboardResult.error && !activeKind) showScreenState("Восстанавливаем связь", "Повторим попытку через несколько секунд.");

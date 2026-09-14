@@ -38,8 +38,9 @@ body {
   grid-column: 2;
   display: block;
   width: clamp(170px, 18vw, 360px);
-  height: auto;
+  height: clamp(58px, 7vw, 108px);
   object-fit: contain;
+  object-position: center;
 }
 
 .screen-datetime {

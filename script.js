@@ -66,6 +66,11 @@ const createScreenButton =
   document.querySelector("#create-screen-button");
 const openScreenButton =
   document.querySelector("#open-screen-button");
+const tvLogoFile = document.querySelector("#tv-logo-file");
+const selectTvLogoButton = document.querySelector("#select-tv-logo");
+const resetTvLogoButton = document.querySelector("#reset-tv-logo");
+const tvLogoPreviewImage = document.querySelector("#tv-logo-preview-image");
+const tvLogoMessage = document.querySelector("#tv-logo-message");
 
 const tvBirthdaysEnabled = document.querySelector("#tv-birthdays-enabled");
 const tvAnnouncementsEnabled = document.querySelector("#tv-announcements-enabled");
@@ -94,6 +99,17 @@ function defaultSchoolSchedule() {
     "2": "14:00-14:40\n14:45-15:25\n15:30-16:10\n16:30-17:10\n17:30-18:10\n18:15-18:55"
   };
   return { "1": monday, "2": { ...regular }, "3": { ...regular }, "4": { ...regular }, "5": { ...regular } };
+}
+
+function tvLogoPublicUrl(path) {
+  if (!path) return "skillset-logo.png";
+  return supabaseClient.storage.from("news-images").getPublicUrl(path).data.publicUrl;
+}
+
+function renderTvLogoSetting() {
+  const logoPath = scheduleDraft && typeof scheduleDraft._tv_logo_path === "string" ? scheduleDraft._tv_logo_path : "";
+  tvLogoPreviewImage.src = tvLogoPublicUrl(logoPath);
+  resetTvLogoButton.hidden = !logoPath;
 }
 const saveScoringSettingsButton = document.querySelector("#save-scoring-settings");
 const scoringInputs = Array.from(document.querySelectorAll(".scoring-table input[data-stage]"));
@@ -808,13 +824,97 @@ async function loadSchoolSchedule() {
     }
   }
   renderScheduleEditors();
+  renderTvLogoSetting();
   setSchoolScheduleEditing(false);
 }
+
+selectTvLogoButton.addEventListener("click", function () {
+  tvLogoFile.click();
+});
+
+tvLogoFile.addEventListener("change", async function () {
+  const file = tvLogoFile.files && tvLogoFile.files[0];
+  if (!file) return;
+  if (file.type !== "image/png" && !/\.png$/i.test(file.name)) {
+    tvLogoMessage.textContent = "Выберите изображение в формате PNG";
+    tvLogoFile.value = "";
+    return;
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    tvLogoMessage.textContent = "Размер PNG не должен превышать 8 МБ";
+    tvLogoFile.value = "";
+    return;
+  }
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) return;
+  const userId = sessionData.session.user.id;
+  const newPath = userId + "/tv-logo-" + Date.now() + ".png";
+  const oldPath = typeof scheduleDraft._tv_logo_path === "string" ? scheduleDraft._tv_logo_path : "";
+  selectTvLogoButton.disabled = true;
+  tvLogoMessage.textContent = "Загружаем логотип...";
+  try {
+    const { error: uploadError } = await supabaseClient.storage.from("news-images").upload(newPath, file, { contentType: "image/png", upsert: false });
+    if (uploadError) throw uploadError;
+    const { data: stored, error: loadError } = await supabaseClient.from("school_schedule_settings").select("shift_count,schedules").maybeSingle();
+    if (loadError) throw loadError;
+    const nextSchedules = stored?.schedules && typeof stored.schedules === "object" ? { ...stored.schedules } : { ...scheduleDraft };
+    nextSchedules._tv_logo_path = newPath;
+    const { error: saveError } = await supabaseClient.from("school_schedule_settings").upsert({
+      user_id: userId,
+      shift_count: Number(stored?.shift_count || schoolShiftCount.value || 2),
+      schedules: nextSchedules,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
+    if (saveError) {
+      await supabaseClient.storage.from("news-images").remove([newPath]);
+      throw saveError;
+    }
+    scheduleDraft = nextSchedules;
+    renderTvLogoSetting();
+    tvLogoMessage.textContent = "Логотип загружен";
+    if (oldPath && oldPath !== newPath) await supabaseClient.storage.from("news-images").remove([oldPath]);
+  } catch (error) {
+    tvLogoMessage.textContent = "Ошибка загрузки: " + error.message;
+  } finally {
+    selectTvLogoButton.disabled = false;
+    tvLogoFile.value = "";
+  }
+});
+
+resetTvLogoButton.addEventListener("click", async function () {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) return;
+  const oldPath = typeof scheduleDraft._tv_logo_path === "string" ? scheduleDraft._tv_logo_path : "";
+  resetTvLogoButton.disabled = true;
+  tvLogoMessage.textContent = "Восстанавливаем стандартный логотип...";
+  try {
+    const { data: stored, error: loadError } = await supabaseClient.from("school_schedule_settings").select("shift_count,schedules").maybeSingle();
+    if (loadError) throw loadError;
+    const nextSchedules = stored?.schedules && typeof stored.schedules === "object" ? { ...stored.schedules } : { ...scheduleDraft };
+    delete nextSchedules._tv_logo_path;
+    const { error: saveError } = await supabaseClient.from("school_schedule_settings").upsert({
+      user_id: sessionData.session.user.id,
+      shift_count: Number(stored?.shift_count || schoolShiftCount.value || 2),
+      schedules: nextSchedules,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
+    if (saveError) throw saveError;
+    scheduleDraft = nextSchedules;
+    renderTvLogoSetting();
+    tvLogoMessage.textContent = "Стандартный логотип восстановлен";
+    if (oldPath) await supabaseClient.storage.from("news-images").remove([oldPath]);
+  } catch (error) {
+    tvLogoMessage.textContent = "Ошибка: " + error.message;
+  } finally {
+    resetTvLogoButton.disabled = false;
+  }
+});
 
 saveSchoolScheduleButton.addEventListener("click", async function () {
   storeVisibleScheduleDay();
   const linePattern = /^([01]\d|2[0-3]):[0-5]\d\s*-\s*([01]\d|2[0-3]):[0-5]\d$/;
-  for (const daySchedule of Object.values(scheduleDraft)) {
+  for (const [day, daySchedule] of Object.entries(scheduleDraft)) {
+    if (!/^\d$/.test(day)) continue;
     for (const value of Object.values(daySchedule || {})) {
       const invalid = String(value || "").split(/\r?\n/).map(line => line.trim()).filter(Boolean).find(line => !linePattern.test(line));
       if (invalid) {

@@ -503,6 +503,17 @@ body {
 }
 
 #settings-panel .schedule-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+#settings-panel .tv-logo-settings { display: grid; grid-template-columns: 126px minmax(0, 1fr) auto; align-items: center; gap: 16px; }
+#settings-panel .tv-logo-preview { display: grid; place-items: center; width: 126px; height: 64px; padding: 8px; overflow: hidden; border: 1px solid #d4e0dd; border-radius: 10px; background: #fff; }
+#settings-panel .tv-logo-preview img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+#settings-panel .tv-logo-copy { display: grid; gap: 3px; min-width: 0; }
+#settings-panel .tv-logo-copy strong { font-size: 14px; }
+#settings-panel .tv-logo-copy > span { color: #71827e; font-size: 13px; }
+#settings-panel .tv-logo-copy .form-message { min-height: 0; margin: 0; font-size: 12px; }
+#settings-panel .tv-logo-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+#settings-panel .tv-logo-actions input[hidden] { display: none !important; }
+#app-content #settings-panel .tv-logo-actions button { width: auto; min-width: 0; min-height: 40px; margin: 0; padding: 0 16px; white-space: nowrap; }
+#app-content #settings-panel .tv-logo-actions button[hidden] { display: none !important; }
 #settings-panel .schedule-toolbar label { display: grid; gap: 5px; font-size: 13px; }
 #settings-panel .schedule-toolbar select { height: 40px; min-height: 40px; padding: 0 10px; }
 #settings-panel .shift-schedule-editors { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 12px; }
@@ -516,6 +527,9 @@ body {
 #settings-panel .shift-schedule-card textarea[readonly] { background: #f5f8f7; color: #45615b; cursor: default; }
 #settings-panel .schedule-toolbar select:disabled { opacity: 1; background: #f5f8f7; color: #45615b; cursor: default; }
 @media (max-width: 900px) {
+  #settings-panel .tv-logo-settings { grid-template-columns: 100px minmax(0, 1fr); }
+  #settings-panel .tv-logo-preview { width: 100px; }
+  #settings-panel .tv-logo-actions { grid-column: 1 / -1; justify-content: flex-start; }
   #settings-panel .shift-schedule-editors, #settings-panel .schedule-toolbar { grid-template-columns: 1fr; }
 }
 
