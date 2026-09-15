@@ -767,8 +767,14 @@ async function saveTvSettings(event) {
 }
 
 saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
-document.querySelectorAll(".save-tv-content-trigger").forEach(function (button) {
-  button.addEventListener("click", saveTvSettings);
+let tvContentAutoSaveTimer = null;
+[tvBirthdaysEnabled, tvAnnouncementsEnabled, tvEventsEnabled, tvLeaderboardEnabled].forEach(function (checkbox) {
+  checkbox.addEventListener("change", function () {
+    window.clearTimeout(tvContentAutoSaveTimer);
+    tvContentAutoSaveTimer = window.setTimeout(function () {
+      saveTvContentSettingsButton.click();
+    }, 250);
+  });
 });
 saveTvLeaderboardSettingsButton.addEventListener("click", saveTvSettings);
 saveQuarterSettingsButton.addEventListener("click", saveTvSettings);
