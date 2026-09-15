@@ -294,11 +294,21 @@ body {
 #app-content #settings-panel[hidden] { display: none; }
 
 #settings-panel > .settings-category {
+  position: relative;
   margin: 0;
   overflow: hidden;
-  border: 1px solid #d4e0dd;
+  border: 1px solid #c6d8d3;
   border-radius: 11px;
   background: #fff;
+}
+
+#settings-panel > .settings-category::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #356f65;
 }
 
 #settings-panel > .settings-category + .settings-category {
@@ -310,8 +320,8 @@ body {
   align-items: center;
   justify-content: space-between;
   min-height: 48px;
-  padding: 8px 14px;
-  background: #f5f8f7;
+  padding: 8px 16px 8px 18px;
+  background: #e8f0ed;
   color: #123f38;
   cursor: pointer;
   list-style: none;
@@ -321,7 +331,7 @@ body {
 #settings-panel > .settings-category > .settings-category-summary strong {
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: clamp(12px, 1.4vw, 15px);
-  font-weight: 700;
+  font-weight: 750;
   line-height: 1.15;
   letter-spacing: 0;
 }
@@ -329,9 +339,12 @@ body {
 #settings-panel .settings-category-action::after { content: ""; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
 #settings-panel .settings-category-close-label { display: none; }
 #settings-panel .settings-category[open] {
-  border-color: #b9cec8;
+  border-color: #94b5ad;
 }
-#settings-panel .settings-category[open] > .settings-category-summary { background: #eaf2ef; }
+#settings-panel .settings-category[open] > .settings-category-summary {
+  background: #dceae6;
+  box-shadow: inset 0 -1px #bfd2cd;
+}
 #settings-panel .settings-category[open] > .settings-category-summary .settings-category-open-label { display: none; }
 #settings-panel .settings-category[open] > .settings-category-summary .settings-category-close-label { display: inline; }
 #settings-panel .settings-category[open] > .settings-category-summary .settings-category-action::after { transform: rotate(225deg) translate(-2px, -2px); }
@@ -339,7 +352,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  padding: 8px;
+  padding: 9px 9px 9px 14px;
   border-top: 1px solid #d9e4e1;
   background: #fff;
 }
@@ -353,9 +366,9 @@ body {
   margin: 0;
   padding: 0;
   overflow: visible;
-  border: 1px solid #e0e8e5;
+  border: 1px solid #e2e9e7;
   border-radius: 9px;
-  background: #f8faf9;
+  background: #fbfcfc;
   box-shadow: none;
 }
 
@@ -436,6 +449,13 @@ body {
   padding: 9px 12px;
   border-radius: 8px;
   background: transparent;
+}
+
+#app-content #settings-panel .settings-category-body .school-base-summary strong,
+#app-content #settings-panel .settings-category-body .achievement-reference-summary strong {
+  color: #274f48;
+  font-size: 14px;
+  font-weight: 650;
 }
 
 #app-content #settings-panel .school-base-summary > span:first-child {
@@ -1137,8 +1157,8 @@ body {
 @media (max-width: 620px) {
   #app-content #settings-panel { padding: 7px; }
   #settings-panel > .settings-category + .settings-category { margin-top: 7px; }
-  #settings-panel > .settings-category > .settings-category-summary { min-height: 46px; padding: 8px 12px; }
-  #settings-panel .settings-category-body { padding: 7px; }
+  #settings-panel > .settings-category > .settings-category-summary { min-height: 46px; padding: 8px 12px 8px 16px; }
+  #settings-panel .settings-category-body { padding: 7px 7px 7px 11px; }
   #settings-panel .settings-category-body > .settings-inline-visibility { align-items: center; flex-direction: row; gap: 10px; }
   #settings-panel .settings-category-body > .settings-inline-visibility .tv-setting-toggle { margin-left: auto; }
   #settings-panel .settings-category-body > .settings-inline-visibility.tv-publications-manager { align-items: stretch; }
