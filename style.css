@@ -293,16 +293,17 @@ body {
 
 #app-content #settings-panel[hidden] { display: none; }
 
-/* Логический порядок: доступ → данные → периоды → показ → хранение */
-#settings-panel > .screen-access-row { order: 1; }
-#settings-panel > .school-base-manager { order: 2; }
-#settings-panel > .achievement-upload-card:not(#achievement-export-panel) { order: 3; }
-#settings-panel > .school-schedule-manager { order: 4; }
-#settings-panel > .tv-quarter-manager { order: 5; }
-#settings-panel > .tv-ranking-manager { order: 6; }
-#settings-panel > .scoring-manager { order: 7; }
-#settings-panel > .tv-content-manager { order: 8; }
-#settings-panel > #achievement-export-panel { order: 9; }
+#settings-panel > .settings-category-heading {
+  margin: 12px 0 0;
+  padding: 10px 14px 8px;
+  border-bottom: 2px solid #315f57;
+  color: #123f38;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+}
+
+#settings-panel > .settings-category-heading:first-of-type { margin-top: 0; }
 
 #app-content #settings-panel .settings-panel-heading {
   padding: 10px 12px 12px;
@@ -565,6 +566,10 @@ body {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+}
+
+#settings-panel .tv-content-toggles.tv-content-toggles-single {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 #settings-panel .tv-content-settings {

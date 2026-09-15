@@ -767,8 +767,36 @@ async function saveTvSettings(event) {
 }
 
 saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
+document.querySelectorAll(".save-tv-content-trigger").forEach(function (button) {
+  button.addEventListener("click", saveTvSettings);
+});
 saveTvLeaderboardSettingsButton.addEventListener("click", saveTvSettings);
 saveQuarterSettingsButton.addEventListener("click", saveTvSettings);
+
+function organizeSettingsSections() {
+  const panel = document.querySelector("#settings-panel");
+  if (!panel || panel.dataset.organized === "true") return;
+  panel.dataset.organized = "true";
+  const groups = [
+    ["Общие", [".screen-access-row", ".tv-logo-manager", ".school-schedule-manager", ".school-base-manager"]],
+    ["Достижения", [".achievement-fields-manager", ".achievement-upload-card:not(#achievement-export-panel)", ".scoring-manager", "#achievement-export-panel"]],
+    ["Рейтинг", [".tv-ranking-visibility-manager", ".tv-ranking-manager", ".tv-quarter-manager"]],
+    ["Публикации", [".tv-publications-manager"]],
+    ["Дни рождения", [".tv-birthdays-manager"]]
+  ];
+  groups.forEach(function ([title, selectors]) {
+    const heading = document.createElement("h2");
+    heading.className = "settings-category-heading";
+    heading.textContent = title;
+    panel.append(heading);
+    selectors.forEach(function (selector) {
+      const section = panel.querySelector(selector);
+      if (section) panel.append(section);
+    });
+  });
+}
+
+organizeSettingsSections();
 
 function storeVisibleScheduleDay() {
   const day = renderedScheduleDay;

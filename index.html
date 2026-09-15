@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель управления - Ayna</title>
     <link rel="icon" href="ayna-favicon-v2.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="style.css?v=106">
+    <link rel="stylesheet" href="style.css?v=107">
   </head>
 
   <body>
@@ -127,9 +127,9 @@
       </div>
     </details>
 
-    <details class="card settings-manager achievement-reference-manager tv-content-manager">
+    <details class="card settings-manager achievement-reference-manager tv-publications-manager">
       <summary class="achievement-reference-summary">
-        <span><strong>Содержимое ТВ-экрана</strong></span>
+        <span><strong>Публикации на ТВ-экране</strong></span>
         <span class="reference-summary-action" aria-hidden="true">
           <span class="reference-open-label">Настроить</span>
           <span class="reference-close-label">Скрыть</span>
@@ -138,12 +138,40 @@
       <div class="achievement-reference-content compact-reference-content">
         <div class="tv-content-settings">
           <div class="tv-content-toggles">
-            <label class="tv-setting-toggle"><input type="checkbox" id="tv-birthdays-enabled" checked><span>Дни рождения</span></label>
             <label class="tv-setting-toggle"><input type="checkbox" id="tv-announcements-enabled" checked><span>Объявления</span></label>
             <label class="tv-setting-toggle"><input type="checkbox" id="tv-events-enabled" checked><span>События</span></label>
-            <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked><span>Рейтинг учеников</span></label>
           </div>
           <button type="button" id="save-tv-content-settings">Сохранить</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="card settings-manager achievement-reference-manager tv-birthdays-manager">
+      <summary class="achievement-reference-summary">
+        <span><strong>Дни рождения на ТВ-экране</strong></span>
+        <span class="reference-summary-action" aria-hidden="true"><span class="reference-open-label">Настроить</span><span class="reference-close-label">Скрыть</span></span>
+      </summary>
+      <div class="achievement-reference-content compact-reference-content">
+        <div class="tv-content-settings">
+          <div class="tv-content-toggles tv-content-toggles-single">
+            <label class="tv-setting-toggle"><input type="checkbox" id="tv-birthdays-enabled" checked><span>Показывать дни рождения</span></label>
+          </div>
+          <button type="button" class="save-tv-content-trigger">Сохранить</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="card settings-manager achievement-reference-manager tv-ranking-visibility-manager">
+      <summary class="achievement-reference-summary">
+        <span><strong>Рейтинг на ТВ-экране</strong></span>
+        <span class="reference-summary-action" aria-hidden="true"><span class="reference-open-label">Настроить</span><span class="reference-close-label">Скрыть</span></span>
+      </summary>
+      <div class="achievement-reference-content compact-reference-content">
+        <div class="tv-content-settings">
+          <div class="tv-content-toggles tv-content-toggles-single">
+            <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked><span>Показывать рейтинг учеников</span></label>
+          </div>
+          <button type="button" class="save-tv-content-trigger">Сохранить</button>
         </div>
       </div>
     </details>
@@ -629,8 +657,8 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="admin-i18n.js?v=3"></script>
-    <script src="script.js?v=82"></script>
+    <script src="admin-i18n.js?v=4"></script>
+    <script src="script.js?v=83"></script>
     <script src="top-table-scroll.js?v=1"></script>
   </body>
 </html>
