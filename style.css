@@ -614,11 +614,10 @@ body {
 #settings-panel .tv-logo-actions input[hidden] { display: none !important; }
 #settings-panel .achievement-fields-hint { margin: 0 0 10px; color: #71827e; font-size: 13px; }
 #settings-panel .achievement-fields-settings { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-#settings-panel .achievement-fields-settings label { display: grid; grid-template-columns: 16px auto; align-content: center; align-items: center; justify-content: center; column-gap: 9px; row-gap: 2px; min-height: 52px; margin: 0; padding: 7px 10px; border: 1px solid #d4e0dd; border-radius: 9px; background: #fff; color: #244943; font-size: 14px; font-weight: 600; text-align: left; }
+#settings-panel .achievement-fields-settings label { display: grid; grid-template-columns: 16px minmax(0, 1fr); align-content: center; align-items: center; column-gap: 9px; row-gap: 2px; min-height: 52px; margin: 0; padding: 7px 12px; border: 1px solid #d4e0dd; border-radius: 9px; background: #fff; color: #244943; font-size: 14px; font-weight: 600; text-align: left; }
 #settings-panel .achievement-fields-settings label.is-required { background: #edf3f1; }
-#settings-panel .achievement-fields-settings input { display: block; flex: 0 0 auto; width: 16px; height: 16px; margin: 0; }
-#settings-panel .achievement-fields-settings label.is-required input { grid-row: 1 / span 2; align-self: center; }
-#settings-panel .achievement-fields-settings label > span { align-self: center; line-height: 1.2; }
+#settings-panel .achievement-fields-settings input { display: block; align-self: center; flex: 0 0 auto; width: 16px; height: 16px; margin: 0; transform: translateY(1px); }
+#settings-panel .achievement-fields-settings label > span { align-self: center; line-height: 16px; }
 #settings-panel .achievement-fields-settings small { grid-column: 2; min-width: 0; color: #78908a; font-size: 12px; font-weight: 500; line-height: 1.15; }
 #settings-panel .achievement-fields-footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding-top: 10px; }
 #settings-panel .achievement-fields-footer .form-message { flex: 1; min-height: 0; margin: 0; font-size: 13px; text-align: right; }
