@@ -597,6 +597,9 @@ body {
 
 #settings-panel > .settings-inline-visibility.tv-publications-manager {
   display: grid;
+  width: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
   gap: 0;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
@@ -607,6 +610,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  width: 100%;
   min-height: 52px;
 }
 
@@ -617,12 +621,14 @@ body {
   align-items: center;
   gap: 9px;
   min-width: 150px;
-  margin: 0;
+  margin: 0 0 0 auto;
   padding: 5px 10px;
   border: 1px solid #d6e2de;
   border-radius: 9px;
   background: #f7f9f8;
 }
+
+#settings-panel > .settings-inline-visibility > button[hidden] { display: none !important; }
 
 #settings-panel .tv-ranking-manager .tv-leaderboard-settings {
   display: grid;
@@ -1068,7 +1074,8 @@ body {
 @media (max-width: 620px) {
   #settings-panel > .settings-inline-visibility { align-items: flex-start; flex-direction: column; gap: 8px; }
   #settings-panel > .settings-inline-visibility.tv-publications-manager { align-items: stretch; }
-  #settings-panel .publication-visibility-row { align-items: flex-start; flex-direction: column; gap: 6px; padding: 8px 0; }
+  #settings-panel .publication-visibility-row { align-items: center; flex-direction: row; gap: 10px; padding: 8px 0; }
+  #settings-panel .publication-visibility-row .tv-setting-toggle { min-width: 132px; }
 }
 
 @media (max-width: 620px) {
