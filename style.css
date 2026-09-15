@@ -116,7 +116,8 @@ body {
 }
 
 #app-content button:not(.secondary-button):not(.cabinet-logout) {
-  box-shadow: 0 6px 14px rgba(196, 157, 28, 0.16);
+  border: 1px solid #d3b441;
+  box-shadow: 0 2px 6px rgba(23, 58, 53, 0.10);
 }
 
 .school-base-section,
@@ -1966,7 +1967,7 @@ input[type="file"] {
   border: 1px solid #cad8d4;
   border-radius: 12px;
   background: #ffffff;
-  box-shadow: 0 14px 34px rgba(23, 58, 53, 0.16);
+  box-shadow: 0 10px 28px rgba(23, 58, 53, 0.13);
 }
 
 .student-suggestion-menu[hidden] {
@@ -1978,19 +1979,28 @@ input[type="file"] {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 11px 12px;
-  border-radius: 8px;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid #e5ecea;
+  border-radius: 0;
   background: transparent;
   color: #173a35;
   text-align: left;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .student-suggestion-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: stretch;
+}
+
+.student-suggestion-menu > .student-suggestion-option:last-child,
+.student-suggestion-row:last-child .student-suggestion-option {
+  border-bottom: 0;
 }
 
 .student-suggestion-row .student-suggestion-option {
@@ -2005,6 +2015,9 @@ input[type="file"] {
   color: #a83f3f;
   font-size: 20px;
   line-height: 1;
+  border: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .suggestion-delete-button:hover,

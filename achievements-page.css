@@ -44,9 +44,10 @@ button {
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(23, 58, 53, .10);
 }
 
-button.secondary { background: #fff; border: 1px solid #bfd0cb; }
+button.secondary { background: #fff; border: 1px solid #bfd0cb; box-shadow: none; }
 
 .filters {
   display: grid;
