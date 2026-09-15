@@ -580,6 +580,21 @@ body {
 
 #settings-panel .tv-content-settings > button[hidden] { display: none !important; }
 
+#settings-panel > .settings-inline-visibility {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+  padding: 8px 14px !important;
+}
+
+#settings-panel > .settings-inline-visibility > strong {
+  flex: 0 0 auto;
+  color: #214b44;
+  font-size: 14px;
+}
+
 #settings-panel .tv-ranking-manager .tv-leaderboard-settings {
   display: grid;
   grid-template-columns: minmax(280px, 420px) auto;
@@ -1019,6 +1034,10 @@ body {
   #settings-panel .standalone-quarter-settings .quarter-date-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #settings-panel .tv-settings-actions { align-items: stretch; flex-direction: column; }
   #settings-panel .tv-settings-actions button { width: 100%; }
+}
+
+@media (max-width: 620px) {
+  #settings-panel > .settings-inline-visibility { align-items: flex-start; flex-direction: column; gap: 8px; }
 }
 
 @media (max-width: 620px) {

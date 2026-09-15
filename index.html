@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель управления - Ayna</title>
     <link rel="icon" href="ayna-favicon-v2.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="style.css?v=108">
+    <link rel="stylesheet" href="style.css?v=109">
   </head>
 
   <body>
@@ -127,52 +127,30 @@
       </div>
     </details>
 
-    <details class="card settings-manager achievement-reference-manager tv-publications-manager">
-      <summary class="achievement-reference-summary">
-        <span><strong>Показ на ТВ</strong></span>
-        <span class="reference-summary-action" aria-hidden="true">
-          <span class="reference-open-label">Настроить</span>
-          <span class="reference-close-label">Скрыть</span>
-        </span>
-      </summary>
-      <div class="achievement-reference-content compact-reference-content">
-        <div class="tv-content-settings">
-          <div class="tv-content-toggles">
-            <label class="tv-setting-toggle"><input type="checkbox" id="tv-announcements-enabled" checked><span>Объявления</span></label>
-            <label class="tv-setting-toggle"><input type="checkbox" id="tv-events-enabled" checked><span>События</span></label>
-          </div>
-          <button type="button" id="save-tv-content-settings" hidden>Сохранить</button>
+    <div class="card settings-manager tv-publications-manager settings-inline-visibility">
+      <strong>Показ на ТВ</strong>
+      <div class="tv-content-settings">
+        <div class="tv-content-toggles">
+          <label class="tv-setting-toggle"><input type="checkbox" id="tv-announcements-enabled" checked><span>Объявления</span></label>
+          <label class="tv-setting-toggle"><input type="checkbox" id="tv-events-enabled" checked><span>События</span></label>
         </div>
+        <button type="button" id="save-tv-content-settings" hidden>Сохранить</button>
       </div>
-    </details>
+    </div>
 
-    <details class="card settings-manager achievement-reference-manager tv-birthdays-manager">
-      <summary class="achievement-reference-summary">
-        <span><strong>Показ на ТВ</strong></span>
-        <span class="reference-summary-action" aria-hidden="true"><span class="reference-open-label">Настроить</span><span class="reference-close-label">Скрыть</span></span>
-      </summary>
-      <div class="achievement-reference-content compact-reference-content">
-        <div class="tv-content-settings">
-          <div class="tv-content-toggles tv-content-toggles-single">
-            <label class="tv-setting-toggle"><input type="checkbox" id="tv-birthdays-enabled" checked><span>Показывать</span></label>
-          </div>
-        </div>
+    <div class="card settings-manager tv-birthdays-manager settings-inline-visibility">
+      <strong>Показ на ТВ</strong>
+      <div class="tv-content-toggles tv-content-toggles-single">
+        <label class="tv-setting-toggle"><input type="checkbox" id="tv-birthdays-enabled" checked><span>Показывать</span></label>
       </div>
-    </details>
+    </div>
 
-    <details class="card settings-manager achievement-reference-manager tv-ranking-visibility-manager">
-      <summary class="achievement-reference-summary">
-        <span><strong>Показ на ТВ</strong></span>
-        <span class="reference-summary-action" aria-hidden="true"><span class="reference-open-label">Настроить</span><span class="reference-close-label">Скрыть</span></span>
-      </summary>
-      <div class="achievement-reference-content compact-reference-content">
-        <div class="tv-content-settings">
-          <div class="tv-content-toggles tv-content-toggles-single">
-            <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked><span>Показывать</span></label>
-          </div>
-        </div>
+    <div class="card settings-manager tv-ranking-visibility-manager settings-inline-visibility">
+      <strong>Показ на ТВ</strong>
+      <div class="tv-content-toggles tv-content-toggles-single">
+        <label class="tv-setting-toggle"><input type="checkbox" id="tv-leaderboard-enabled" checked><span>Показывать</span></label>
       </div>
-    </details>
+    </div>
 
     <details class="card settings-manager achievement-reference-manager achievement-fields-manager">
       <summary class="achievement-reference-summary">
