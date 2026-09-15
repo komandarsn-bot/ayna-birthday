@@ -595,6 +595,35 @@ body {
   font-size: 14px;
 }
 
+#settings-panel > .settings-inline-visibility.tv-publications-manager {
+  display: grid;
+  gap: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#settings-panel .publication-visibility-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+}
+
+#settings-panel .publication-visibility-row + .publication-visibility-row { border-top: 1px solid #e1e8e6; }
+#settings-panel .publication-visibility-row > strong { color: #214b44; font-size: 14px; }
+#settings-panel .publication-visibility-row .tv-setting-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 150px;
+  margin: 0;
+  padding: 5px 10px;
+  border: 1px solid #d6e2de;
+  border-radius: 9px;
+  background: #f7f9f8;
+}
+
 #settings-panel .tv-ranking-manager .tv-leaderboard-settings {
   display: grid;
   grid-template-columns: minmax(280px, 420px) auto;
@@ -636,7 +665,7 @@ body {
   box-sizing: border-box;
 }
 
-#settings-panel .tv-content-toggles .tv-setting-toggle {
+#settings-panel .settings-inline-visibility .tv-setting-toggle {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -653,7 +682,7 @@ body {
   white-space: nowrap;
 }
 
-#settings-panel .tv-content-toggles .tv-setting-toggle input {
+#settings-panel .settings-inline-visibility .tv-setting-toggle input {
   appearance: none;
   width: 30px;
   height: 18px;
@@ -666,7 +695,7 @@ body {
   transition: background-color .16s ease;
 }
 
-#settings-panel .tv-content-toggles .tv-setting-toggle input::before {
+#settings-panel .settings-inline-visibility .tv-setting-toggle input::before {
   content: "";
   display: block;
   width: 14px;
@@ -677,11 +706,11 @@ body {
   transition: transform .16s ease;
 }
 
-#settings-panel .tv-content-toggles .tv-setting-toggle input:checked { background: #28675d; }
-#settings-panel .tv-content-toggles .tv-setting-toggle input:checked::before { transform: translateX(12px); }
-#settings-panel .tv-content-toggles .tv-setting-toggle input:focus-visible { outline: 2px solid #4d8379; outline-offset: 2px; }
+#settings-panel .settings-inline-visibility .tv-setting-toggle input:checked { background: #28675d; }
+#settings-panel .settings-inline-visibility .tv-setting-toggle input:checked::before { transform: translateX(12px); }
+#settings-panel .settings-inline-visibility .tv-setting-toggle input:focus-visible { outline: 2px solid #4d8379; outline-offset: 2px; }
 
-#settings-panel .tv-content-toggles .tv-setting-toggle span {
+#settings-panel .settings-inline-visibility .tv-setting-toggle span {
   line-height: 1.2;
 }
 
@@ -1038,6 +1067,8 @@ body {
 
 @media (max-width: 620px) {
   #settings-panel > .settings-inline-visibility { align-items: flex-start; flex-direction: column; gap: 8px; }
+  #settings-panel > .settings-inline-visibility.tv-publications-manager { align-items: stretch; }
+  #settings-panel .publication-visibility-row { align-items: flex-start; flex-direction: column; gap: 6px; padding: 8px 0; }
 }
 
 @media (max-width: 620px) {
