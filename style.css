@@ -2242,8 +2242,8 @@ input[type="file"] {
   letter-spacing: 0.02em;
 }
 
-.achievement-sort-button,
-.achievement-sort-button:hover {
+#app-content .achievement-sort-button,
+#app-content .achievement-sort-button:hover {
   width: 100%;
   padding: 0;
   border: 0;
@@ -2252,10 +2252,12 @@ input[type="file"] {
   color: inherit;
   text-align: left;
   font: inherit;
+  box-shadow: none;
+  transform: none;
 }
 
-.achievement-sort-button:focus-visible {
-  outline: 2px solid #e4c455;
+#app-content .achievement-sort-button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, .75);
   outline-offset: 3px;
 }
 

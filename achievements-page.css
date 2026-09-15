@@ -79,8 +79,9 @@ th:nth-child(2), td:nth-child(2) { position: sticky; left: 140px; z-index: 3; wi
 th:nth-child(1), th:nth-child(2) { z-index: 5; background: #173f39; }
 tbody tr:nth-child(even) td:nth-child(1), tbody tr:nth-child(even) td:nth-child(2) { background: #f7f9f8; }
 
-.sort-button { width: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
-.sort-button:hover { background: transparent; }
+.sort-button { width: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; text-align: left; box-shadow: none; transform: none; }
+.sort-button:hover { background: transparent; box-shadow: none; transform: none; }
+.sort-button:focus-visible { outline: 2px solid rgba(255, 255, 255, .75); outline-offset: 2px; }
 td a { color: #176b5e; font-weight: 700; }
 
 .row-actions { min-width: 125px; }
