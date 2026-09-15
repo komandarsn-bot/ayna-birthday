@@ -1,11 +1,13 @@
 :root {
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
   color: #123d37;
   background: #f4f1e8;
 }
 
 * { box-sizing: border-box; }
 body { margin: 0; }
+button, input, select, textarea { font-family: inherit; }
 
 .page-header-actions { justify-self: end; display: flex; align-items: center; gap: 10px; }
 .admin-language-switcher { display: inline-flex; align-items: center; gap: 8px; color: #60756f; font-size: 13px; font-weight: 600; white-space: nowrap; }
@@ -35,6 +37,8 @@ button {
   border-radius: 9px;
   background: #e4c455;
   color: #173a35;
+  font-family: inherit;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -57,7 +61,7 @@ button.secondary { background: #fff; border: 1px solid #bfd0cb; }
 .all-filters summary { cursor: pointer; color: #174a42; font-weight: 700; }
 .column-filters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
 
-.filters label { display: grid; min-width: 0; gap: 5px; font-size: 12px; font-weight: 700; }
+.filters label { display: grid; min-width: 0; gap: 5px; font-size: 13px; font-weight: 700; }
 .filters input, .filters select { width: 100%; min-width: 0; max-width: 100%; padding: 8px 9px; border: 1px solid #bfd0cb; border-radius: 7px; font: inherit; }
 
 .table-wrap { overflow: auto; max-height: calc(100vh - 230px); border: 1px solid #d9e2df; border-radius: 12px; background: #fff; }
