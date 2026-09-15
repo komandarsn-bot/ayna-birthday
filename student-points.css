@@ -38,7 +38,7 @@ h1 { margin: 0; font-size: clamp(30px, 3vw, 38px); line-height: 1.15; font-weigh
 button {
   min-height: 40px;
   padding: 9px 16px;
-  border: 1px solid #d4b43d;
+  border: 0;
   border-radius: 7px;
   background: #e7c84f;
   color: #173d37;
