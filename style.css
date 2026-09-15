@@ -512,6 +512,16 @@ body {
 #settings-panel .tv-logo-copy .form-message { min-height: 0; margin: 0; font-size: 12px; }
 #settings-panel .tv-logo-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 #settings-panel .tv-logo-actions input[hidden] { display: none !important; }
+#settings-panel .achievement-fields-hint { margin: 0 0 10px; color: #71827e; font-size: 13px; }
+#settings-panel .achievement-fields-settings { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+#settings-panel .achievement-fields-settings label { display: flex; align-items: center; gap: 8px; min-height: 42px; margin: 0; padding: 8px 10px; border: 1px solid #d4e0dd; border-radius: 9px; background: #fff; color: #244943; font-size: 13px; font-weight: 600; }
+#settings-panel .achievement-fields-settings label.is-required { background: #edf3f1; }
+#settings-panel .achievement-fields-settings input { flex: 0 0 auto; width: 16px; height: 16px; margin: 0; }
+#settings-panel .achievement-fields-settings small { margin-left: auto; color: #78908a; font-size: 11px; font-weight: 500; }
+#settings-panel .achievement-fields-footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding-top: 10px; }
+#settings-panel .achievement-fields-footer .form-message { flex: 1; min-height: 0; margin: 0; text-align: right; }
+#app-content #settings-panel .achievement-fields-footer button { width: auto; min-width: 116px; min-height: 40px; margin: 0; padding: 0 18px; }
+.achievement-form [data-achievement-field][hidden], .achievement-form [data-achievement-divider][hidden] { display: none !important; }
 #app-content #settings-panel .tv-logo-actions button { width: auto; min-width: 0; min-height: 40px; margin: 0; padding: 0 16px; white-space: nowrap; }
 #app-content #settings-panel .tv-logo-actions button[hidden] { display: none !important; }
 #settings-panel .schedule-toolbar label { display: grid; gap: 5px; font-size: 13px; }
@@ -527,11 +537,13 @@ body {
 #settings-panel .shift-schedule-card textarea[readonly] { background: #f5f8f7; color: #45615b; cursor: default; }
 #settings-panel .schedule-toolbar select:disabled { opacity: 1; background: #f5f8f7; color: #45615b; cursor: default; }
 @media (max-width: 900px) {
+  #settings-panel .achievement-fields-settings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #settings-panel .tv-logo-settings { grid-template-columns: 100px minmax(0, 1fr); }
   #settings-panel .tv-logo-preview { width: 100px; }
   #settings-panel .tv-logo-actions { grid-column: 1 / -1; justify-content: flex-start; }
   #settings-panel .shift-schedule-editors, #settings-panel .schedule-toolbar { grid-template-columns: 1fr; }
 }
+@media (max-width: 560px) { #settings-panel .achievement-fields-settings { grid-template-columns: 1fr; } }
 
 #settings-panel .tv-content-toggles {
   display: grid;

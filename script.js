@@ -85,6 +85,11 @@ const scheduleWeekday = document.querySelector("#schedule-weekday");
 const shiftScheduleEditors = document.querySelector("#shift-schedule-editors");
 const saveSchoolScheduleButton = document.querySelector("#save-school-schedule");
 const editSchoolScheduleButton = document.querySelector("#edit-school-schedule");
+const achievementFieldsSettings = document.querySelector("#achievement-fields-settings");
+const saveAchievementFieldsButton = document.querySelector("#save-achievement-fields");
+const achievementFieldsMessage = document.querySelector("#achievement-fields-message");
+const achievementFieldNames = ["subject", "order", "cost", "level", "stage", "type", "academic", "result", "points", "format", "supervisor", "organizers", "country", "city", "dates", "link"];
+let achievementFieldSettings = Object.fromEntries(achievementFieldNames.map(name => [name, true]));
 let scheduleDraft = {};
 let renderedScheduleDay = "1";
 let schoolScheduleEditing = false;
@@ -110,6 +115,30 @@ function renderTvLogoSetting() {
   const logoPath = scheduleDraft && typeof scheduleDraft._tv_logo_path === "string" ? scheduleDraft._tv_logo_path : "";
   tvLogoPreviewImage.src = tvLogoPublicUrl(logoPath);
   resetTvLogoButton.hidden = !logoPath;
+}
+
+function isAchievementFieldEnabled(name) {
+  return achievementFieldSettings[name] !== false;
+}
+
+function applyAchievementFieldSettings() {
+  achievementFieldNames.forEach(function (name) {
+    const enabled = isAchievementFieldEnabled(name);
+    const checkbox = achievementFieldsSettings.querySelector('[data-field="' + name + '"]');
+    const formField = achievementForm.querySelector('[data-achievement-field="' + name + '"]');
+    if (checkbox) checkbox.checked = enabled;
+    if (formField) formField.hidden = !enabled;
+  });
+  const dividerGroups = {
+    competition: ["level", "stage", "type", "academic", "result", "points", "format"],
+    people: ["supervisor", "organizers"],
+    location: ["country", "city", "dates"],
+    link: ["link"]
+  };
+  Object.entries(dividerGroups).forEach(function ([name, fields]) {
+    const divider = achievementForm.querySelector('[data-achievement-divider="' + name + '"]');
+    if (divider) divider.hidden = !fields.some(isAchievementFieldEnabled);
+  });
 }
 const saveScoringSettingsButton = document.querySelector("#save-scoring-settings");
 const scoringInputs = Array.from(document.querySelectorAll(".scoring-table input[data-stage]"));
@@ -823,10 +852,51 @@ async function loadSchoolSchedule() {
       if (seedError) console.warn("Не удалось сохранить расписание по умолчанию:", seedError.message);
     }
   }
+  const savedAchievementFields = scheduleDraft && typeof scheduleDraft._achievement_fields === "object" ? scheduleDraft._achievement_fields : {};
+  achievementFieldSettings = Object.fromEntries(achievementFieldNames.map(name => [name, savedAchievementFields[name] !== false]));
+  applyAchievementFieldSettings();
   renderScheduleEditors();
   renderTvLogoSetting();
   setSchoolScheduleEditing(false);
 }
+
+achievementFieldsSettings.addEventListener("change", function (event) {
+  const field = event.target.dataset.field;
+  if (!field) return;
+  achievementFieldSettings[field] = event.target.checked;
+  applyAchievementFieldSettings();
+  achievementFieldsMessage.textContent = "Сохраните изменения";
+});
+
+saveAchievementFieldsButton.addEventListener("click", async function () {
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) return;
+  const originalText = saveAchievementFieldsButton.textContent;
+  saveAchievementFieldsButton.disabled = true;
+  saveAchievementFieldsButton.textContent = "Сохраняем...";
+  try {
+    const { data: stored, error: loadError } = await supabaseClient.from("school_schedule_settings").select("shift_count,schedules").maybeSingle();
+    if (loadError) throw loadError;
+    const nextSchedules = stored?.schedules && typeof stored.schedules === "object" ? { ...stored.schedules } : { ...scheduleDraft };
+    nextSchedules._achievement_fields = { ...achievementFieldSettings };
+    const { error: saveError } = await supabaseClient.from("school_schedule_settings").upsert({
+      user_id: sessionData.session.user.id,
+      shift_count: Number(stored?.shift_count || schoolShiftCount.value || 2),
+      schedules: nextSchedules,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
+    if (saveError) throw saveError;
+    scheduleDraft = nextSchedules;
+    achievementFieldsMessage.textContent = "Настройки полей сохранены";
+    saveAchievementFieldsButton.textContent = "Сохранено";
+  } catch (error) {
+    achievementFieldsMessage.textContent = "Ошибка: " + error.message;
+    saveAchievementFieldsButton.textContent = originalText;
+  } finally {
+    saveAchievementFieldsButton.disabled = false;
+    window.setTimeout(function () { saveAchievementFieldsButton.textContent = originalText; }, 1600);
+  }
+});
 
 selectTvLogoButton.addEventListener("click", function () {
   tvLogoFile.click();
@@ -3356,14 +3426,14 @@ achievementForm.addEventListener("submit", async function (event) {
     return;
   }
   chooseAchievementOrder();
-  if (achievementOrder.value.trim() && !selectedAchievementOrder) {
+  if (isAchievementFieldEnabled("order") && achievementOrder.value.trim() && !selectedAchievementOrder) {
     achievementMessage.textContent = "Выберите приказ из списка или добавьте новый";
     achievementOrder.focus();
     showAchievementOrderSuggestions();
     return;
   }
   chooseAchievementSubject();
-  if (achievementSubject.value.trim() && !selectedAchievementSubject) {
+  if (isAchievementFieldEnabled("subject") && achievementSubject.value.trim() && !selectedAchievementSubject) {
     achievementMessage.textContent = "Выберите предмет из справочника или добавьте новый";
     achievementSubject.focus();
     showSubjectSuggestions();
@@ -3371,53 +3441,54 @@ achievementForm.addEventListener("submit", async function (event) {
   }
   const levelRank = achievementScopeOrder.indexOf(achievementLevel.value);
   const stageRank = achievementScopeOrder.indexOf(achievementStage.value);
-  if (stageRank > levelRank) {
+  if (isAchievementFieldEnabled("level") && isAchievementFieldEnabled("stage") && stageRank > levelRank) {
     achievementMessage.textContent = "Этап не может быть выше уровня мероприятия";
     achievementStage.focus();
     return;
   }
   chooseAchievementType();
-  if (!selectedAchievementType) {
+  if (isAchievementFieldEnabled("type") && achievementType.value.trim() && !selectedAchievementType) {
     achievementMessage.textContent = "Выберите вид достижения из списка или добавьте новый";
     achievementType.focus();
     showAchievementTypeSuggestions();
     return;
   }
   chooseAchievementResult();
-  if (achievementResult.value.trim() && !selectedAchievementResult) {
+  if (isAchievementFieldEnabled("result") && achievementResult.value.trim() && !selectedAchievementResult) {
     achievementMessage.textContent = "Выберите результат из списка или добавьте новый";
     achievementResult.focus();
     showAchievementResultSuggestions();
     return;
   }
-  if (achievementSupervisor.value.trim() && !selectedAchievementSupervisor) {
+  if (isAchievementFieldEnabled("supervisor") && achievementSupervisor.value.trim() && !selectedAchievementSupervisor) {
     achievementMessage.textContent = "Выберите руководителя из списка учителей";
     achievementSupervisor.focus();
     showSupervisorSuggestions();
     return;
   }
   chooseLocationReference(achievementOrganizerReference);
-  if (achievementOrganizers.value.trim() && !achievementOrganizerReference.selected) {
+  if (isAchievementFieldEnabled("organizers") && achievementOrganizers.value.trim() && !achievementOrganizerReference.selected) {
     achievementMessage.textContent = "Выберите организатора из списка или добавьте нового";
     achievementOrganizers.focus();
     showLocationSuggestions(achievementOrganizerReference);
     return;
   }
   chooseLocationReference(achievementCountryReference);
-  if (achievementCountry.value.trim() && !achievementCountryReference.selected) {
+  if (isAchievementFieldEnabled("country") && achievementCountry.value.trim() && !achievementCountryReference.selected) {
     achievementMessage.textContent = "Выберите страну из списка или добавьте новую";
     achievementCountry.focus();
     showLocationSuggestions(achievementCountryReference);
     return;
   }
   chooseLocationReference(achievementCityReference);
-  if (achievementCity.value.trim() && !achievementCityReference.selected) {
+  if (isAchievementFieldEnabled("city") && achievementCity.value.trim() && !achievementCityReference.selected) {
     achievementMessage.textContent = "Выберите город из списка или добавьте новый";
     achievementCity.focus();
     showLocationSuggestions(achievementCityReference);
     return;
   }
   if (
+    isAchievementFieldEnabled("dates") &&
     achievementStartDate.value &&
     achievementEndDate.value &&
     achievementEndDate.value < achievementStartDate.value
@@ -3438,35 +3509,35 @@ achievementForm.addEventListener("submit", async function (event) {
     return;
   }
 
-  const costValue = document.querySelector("#achievement-cost").value;
+  const costValue = isAchievementFieldEnabled("cost") ? document.querySelector("#achievement-cost").value : "";
   const achievement = {
     user_id: sessionData.session.user.id,
     student_id: selectedAchievementStudent.id,
     event_id: selectedAchievementEvent.id,
-    subject_id: selectedAchievementSubject ? selectedAchievementSubject.id : null,
+    subject_id: isAchievementFieldEnabled("subject") && selectedAchievementSubject ? selectedAchievementSubject.id : null,
     last_name: selectedAchievementStudent.last_name,
     first_name: selectedAchievementStudent.first_name,
     class_name: selectedAchievementStudent.class_name,
     event_name: selectedAchievementEvent.name,
-    order_reference: selectedAchievementOrder ? selectedAchievementOrder.name : null,
+    order_reference: isAchievementFieldEnabled("order") && selectedAchievementOrder ? selectedAchievementOrder.name : null,
     cost: costValue === "" ? null : Number(costValue),
-    subject: selectedAchievementSubject ? selectedAchievementSubject.name : null,
-    achievement_level: achievementValue("#achievement-level"),
-    event_stage: achievementValue("#achievement-stage"),
-    project_name: selectedAchievementType.name,
-    academic_type: achievementValue("#achievement-academic-type"),
-    event_format: achievementValue("#achievement-format"),
-    result: selectedAchievementResult ? selectedAchievementResult.name : null,
-    manual_points: achievementPointsManuallyEdited ? Number(achievementPoints.value) : null,
-    supervisor_name: selectedAchievementSupervisor
+    subject: isAchievementFieldEnabled("subject") && selectedAchievementSubject ? selectedAchievementSubject.name : null,
+    achievement_level: isAchievementFieldEnabled("level") ? achievementValue("#achievement-level") : null,
+    event_stage: isAchievementFieldEnabled("stage") ? achievementValue("#achievement-stage") : null,
+    project_name: isAchievementFieldEnabled("type") && selectedAchievementType ? selectedAchievementType.name : null,
+    academic_type: isAchievementFieldEnabled("academic") ? achievementValue("#achievement-academic-type") : null,
+    event_format: isAchievementFieldEnabled("format") ? achievementValue("#achievement-format") : null,
+    result: isAchievementFieldEnabled("result") && selectedAchievementResult ? selectedAchievementResult.name : null,
+    manual_points: isAchievementFieldEnabled("points") && achievementPointsManuallyEdited ? Number(achievementPoints.value) : null,
+    supervisor_name: isAchievementFieldEnabled("supervisor") && selectedAchievementSupervisor
       ? teacherFullName(selectedAchievementSupervisor)
       : null,
-    organizers: achievementOrganizerReference.selected ? achievementOrganizerReference.selected.name : null,
-    event_date: achievementValue("#achievement-date"),
-    event_end_date: achievementValue("#achievement-end-date"),
-    link_url: achievementValue("#achievement-link"),
-    country: achievementCountryReference.selected ? achievementCountryReference.selected.name : null,
-    city: achievementCityReference.selected ? achievementCityReference.selected.name : null
+    organizers: isAchievementFieldEnabled("organizers") && achievementOrganizerReference.selected ? achievementOrganizerReference.selected.name : null,
+    event_date: isAchievementFieldEnabled("dates") ? achievementValue("#achievement-date") : null,
+    event_end_date: isAchievementFieldEnabled("dates") ? achievementValue("#achievement-end-date") : null,
+    link_url: isAchievementFieldEnabled("link") ? achievementValue("#achievement-link") : null,
+    country: isAchievementFieldEnabled("country") && achievementCountryReference.selected ? achievementCountryReference.selected.name : null,
+    city: isAchievementFieldEnabled("city") && achievementCityReference.selected ? achievementCityReference.selected.name : null
   };
 
   const wasEditing = Boolean(editingAchievementId);
