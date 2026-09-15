@@ -305,8 +305,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 54px;
-  padding: 10px 14px;
+  min-height: 48px;
+  padding: 8px 14px;
   background: #f5f8f7;
   color: #123f38;
   cursor: pointer;
@@ -314,7 +314,13 @@ body {
 }
 
 #settings-panel > .settings-category > .settings-category-summary::-webkit-details-marker { display: none; }
-#settings-panel > .settings-category > .settings-category-summary strong { font-size: 17px; letter-spacing: -.015em; }
+#settings-panel > .settings-category > .settings-category-summary strong {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: clamp(12px, 1.4vw, 15px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
 #settings-panel .settings-category-action { display: flex; align-items: center; gap: 8px; color: #35675e; font-size: 13px; font-weight: 700; }
 #settings-panel .settings-category-action::after { content: ""; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
 #settings-panel .settings-category-close-label { display: none; }
