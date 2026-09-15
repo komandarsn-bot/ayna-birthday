@@ -209,6 +209,27 @@ function startInlineEdit(row, item) {
   studentInput.focus();
 }
 
+async function deleteAchievement(item, button) {
+  const studentName = [item.last_name, item.first_name].filter(Boolean).join(" ");
+  const eventName = item.event_name || "достижение";
+  if (!confirm(`Удалить запись «${eventName}» ученика ${studentName}?`)) return;
+
+  button.disabled = true;
+  button.textContent = "Удаляем...";
+  const { error } = await client.from("achievements").delete().eq("id", item.id);
+  if (error) {
+    alert("Ошибка удаления: " + error.message);
+    button.disabled = false;
+    button.textContent = "Удалить";
+    return;
+  }
+
+  records = records.filter(record => record.id !== item.id);
+  try { localStorage.setItem("ayna-achievements-updated", String(Date.now())); } catch (_error) {}
+  buildColumnFilters();
+  render();
+}
+
 function render() {
   const visible = visibleRecords();
   recordsCount.textContent = "Показано записей: " + visible.length + " из " + records.length;
@@ -242,7 +263,11 @@ function render() {
     editButton.className = "secondary";
     editButton.textContent = "Редактировать";
     editButton.addEventListener("click", () => startInlineEdit(row, item));
-    actions.append(editButton);
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "danger";
+    deleteButton.textContent = "Удалить";
+    deleteButton.addEventListener("click", () => deleteAchievement(item, deleteButton));
+    actions.append(editButton, deleteButton);
     row.append(actions);
     tbody.append(row);
   });

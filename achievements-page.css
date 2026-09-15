@@ -85,6 +85,9 @@ td a { color: #176b5e; font-weight: 700; }
 .row-actions { min-width: 125px; }
 .row-actions button { width: 100%; padding: 7px 9px; font-size: 11px; }
 .row-actions button + button { margin-top: 6px; }
+.row-actions button.danger { border: 1px solid #d8b8b5; background: #fff4f2; color: #9a342d; }
+.row-actions button.danger:hover { background: #fbe5e2; }
+.row-actions button:disabled { cursor: wait; opacity: .65; }
 .inline-edit-control { width: 100%; min-width: 82px; padding: 6px; border: 1px solid #8fa9a2; border-radius: 6px; font: inherit; background: #fff; }
 .student-edit-control { min-width: 150px; }
 .inline-edit-control[readonly] { background: #eef3f1; color: #52645f; }
