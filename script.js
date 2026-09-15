@@ -791,13 +791,24 @@ function organizeSettingsSections() {
     ["Дни рождения", [".tv-birthdays-manager"]]
   ];
   groups.forEach(function ([title, selectors]) {
-    const heading = document.createElement("h2");
-    heading.className = "settings-category-heading";
-    heading.textContent = title;
-    panel.append(heading);
+    const category = document.createElement("details");
+    category.className = "settings-category";
+    const summary = document.createElement("summary");
+    summary.className = "settings-category-summary";
+    summary.innerHTML = `<span><strong>${title}</strong></span><span class="settings-category-action" aria-hidden="true"><span class="settings-category-open-label">Настроить</span><span class="settings-category-close-label">Скрыть</span></span>`;
+    const body = document.createElement("div");
+    body.className = "settings-category-body";
+    category.append(summary, body);
+    panel.append(category);
     selectors.forEach(function (selector) {
       const section = panel.querySelector(selector);
-      if (section) panel.append(section);
+      if (section) body.append(section);
+    });
+    category.addEventListener("toggle", function () {
+      if (!category.open) return;
+      panel.querySelectorAll(".settings-category[open]").forEach(function (otherCategory) {
+        if (otherCategory !== category) otherCategory.open = false;
+      });
     });
   });
 }

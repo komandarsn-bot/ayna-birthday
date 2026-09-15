@@ -293,17 +293,47 @@ body {
 
 #app-content #settings-panel[hidden] { display: none; }
 
-#settings-panel > .settings-category-heading {
-  margin: 12px 0 0;
-  padding: 10px 14px 8px;
-  border-bottom: 2px solid #315f57;
-  color: #123f38;
-  font-size: 18px;
-  line-height: 1.2;
-  letter-spacing: -.015em;
+#settings-panel > .settings-category {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #d4e0dd;
+  border-radius: 11px;
+  background: #fff;
 }
 
-#settings-panel > .settings-category-heading:first-of-type { margin-top: 0; }
+#settings-panel > .settings-category > .settings-category-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 54px;
+  padding: 10px 14px;
+  background: #f5f8f7;
+  color: #123f38;
+  cursor: pointer;
+  list-style: none;
+}
+
+#settings-panel > .settings-category > .settings-category-summary::-webkit-details-marker { display: none; }
+#settings-panel > .settings-category > .settings-category-summary strong { font-size: 17px; letter-spacing: -.015em; }
+#settings-panel .settings-category-action { display: flex; align-items: center; gap: 8px; color: #35675e; font-size: 13px; font-weight: 700; }
+#settings-panel .settings-category-action::after { content: ""; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+#settings-panel .settings-category-close-label { display: none; }
+#settings-panel .settings-category[open] > .settings-category-summary { background: #edf4f1; }
+#settings-panel .settings-category[open] > .settings-category-summary .settings-category-open-label { display: none; }
+#settings-panel .settings-category[open] > .settings-category-summary .settings-category-close-label { display: inline; }
+#settings-panel .settings-category[open] > .settings-category-summary .settings-category-action::after { transform: rotate(225deg) translate(-2px, -2px); }
+#settings-panel .settings-category-body { display: flex; flex-direction: column; gap: 6px; padding: 6px 8px 8px; }
+#settings-panel .settings-category-body > .settings-manager { padding: 0; overflow: hidden; }
+#app-content #settings-panel .settings-category-body > .card {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-top: 1px solid #e1e8e6;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
 
 #app-content #settings-panel .settings-panel-heading {
   padding: 10px 12px 12px;
@@ -580,7 +610,7 @@ body {
 
 #settings-panel .tv-content-settings > button[hidden] { display: none !important; }
 
-#settings-panel > .settings-inline-visibility {
+#settings-panel .settings-category-body > .settings-inline-visibility {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -589,13 +619,13 @@ body {
   padding: 8px 14px !important;
 }
 
-#settings-panel > .settings-inline-visibility > strong {
+#settings-panel .settings-category-body > .settings-inline-visibility > strong {
   flex: 0 0 auto;
   color: #214b44;
   font-size: 14px;
 }
 
-#settings-panel > .settings-inline-visibility.tv-publications-manager {
+#settings-panel .settings-category-body > .settings-inline-visibility.tv-publications-manager {
   display: grid;
   width: 100%;
   align-self: stretch;
@@ -628,7 +658,7 @@ body {
   background: #f7f9f8;
 }
 
-#settings-panel > .settings-inline-visibility > button[hidden] { display: none !important; }
+#settings-panel .settings-category-body > .settings-inline-visibility > button[hidden] { display: none !important; }
 
 #settings-panel .tv-ranking-manager .tv-leaderboard-settings {
   display: grid;
@@ -1072,8 +1102,8 @@ body {
 }
 
 @media (max-width: 620px) {
-  #settings-panel > .settings-inline-visibility { align-items: flex-start; flex-direction: column; gap: 8px; }
-  #settings-panel > .settings-inline-visibility.tv-publications-manager { align-items: stretch; }
+  #settings-panel .settings-category-body > .settings-inline-visibility { align-items: flex-start; flex-direction: column; gap: 8px; }
+  #settings-panel .settings-category-body > .settings-inline-visibility.tv-publications-manager { align-items: stretch; }
   #settings-panel .publication-visibility-row { align-items: center; flex-direction: row; gap: 10px; padding: 8px 0; }
   #settings-panel .publication-visibility-row .tv-setting-toggle { min-width: 132px; }
 }
