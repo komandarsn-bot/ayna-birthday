@@ -301,6 +301,10 @@ body {
   background: #fff;
 }
 
+#settings-panel > .settings-category + .settings-category {
+  margin-top: 8px;
+}
+
 #settings-panel > .settings-category > .settings-category-summary {
   display: flex;
   align-items: center;
@@ -324,21 +328,43 @@ body {
 #settings-panel .settings-category-action { display: flex; align-items: center; gap: 8px; color: #35675e; font-size: 13px; font-weight: 700; }
 #settings-panel .settings-category-action::after { content: ""; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
 #settings-panel .settings-category-close-label { display: none; }
-#settings-panel .settings-category[open] > .settings-category-summary { background: #edf4f1; }
+#settings-panel .settings-category[open] {
+  border-color: #b9cec8;
+}
+#settings-panel .settings-category[open] > .settings-category-summary { background: #eaf2ef; }
 #settings-panel .settings-category[open] > .settings-category-summary .settings-category-open-label { display: none; }
 #settings-panel .settings-category[open] > .settings-category-summary .settings-category-close-label { display: inline; }
 #settings-panel .settings-category[open] > .settings-category-summary .settings-category-action::after { transform: rotate(225deg) translate(-2px, -2px); }
-#settings-panel .settings-category-body { display: flex; flex-direction: column; gap: 6px; padding: 6px 8px 8px; }
+#settings-panel .settings-category-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 8px;
+  border-top: 1px solid #d9e4e1;
+  background: #fff;
+}
+#settings-panel .settings-category-body > * {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
 #settings-panel .settings-category-body > .settings-manager { padding: 0; overflow: hidden; }
 #app-content #settings-panel .settings-category-body > .card {
   margin: 0;
   padding: 0;
   overflow: visible;
-  border: 0;
-  border-top: 1px solid #e1e8e6;
-  border-radius: 0;
-  background: transparent;
+  border: 1px solid #e0e8e5;
+  border-radius: 9px;
+  background: #f8faf9;
   box-shadow: none;
+}
+
+#settings-panel > .settings-category > .settings-category-summary:focus {
+  outline: none;
+}
+
+#settings-panel > .settings-category > .settings-category-summary:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(40, 103, 93, 0.42);
 }
 
 #app-content #settings-panel .settings-panel-heading {
@@ -354,7 +380,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 6px;
+  margin: 0;
   padding: 10px 12px;
   border: 1px solid #d5e1de;
   border-radius: 11px;
@@ -408,8 +434,8 @@ body {
 #app-content #settings-panel .achievement-reference-summary {
   min-height: 44px;
   padding: 9px 12px;
-  border-radius: 9px;
-  background: #f7faf9;
+  border-radius: 8px;
+  background: transparent;
 }
 
 #app-content #settings-panel .school-base-summary > span:first-child {
@@ -420,7 +446,7 @@ body {
 
 #app-content #settings-panel .school-base-summary:hover,
 #app-content #settings-panel .achievement-reference-summary:hover {
-  background: #f3f7f5;
+  background: #f1f5f3;
 }
 
 #app-content #settings-panel .school-base-summary-action,
@@ -433,10 +459,11 @@ body {
 
 #app-content #settings-panel .school-base-content,
 #app-content #settings-panel .achievement-reference-content {
-  margin: 0 6px 8px;
-  padding: 14px;
-  border-radius: 10px;
-  background: #f7faf9;
+  margin: 0 8px 8px;
+  padding: 12px;
+  border-top: 1px solid #e1e8e6;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
 }
 
 #app-content #settings-panel .tv-content-manager .achievement-reference-content,
@@ -1108,7 +1135,12 @@ body {
 }
 
 @media (max-width: 620px) {
-  #settings-panel .settings-category-body > .settings-inline-visibility { align-items: flex-start; flex-direction: column; gap: 8px; }
+  #app-content #settings-panel { padding: 7px; }
+  #settings-panel > .settings-category + .settings-category { margin-top: 7px; }
+  #settings-panel > .settings-category > .settings-category-summary { min-height: 46px; padding: 8px 12px; }
+  #settings-panel .settings-category-body { padding: 7px; }
+  #settings-panel .settings-category-body > .settings-inline-visibility { align-items: center; flex-direction: row; gap: 10px; }
+  #settings-panel .settings-category-body > .settings-inline-visibility .tv-setting-toggle { margin-left: auto; }
   #settings-panel .settings-category-body > .settings-inline-visibility.tv-publications-manager { align-items: stretch; }
   #settings-panel .publication-visibility-row { align-items: center; flex-direction: row; gap: 10px; padding: 8px 0; }
   #settings-panel .publication-visibility-row .tv-setting-toggle { min-width: 132px; }
