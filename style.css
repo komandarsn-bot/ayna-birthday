@@ -227,6 +227,27 @@ body {
   background: transparent;
 }
 
+#settings-panel .tv-ranking-manager .tv-leaderboard-settings {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+.leaderboard-scope-panel,
+.class-shift-settings { grid-column: 1 / -1; display: grid; gap: 10px; }
+.leaderboard-scope-panel { padding: 14px; border: 1px solid #d4e0dd; border-radius: 12px; background: #fff; }
+.leaderboard-scope-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.leaderboard-scope-options label { display: flex; grid-template-columns: none; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; border: 1px solid #d4e0dd; border-radius: 10px; background: #f8fbfa; font-weight: 600; }
+.leaderboard-scope-options input { width: 18px; height: 18px; }
+.class-shift-heading { display: grid; gap: 3px; }
+.class-shift-heading small { color: #657873; font-weight: 400; }
+.class-shift-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.class-shift-row { display: grid !important; grid-template-columns: minmax(70px, 1fr) minmax(120px, 1fr); align-items: center; gap: 8px !important; padding: 8px 10px; border: 1px solid #d4e0dd; border-radius: 10px; background: #fff; }
+.class-shift-row select { min-height: 38px !important; }
+.tv-ranking-manager .tv-settings-actions { grid-column: 1 / -1; justify-content: flex-end; }
+@media (max-width: 800px) {
+  #settings-panel .tv-ranking-manager .tv-leaderboard-settings,
+  .class-shift-list { grid-template-columns: 1fr; }
+}
+
 #settings-panel .tv-leaderboard-settings strong { font-size: 15px; }
 #settings-panel .tv-leaderboard-settings small { font-size: 12px; }
 #settings-panel .tv-leaderboard-settings select { min-height: 40px; padding: 8px 10px; }
@@ -731,8 +752,8 @@ body {
 
 #settings-panel .tv-ranking-manager .tv-leaderboard-settings {
   display: grid;
-  grid-template-columns: minmax(280px, 420px) auto;
-  align-items: end;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   justify-content: start;
   gap: 12px;
 }

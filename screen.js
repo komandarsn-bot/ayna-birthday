@@ -324,12 +324,12 @@ function renderLeaderboard(slide) {
   heading.className = "leaderboard-heading";
   const headingText = document.createElement("div");
   const title = document.createElement("h1");
-  title.textContent = `Топ-10 · ${slide.shift_number} смена`;
+  title.textContent = "Топ-10 учеников";
   const period = document.createElement("p");
   period.textContent = slide.period_label;
   headingText.append(title, period);
   const classes = document.createElement("span");
-  classes.textContent = slide.shift_number === 1 ? "8–11 классы" : "5–7 классы";
+  classes.textContent = slide.group_label;
   heading.append(headingText, classes);
 
   const table = document.createElement("table");
@@ -495,18 +495,13 @@ function startSequence() {
 
 function updateLeaderboard(data) {
   const hadLeaderboardSlides = leaderboardSlides.length > 0;
-  const normalized = [1, 2].map(function (shiftNumber) {
-    const rows = data.filter(function (item) {
-      const gradeMatch = String(item.class_name || "").match(/\d+/);
-      const grade = gradeMatch ? Number(gradeMatch[0]) : null;
-      const matchesClassShift = shiftNumber === 1
-        ? grade >= 8 && grade <= 11
-        : grade >= 5 && grade <= 7;
-      return matchesClassShift;
-    });
+  const groupKeys = Array.from(new Set(data.map(item => String(item.group_key || item.shift_number || "all"))));
+  const normalized = groupKeys.map(function (groupKey) {
+    const rows = data.filter(item => String(item.group_key || item.shift_number || "all") === groupKey);
     if (!rows.length) return null;
     return {
-      shift_number: shiftNumber,
+      group_key: groupKey,
+      group_label: rows[0].group_label || (rows[0].shift_number ? rows[0].shift_number + " смена" : "Общий рейтинг"),
       period_label: rows[0].period_label || "",
       rows: rows.map(item => ({
         place_number: Number(item.place_number),

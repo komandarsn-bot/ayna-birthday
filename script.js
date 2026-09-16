@@ -77,6 +77,10 @@ const tvAnnouncementsEnabled = document.querySelector("#tv-announcements-enabled
 const tvEventsEnabled = document.querySelector("#tv-events-enabled");
 const tvLeaderboardEnabled = document.querySelector("#tv-leaderboard-enabled");
 const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
+const tvLeaderboardGroupMode = document.querySelector("#tv-leaderboard-group-mode");
+const leaderboardScopeTitle = document.querySelector("#leaderboard-scope-title");
+const leaderboardScopeOptions = document.querySelector("#leaderboard-scope-options");
+const classShiftList = document.querySelector("#class-shift-list");
 const saveTvContentSettingsButton = document.querySelector("#save-tv-content-settings");
 const saveTvLeaderboardSettingsButton = document.querySelector("#save-tv-leaderboard-settings");
 const saveQuarterSettingsButton = document.querySelector("#save-quarter-settings");
@@ -93,6 +97,9 @@ let achievementFieldSettings = Object.fromEntries(achievementFieldNames.map(name
 let scheduleDraft = {};
 let renderedScheduleDay = "1";
 let schoolScheduleEditing = false;
+let leaderboardClasses = [];
+let leaderboardClassShifts = {};
+let leaderboardSelectedGroups = [];
 
 function defaultSchoolSchedule() {
   const monday = {
@@ -699,10 +706,11 @@ function sortPeopleByUpcomingBirthday(people, today = new Date()) {
 }
 
 async function loadTvLeaderboardSettings() {
-  const { data, error } = await supabaseClient
-    .from("screen_leaderboard_settings")
-    .select("is_enabled,show_birthdays,show_announcements,show_events,period_type,quarter_1_start,quarter_1_end,quarter_2_start,quarter_2_end,quarter_3_start,quarter_3_end,quarter_4_start,quarter_4_end")
-    .maybeSingle();
+  const [settingsResult, classesResult] = await Promise.all([
+    supabaseClient.from("screen_leaderboard_settings").select("*").maybeSingle(),
+    supabaseClient.from("students").select("class_name").order("class_name")
+  ]);
+  const { data, error } = settingsResult;
   if (error) {
     console.warn("Не удалось загрузить настройки рейтинга:", error.message);
     return;
@@ -713,13 +721,76 @@ async function loadTvLeaderboardSettings() {
     tvAnnouncementsEnabled.checked = data.show_announcements !== false;
     tvEventsEnabled.checked = data.show_events !== false;
     tvLeaderboardPeriod.value = data.period_type;
+    tvLeaderboardGroupMode.value = data.group_mode || "all";
+    leaderboardClassShifts = data.class_shift_map && typeof data.class_shift_map === "object" ? data.class_shift_map : {};
+    leaderboardSelectedGroups = Array.isArray(data.selected_groups) ? data.selected_groups.map(String) : [];
     quarterDateControls.forEach((controls, index) => {
       controls.start.value = data[`quarter_${index + 1}_start`] || "";
       controls.end.value = data[`quarter_${index + 1}_end`] || "";
     });
   }
+  leaderboardClasses = Array.from(new Set((classesResult.data || []).map(item => item.class_name).filter(Boolean)))
+    .sort((a, b) => a.localeCompare(b, "ru", { numeric: true }));
+  renderLeaderboardClassShifts();
+  renderLeaderboardScopeOptions();
   fillDefaultQuarterDates();
 }
+
+function classGrade(className) {
+  const match = String(className || "").match(/^\s*(\d+)/);
+  return match ? match[1] : "";
+}
+
+function renderLeaderboardClassShifts() {
+  const shiftCount = Number(schoolShiftCount.value || 2);
+  classShiftList.replaceChildren(...leaderboardClasses.map(function (className) {
+    const row = document.createElement("label");
+    row.className = "class-shift-row";
+    const name = document.createElement("span");
+    name.textContent = className;
+    const select = document.createElement("select");
+    select.dataset.className = className;
+    select.append(new Option("Не назначена", ""));
+    for (let shift = 1; shift <= shiftCount; shift += 1) select.append(new Option(shift + " смена", String(shift)));
+    select.value = String(leaderboardClassShifts[className] || "");
+    row.append(name, select);
+    return row;
+  }));
+  if (!leaderboardClasses.length) classShiftList.textContent = "Сначала добавьте учеников в состав школы";
+}
+
+function leaderboardScopeValues() {
+  const mode = tvLeaderboardGroupMode.value;
+  if (mode === "shift") return Array.from({ length: Number(schoolShiftCount.value || 2) }, (_, index) => ({ value: String(index + 1), label: (index + 1) + " смена" }));
+  if (mode === "grade") return Array.from(new Set(leaderboardClasses.map(classGrade).filter(Boolean))).sort((a, b) => Number(a) - Number(b)).map(value => ({ value, label: value + " классы" }));
+  if (mode === "class") return leaderboardClasses.map(value => ({ value, label: value }));
+  return [];
+}
+
+function renderLeaderboardScopeOptions() {
+  const mode = tvLeaderboardGroupMode.value;
+  const labels = { shift: "Смены на ТВ", grade: "Параллели на ТВ", class: "Классы на ТВ" };
+  leaderboardScopeTitle.textContent = labels[mode] || "Общий рейтинг школы";
+  leaderboardScopeOptions.hidden = mode === "all";
+  leaderboardScopeOptions.replaceChildren(...leaderboardScopeValues().map(function (item) {
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = item.value;
+    checkbox.checked = !leaderboardSelectedGroups.length || leaderboardSelectedGroups.includes(item.value);
+    label.append(checkbox, document.createTextNode(item.label));
+    return label;
+  }));
+}
+
+tvLeaderboardGroupMode.addEventListener("change", function () {
+  leaderboardSelectedGroups = [];
+  renderLeaderboardScopeOptions();
+});
+schoolShiftCount.addEventListener("change", function () {
+  renderLeaderboardClassShifts();
+  if (tvLeaderboardGroupMode.value === "shift") renderLeaderboardScopeOptions();
+});
 
 async function saveTvSettings(event) {
   const { data: sessionData } = await supabaseClient.auth.getSession();
@@ -734,7 +805,15 @@ async function saveTvSettings(event) {
   activeButton.disabled = true;
   activeButton.textContent = "Сохраняем...";
   try {
-    const { error } = await AynaUI.withTimeout(supabaseClient
+    const classShiftMap = {};
+    classShiftList.querySelectorAll("select[data-class-name]").forEach(function (select) {
+      if (select.value) classShiftMap[select.dataset.className] = Number(select.value);
+    });
+    const selectedGroups = Array.from(leaderboardScopeOptions.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
+    if (tvLeaderboardGroupMode.value !== "all" && !selectedGroups.length) {
+      throw new Error("Выберите хотя бы одну группу для рейтинга");
+    }
+    let { error } = await AynaUI.withTimeout(supabaseClient
       .from("screen_leaderboard_settings")
       .upsert({
         user_id: sessionData.session.user.id,
@@ -743,6 +822,9 @@ async function saveTvSettings(event) {
         show_announcements: tvAnnouncementsEnabled.checked,
         show_events: tvEventsEnabled.checked,
         period_type: tvLeaderboardPeriod.value,
+        group_mode: tvLeaderboardGroupMode.value,
+        selected_groups: selectedGroups,
+        class_shift_map: classShiftMap,
         quarter_1_start: quarterDateControls[0].start.value,
         quarter_1_end: quarterDateControls[0].end.value,
         quarter_2_start: quarterDateControls[1].start.value,
@@ -753,6 +835,9 @@ async function saveTvSettings(event) {
         quarter_4_end: quarterDateControls[3].end.value,
         updated_at: new Date().toISOString()
       }, { onConflict: "user_id" }), 20000);
+    if (error && /group_mode|selected_groups|class_shift_map/i.test(error.message || "")) {
+      throw new Error("Обновление базы для группировки рейтинга ещё не применено");
+    }
     if (error) throw error;
     activeButton.textContent = "Сохранено";
     AynaUI.notify("Настройки ТВ-экрана сохранены", "success");

@@ -12,6 +12,7 @@ let students = [];
 let achievementsById = new Map();
 let sourceSignature = "";
 let pointsLoading = false;
+let classShiftMap = {};
 
 function normalized(value) {
   return String(value || "").trim().toLocaleLowerCase("ru");
@@ -24,9 +25,7 @@ function classGrade(className) {
 
 function matchesShift(className) {
   if (!shiftControl.value) return true;
-  const grade = classGrade(className);
-  if (shiftControl.value === "1") return grade >= 8 && grade <= 11;
-  return grade >= 5 && grade <= 7;
+  return String(classShiftMap[className] || "") === shiftControl.value;
 }
 
 function matchesPeriod(entry) {
@@ -120,6 +119,13 @@ function fillClassFilter() {
   classControl.value = classes.includes(current) ? current : "";
 }
 
+function fillShiftFilter() {
+  const current = shiftControl.value;
+  const shifts = Array.from(new Set(Object.values(classShiftMap).map(String).filter(Boolean))).sort((a, b) => Number(a) - Number(b));
+  shiftControl.replaceChildren(new Option("Все смены", ""), ...shifts.map(value => new Option(value + " смена", value)));
+  shiftControl.value = shifts.includes(current) ? current : "";
+}
+
 async function loadPoints(silent = false) {
   if (pointsLoading) return;
   pointsLoading = true;
@@ -127,10 +133,11 @@ async function loadPoints(silent = false) {
   const { data: sessionData } = await pointsClient.auth.getSession();
   if (!sessionData.session) { pointsLoading = false; location.replace("index.html"); return; }
 
-  const [pointsResult, studentsResult, achievementsResult] = await Promise.all([
+  const [pointsResult, studentsResult, achievementsResult, settingsResult] = await Promise.all([
     pointsClient.from("student_achievement_points").select("student_id,achievement_id,points").order("achievement_id"),
     pointsClient.from("students").select("id,last_name,first_name,class_name").order("id"),
-    pointsClient.from("achievements").select("id,event_date,event_end_date").order("id")
+    pointsClient.from("achievements").select("id,event_date,event_end_date").order("id"),
+    pointsClient.from("screen_leaderboard_settings").select("class_shift_map").maybeSingle()
   ]);
   const failed = [pointsResult, studentsResult, achievementsResult].find(result => result.error);
   if (failed) {
@@ -145,7 +152,8 @@ async function loadPoints(silent = false) {
   const nextSignature = JSON.stringify([
     pointsResult.data,
     studentsResult.data,
-    achievementsResult.data
+    achievementsResult.data,
+    settingsResult.error ? null : settingsResult.data
   ]);
   if (silent && sourceSignature === nextSignature) {
     pointsLoading = false;
@@ -155,7 +163,9 @@ async function loadPoints(silent = false) {
   pointEntries = pointsResult.data || [];
   students = studentsResult.data || [];
   achievementsById = new Map((achievementsResult.data || []).map(item => [item.id, item]));
+  classShiftMap = settingsResult.error ? {} : (settingsResult.data?.class_shift_map || {});
   fillClassFilter();
+  fillShiftFilter();
   rebuildPointRows();
   pointsLoading = false;
 }

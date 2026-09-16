@@ -6,7 +6,7 @@
     <title>Панель управления - Ayna</title>
     <link rel="icon" href="ayna-favicon-v2.svg" type="image/svg+xml">
     <link rel="stylesheet" href="ayna-ui.css?v=1">
-    <link rel="stylesheet" href="style.css?v=119">
+    <link rel="stylesheet" href="style.css?v=120">
   </head>
 
   <body>
@@ -246,6 +246,25 @@
               <option value="all_time">За всё время</option>
             </select>
           </label>
+          <label>Показывать рейтинг
+            <select id="tv-leaderboard-group-mode">
+              <option value="all">Общий по школе</option>
+              <option value="shift">По сменам</option>
+              <option value="grade">По параллелям</option>
+              <option value="class">По классам</option>
+            </select>
+          </label>
+          <div class="leaderboard-scope-panel">
+            <strong id="leaderboard-scope-title">Выбранные группы</strong>
+            <div id="leaderboard-scope-options" class="leaderboard-scope-options"></div>
+          </div>
+          <div class="class-shift-settings">
+            <div class="class-shift-heading">
+              <strong>Классы и смены</strong>
+              <small>Укажите смену один раз — рейтинг и ТВ будут использовать эту привязку.</small>
+            </div>
+            <div id="class-shift-list" class="class-shift-list"></div>
+          </div>
           <div class="tv-settings-actions">
             <button type="button" id="save-tv-leaderboard-settings">Сохранить</button>
           </div>
@@ -638,7 +657,7 @@
     <script src="config.js"></script>
     <script src="admin-i18n.js?v=6"></script>
     <script src="ayna-ui.js?v=1"></script>
-    <script src="script.js?v=86"></script>
+    <script src="script.js?v=87"></script>
     <script src="top-table-scroll.js?v=1"></script>
   </body>
 </html>
