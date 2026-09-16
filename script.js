@@ -711,7 +711,7 @@ function sortPeopleByUpcomingBirthday(people, today = new Date()) {
 async function loadTvLeaderboardSettings() {
   const [settingsResult, classesResult] = await Promise.all([
     supabaseClient.from("screen_leaderboard_settings").select("*").maybeSingle(),
-    supabaseClient.from("students").select("class_name").order("class_name")
+    fetchStudentRows("class_name")
   ]);
   const { data, error } = settingsResult;
   if (error || classesResult.error) {
@@ -737,11 +737,58 @@ async function loadTvLeaderboardSettings() {
       controls.end.value = data[`quarter_${index + 1}_end`] || "";
     });
   }
-  leaderboardClasses = Array.from(new Set((classesResult.data || []).map(item => item.class_name).filter(Boolean)))
+  leaderboardClasses = Array.from(new Set((classesResult.data || []).map(item => item.class_name?.trim()).filter(Boolean)))
     .sort((a, b) => a.localeCompare(b, "ru", { numeric: true }));
   renderLeaderboardClassShifts();
   renderLeaderboardScopeOptions();
   fillDefaultQuarterDates();
+}
+
+async function fetchStudentRows(columns) {
+  const rows = [];
+  const pageSize = 500;
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabaseClient.from("students")
+      .select(columns).order("id").range(offset, offset + pageSize - 1);
+    if (error) return { data: null, error };
+    rows.push(...data);
+    if (data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+function syncLeaderboardClasses(students) {
+  if (!leaderboardSettingsLoaded) return;
+  const currentClasses = Array.from(new Set(students.map(student => student.class_name?.trim()).filter(Boolean)))
+    .sort((a, b) => a.localeCompare(b, "ru", { numeric: true }));
+  if (JSON.stringify(currentClasses) === JSON.stringify(leaderboardClasses)) return;
+
+  classShiftList.querySelectorAll("select[data-class-name]").forEach(select => {
+    if (select.value) leaderboardClassShifts[select.dataset.className] = select.value;
+    else delete leaderboardClassShifts[select.dataset.className];
+  });
+  const active = new Set(currentClasses);
+  for (const className of Object.keys(leaderboardClassShifts)) {
+    if (!active.has(className)) delete leaderboardClassShifts[className];
+  }
+
+  const optionsBeforeRefresh = Array.from(leaderboardScopeOptions.querySelectorAll('input[type="checkbox"]'));
+  const previousChecked = optionsBeforeRefresh.filter(input => input.checked).map(input => input.value);
+  if (tvLeaderboardGroupMode.value !== "all" && optionsBeforeRefresh.length) {
+    leaderboardSelectedGroups = previousChecked.length === optionsBeforeRefresh.length
+      ? []
+      : (previousChecked.length ? previousChecked : null);
+  }
+  leaderboardClasses = currentClasses;
+  if (tvLeaderboardGroupMode.value === "class" || tvLeaderboardGroupMode.value === "grade") {
+    const valid = new Set(leaderboardScopeValues().map(item => item.value));
+    if (leaderboardSelectedGroups?.length) {
+      leaderboardSelectedGroups = leaderboardSelectedGroups.filter(value => valid.has(value));
+      if (!leaderboardSelectedGroups.length) leaderboardSelectedGroups = null;
+    }
+  }
+  renderLeaderboardClassShifts();
+  renderLeaderboardScopeOptions();
+  leaderboardSaveStatus.textContent = "Список классов изменился · сохраните настройки рейтинга";
 }
 
 function classGrade(className) {
@@ -803,7 +850,7 @@ function renderLeaderboardScopeOptions() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.value = item.value;
-    checkbox.checked = !leaderboardSelectedGroups.length || leaderboardSelectedGroups.includes(item.value);
+    checkbox.checked = leaderboardSelectedGroups !== null && (!leaderboardSelectedGroups.length || leaderboardSelectedGroups.includes(item.value));
     label.append(checkbox, document.createTextNode(item.label));
     return label;
   }));
@@ -1793,9 +1840,7 @@ function createSchoolPersonRow(person, detail, tableName, reload, showMiddleName
 
 async function loadStudents() {
   studentsList.textContent = "Загрузка...";
-  const { data, error } = await supabaseClient
-    .from("students")
-    .select("id,last_name,first_name,middle_name,class_name,birth_date");
+  const { data, error } = await fetchStudentRows("id,last_name,first_name,middle_name,class_name,birth_date");
   if (error) {
     studentsList.textContent = "Ошибка: " + error.message;
     return;
@@ -1808,6 +1853,7 @@ async function loadStudents() {
   }));
   achievementStudents = normalizedStudents;
   updateAchievementStudentSuggestions();
+  syncLeaderboardClasses(normalizedStudents);
   if (!data.length) {
     studentsList.textContent = "Ученики пока не добавлены";
     return;
