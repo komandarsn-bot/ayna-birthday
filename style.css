@@ -811,23 +811,6 @@ body {
   box-sizing: border-box;
   line-height: 1;
 }
-#settings-panel .tv-ranking-manager #tv-leaderboard-period,
-#settings-panel .tv-ranking-manager #tv-leaderboard-top-count {
-  height: 46px;
-  min-height: 46px;
-  box-sizing: border-box;
-}
-#app-content #settings-panel #tv-leaderboard-top-count {
-  display: block;
-  width: 100%;
-  height: 50px;
-  min-height: 50px;
-  margin: 0;
-  padding: 0 14px;
-  box-sizing: border-box;
-  line-height: normal;
-}
-
 #settings-panel .settings-inline-visibility .tv-setting-toggle {
   display: flex;
   align-items: center;
@@ -1142,11 +1125,15 @@ body {
 #app-content #settings-panel .tv-ranking-manager .tv-settings-actions {
   min-height: 40px;
 }
-#app-content #settings-panel #tv-leaderboard-period {
+#app-content #settings-panel #tv-leaderboard-period,
+#app-content #settings-panel #tv-leaderboard-group-mode,
+#app-content #settings-panel #tv-leaderboard-top-count {
+  display: block;
+  width: 100%;
   height: 40px;
   min-height: 40px;
-  padding-top: 0;
-  padding-bottom: 0;
+  margin: 0;
+  padding: 0 12px;
   box-sizing: border-box;
 }
 #app-content #settings-panel .standalone-quarter-settings .quarter-date-grid input,
