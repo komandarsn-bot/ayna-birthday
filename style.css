@@ -243,6 +243,14 @@ body {
 .class-shift-row { display: grid !important; grid-template-columns: minmax(70px, 1fr) minmax(120px, 1fr); align-items: center; gap: 8px !important; padding: 8px 10px; border: 1px solid #d4e0dd; border-radius: 10px; background: #fff; }
 .class-shift-row select { min-height: 38px !important; }
 .tv-ranking-manager .tv-settings-actions { grid-column: 1 / -1; justify-content: flex-end; }
+.tv-ranking-manager .leaderboard-save-actions {
+  position: sticky;
+  top: 12px;
+  z-index: 3;
+  padding: 8px 0;
+  background: linear-gradient(to bottom, #f7faf9 72%, rgba(247, 250, 249, 0));
+}
+.tv-ranking-manager .leaderboard-save-actions button { min-width: 240px; }
 @media (max-width: 800px) {
   #settings-panel .tv-ranking-manager .tv-leaderboard-settings,
   .class-shift-list { grid-template-columns: 1fr; }

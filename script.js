@@ -840,7 +840,12 @@ async function saveTvSettings(event) {
     }
     if (error) throw error;
     activeButton.textContent = "Сохранено";
-    AynaUI.notify("Настройки ТВ-экрана сохранены", "success");
+    AynaUI.notify(
+      activeButton === saveTvLeaderboardSettingsButton
+        ? "Настройки рейтинга сохранены. ТВ-экран обновится автоматически."
+        : "Настройки ТВ-экрана сохранены",
+      "success"
+    );
   } catch (error) {
     activeButton.textContent = "Ошибка";
     alert("Ошибка сохранения: " + (error.message || "не удалось сохранить настройки"));
