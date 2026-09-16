@@ -919,7 +919,7 @@ async function saveTvSettings(event) {
       try {
         const tvCheck = await verifyTvLeaderboard(userId);
         leaderboardSaveStatus.textContent = tvCheck.message;
-        AynaUI.notify(tvCheck.message, tvCheck.type);
+        if (tvCheck.type !== "success") AynaUI.notify(tvCheck.message, tvCheck.type);
       } catch (tvError) {
         leaderboardSaveStatus.textContent = "Сохранено, но ТВ-рейтинг не удалось проверить";
         AynaUI.notify("Настройки сохранены, но ТВ-рейтинг не загрузился: " + (tvError.message || "ошибка запроса"), "warning");

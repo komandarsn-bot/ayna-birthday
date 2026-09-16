@@ -14,13 +14,8 @@
     toast.className = "ayna-toast" + (type ? " is-" + type : "");
     const text = document.createElement("span");
     text.textContent = String(message || "");
-    const close = document.createElement("button");
-    close.type = "button";
-    close.setAttribute("aria-label", "Закрыть уведомление");
-    close.textContent = "×";
     const remove = function () { toast.remove(); };
-    close.addEventListener("click", remove);
-    toast.append(document.createElement("span"), text, close);
+    toast.append(text);
     ensureToastRegion().append(toast);
     window.setTimeout(remove, duration || (type === "error" ? 7000 : 4200));
   }
