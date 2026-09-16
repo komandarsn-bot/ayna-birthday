@@ -734,7 +734,7 @@ async function saveTvSettings(event) {
   activeButton.disabled = true;
   activeButton.textContent = "Сохраняем...";
   try {
-    const { error } = await supabaseClient
+    const { error } = await AynaUI.withTimeout(supabaseClient
       .from("screen_leaderboard_settings")
       .upsert({
         user_id: sessionData.session.user.id,
@@ -752,9 +752,10 @@ async function saveTvSettings(event) {
         quarter_4_start: quarterDateControls[3].start.value,
         quarter_4_end: quarterDateControls[3].end.value,
         updated_at: new Date().toISOString()
-      }, { onConflict: "user_id" });
+      }, { onConflict: "user_id" }), 20000);
     if (error) throw error;
     activeButton.textContent = "Сохранено";
+    AynaUI.notify("Настройки ТВ-экрана сохранены", "success");
   } catch (error) {
     activeButton.textContent = "Ошибка";
     alert("Ошибка сохранения: " + (error.message || "не удалось сохранить настройки"));
@@ -1043,19 +1044,26 @@ saveSchoolScheduleButton.addEventListener("click", async function () {
   const originalText = saveSchoolScheduleButton.textContent;
   saveSchoolScheduleButton.disabled = true;
   saveSchoolScheduleButton.textContent = "Сохраняем...";
-  const { error } = await supabaseClient.from("school_schedule_settings").upsert({
-    user_id: sessionData.session.user.id,
-    shift_count: Number(schoolShiftCount.value),
-    schedules: scheduleDraft,
-    updated_at: new Date().toISOString()
-  }, { onConflict: "user_id" });
-  saveSchoolScheduleButton.disabled = false;
+  let error;
+  try {
+    ({ error } = await AynaUI.withTimeout(supabaseClient.from("school_schedule_settings").upsert({
+      user_id: sessionData.session.user.id,
+      shift_count: Number(schoolShiftCount.value),
+      schedules: scheduleDraft,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" }), 20000));
+  } catch (requestError) {
+    error = requestError;
+  } finally {
+    saveSchoolScheduleButton.disabled = false;
+  }
   if (error) {
     saveSchoolScheduleButton.textContent = originalText;
     alert("Ошибка сохранения расписания: " + error.message);
     return;
   }
   saveSchoolScheduleButton.textContent = "Сохранено";
+  AynaUI.notify("Расписание сохранено", "success");
   window.setTimeout(() => {
     saveSchoolScheduleButton.textContent = originalText;
     setSchoolScheduleEditing(false);
@@ -1101,13 +1109,14 @@ saveScoringSettingsButton.addEventListener("click", async function () {
       points: Number(input.value),
       updated_at: new Date().toISOString()
     }));
-    const { error: saveError } = await supabaseClient
+    const { error: saveError } = await AynaUI.withTimeout(supabaseClient
       .from("achievement_scoring_rules")
-      .upsert(rules, { onConflict: "user_id,event_stage,result_category" });
+      .upsert(rules, { onConflict: "user_id,event_stage,result_category" }), 20000);
     if (saveError) throw saveError;
-    const { error: recalculateError } = await supabaseClient.rpc("recalculate_my_achievement_points");
+    const { error: recalculateError } = await AynaUI.withTimeout(supabaseClient.rpc("recalculate_my_achievement_points"), 20000);
     if (recalculateError) throw recalculateError;
     saveScoringSettingsButton.textContent = "Сохранено";
+    AynaUI.notify("Настройки баллов сохранены", "success");
   } catch (error) {
     saveScoringSettingsButton.textContent = "Ошибка";
     alert("Ошибка сохранения баллов: " + (error.message || "не удалось сохранить настройки"));
@@ -1220,7 +1229,7 @@ loadNewsButton.addEventListener("click", async function () {
     deleteButton.classList.add("delete-button");
     deleteButton.textContent = "Удалить";
     deleteButton.addEventListener("click", async function () {
-      if (!confirm("Удалить публикацию «" + item.title + "»?")) return;
+      if (!(await AynaUI.confirm("Удалить публикацию «" + item.title + "»?", { danger: true }))) return;
       deleteButton.disabled = true;
 
       const { error: deleteError } = await supabaseClient
@@ -1471,10 +1480,11 @@ deleteButton.classList.add("delete-button");
 deleteButton.addEventListener(
   "click",
   async function () {
-    const confirmed = confirm(
+    const confirmed = await AynaUI.confirm(
       "Удалить запись: " +
       person.full_name +
-      "?"
+      "?",
+      { danger: true }
     );
 
     if (!confirmed) {
@@ -1594,7 +1604,7 @@ function createSchoolPersonRow(person, detail, tableName, reload, showMiddleName
   deleteButton.className = "delete-button compact-button";
   deleteButton.textContent = "Удалить";
   deleteButton.addEventListener("click", async function () {
-    if (!confirm("Удалить запись: " + name.textContent + "?")) return;
+    if (!(await AynaUI.confirm("Удалить запись: " + name.textContent + "?", { danger: true }))) return;
     deleteButton.disabled = true;
     const { error } = await supabaseClient.from(tableName).delete().eq("id", person.id);
     if (error) {
@@ -1701,7 +1711,7 @@ function renderSuggestionMenu(input, menu, items, onSelect, onDelete = null) {
 }
 
 async function deleteAchievementReferenceItem(tableName, item, button, options) {
-  if (!confirm("Удалить «" + item.name + "» из справочника?")) return;
+  if (!(await AynaUI.confirm("Удалить «" + item.name + "» из справочника?", { danger: true }))) return;
   button.disabled = true;
   const { error } = await supabaseClient.from(tableName).delete().eq("id", item.id);
   if (error) {
@@ -1960,7 +1970,7 @@ loadStudentsButton.addEventListener("click", loadStudents);
 loadTeachersButton.addEventListener("click", loadTeachers);
 
 async function deleteAllSchoolPeople(tableName, label, button, list, reload) {
-  if (!confirm("Удалить всех " + label + "? Это действие нельзя отменить.")) return;
+  if (!(await AynaUI.confirm("Удалить всех " + label + "? Это действие нельзя отменить.", { danger: true, title: "Удаление всех записей" }))) return;
 
   const defaultText = button.textContent;
   button.disabled = true;
@@ -2637,7 +2647,7 @@ async function addAchievementType(name, button) {
 }
 
 async function deleteAchievementType(item, button) {
-  if (!confirm("Удалить вид достижения «" + item.name + "» из справочника?")) return;
+  if (!(await AynaUI.confirm("Удалить вид достижения «" + item.name + "» из справочника?", { danger: true }))) return;
   button.disabled = true;
   const { error } = await supabaseClient.from("achievement_types").delete().eq("id", item.id);
   if (error) {
@@ -2783,7 +2793,7 @@ async function addAchievementResult(name, button) {
 }
 
 async function deleteAchievementResult(item, button) {
-  if (!confirm("Удалить результат «" + item.name + "» из справочника?")) return;
+  if (!(await AynaUI.confirm("Удалить результат «" + item.name + "» из справочника?", { danger: true }))) return;
   button.disabled = true;
   const { error } = await supabaseClient.from("achievement_results").delete().eq("id", item.id);
   if (error) {
@@ -3356,7 +3366,7 @@ function renderAchievementsTable() {
     deleteButton.className = "delete-button compact-button";
     deleteButton.textContent = "Удалить";
     deleteButton.addEventListener("click", async function () {
-      if (!confirm("Удалить это достижение?")) return;
+      if (!(await AynaUI.confirm("Удалить это достижение?", { danger: true }))) return;
       deleteButton.disabled = true;
       const { error: deleteError } = await supabaseClient
         .from("achievements")
@@ -3586,18 +3596,59 @@ achievementForm.addEventListener("submit", async function (event) {
   };
 
   const wasEditing = Boolean(editingAchievementId);
+  let possibleDuplicates;
+  let duplicateCheckError;
+  try {
+    ({ data: possibleDuplicates, error: duplicateCheckError } = await AynaUI.withTimeout(
+      supabaseClient
+        .from("achievements")
+        .select("id,event_date,event_end_date,result,project_name")
+        .eq("student_id", achievement.student_id)
+        .eq("event_id", achievement.event_id),
+      20000
+    ));
+  } catch (requestError) {
+    duplicateCheckError = requestError;
+  }
+  if (duplicateCheckError) {
+    achievementMessage.textContent = "Не удалось проверить дубликаты: " + duplicateCheckError.message;
+    AynaUI.notify(achievementMessage.textContent, "error");
+    return;
+  }
+  const normalized = function (value) { return String(value || "").trim().toLocaleLowerCase("ru"); };
+  const duplicate = (possibleDuplicates || []).find(function (item) {
+    return String(item.id) !== String(editingAchievementId || "") &&
+      normalized(item.event_date) === normalized(achievement.event_date) &&
+      normalized(item.event_end_date) === normalized(achievement.event_end_date) &&
+      normalized(item.result) === normalized(achievement.result) &&
+      normalized(item.project_name) === normalized(achievement.project_name);
+  });
+  if (duplicate) {
+    achievementMessage.textContent = "Похожее достижение этого ученика уже сохранено";
+    AynaUI.notify("Проверьте запись: найден возможный дубликат достижения.", "warning");
+    return;
+  }
   saveAchievementButton.disabled = true;
   achievementMessage.textContent = wasEditing ? "Сохраняем изменения..." : "Сохраняем...";
   const saveRequest = wasEditing
     ? supabaseClient.from("achievements").update(achievement).eq("id", editingAchievementId)
     : supabaseClient.from("achievements").insert(achievement);
-  const { error } = await saveRequest;
-  saveAchievementButton.disabled = false;
+  let error;
+  try {
+    ({ error } = await AynaUI.withTimeout(saveRequest, 20000));
+  } catch (requestError) {
+    error = requestError;
+  } finally {
+    saveAchievementButton.disabled = false;
+  }
 
   if (error) {
     achievementMessage.textContent = "Ошибка: " + error.message;
+    AynaUI.notify(achievementMessage.textContent, "error");
     return;
   }
+
+  AynaUI.notify(wasEditing ? "Изменения сохранены" : "Достижение сохранено", "success");
 
   try {
     localStorage.setItem("ayna-achievements-updated", String(Date.now()));

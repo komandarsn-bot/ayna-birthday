@@ -198,8 +198,17 @@ function startInlineEdit(row, item) {
     if (stageRank > levelRank) { alert("Этап не может быть выше уровня мероприятия"); return; }
     saveButton.disabled = true;
     saveButton.textContent = "Сохраняем...";
-    const { error } = await client.from("achievements").update(update).eq("id", item.id);
-    if (error) { alert("Ошибка: " + error.message); saveButton.disabled = false; saveButton.textContent = "Сохранить"; return; }
+    let error;
+    try {
+      ({ error } = await AynaUI.withTimeout(client.from("achievements").update(update).eq("id", item.id), 20000));
+    } catch (requestError) {
+      error = requestError;
+    } finally {
+      saveButton.disabled = false;
+      saveButton.textContent = "Сохранить";
+    }
+    if (error) { alert("Ошибка: " + error.message); return; }
+    AynaUI.notify("Изменения сохранены", "success");
     try { localStorage.setItem("ayna-achievements-updated", String(Date.now())); } catch (_error) {}
     Object.assign(item, update);
     buildColumnFilters();
@@ -212,11 +221,16 @@ function startInlineEdit(row, item) {
 async function deleteAchievement(item, button) {
   const studentName = [item.last_name, item.first_name].filter(Boolean).join(" ");
   const eventName = item.event_name || "достижение";
-  if (!confirm(`Удалить запись «${eventName}» ученика ${studentName}?`)) return;
+  if (!(await AynaUI.confirm(`Удалить запись «${eventName}» ученика ${studentName}?`, { danger: true }))) return;
 
   button.disabled = true;
   button.textContent = "Удаляем...";
-  const { error } = await client.from("achievements").delete().eq("id", item.id);
+  let error;
+  try {
+    ({ error } = await AynaUI.withTimeout(client.from("achievements").delete().eq("id", item.id), 20000));
+  } catch (requestError) {
+    error = requestError;
+  }
   if (error) {
     alert("Ошибка удаления: " + error.message);
     button.disabled = false;
