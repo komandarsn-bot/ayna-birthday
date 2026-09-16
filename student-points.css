@@ -1,8 +1,20 @@
 :root {
+  --ayna-bg: #f4f1e8;
+  --ayna-surface: #ffffff;
+  --ayna-surface-soft: #f7faf9;
+  --ayna-ink: #173a35;
+  --ayna-muted: #657873;
+  --ayna-green: #173f39;
+  --ayna-border: #d6e1de;
+  --ayna-gold: #e7c84f;
+  --ayna-gold-hover: #d9b93f;
+  --ayna-radius-control: 10px;
+  --ayna-radius-panel: 12px;
+  --ayna-shadow-panel: 0 8px 24px rgba(23, 58, 53, .06);
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: 14px;
-  color: #173d37;
-  background: #f6f4ee;
+  color: var(--ayna-ink);
+  background: var(--ayna-bg);
 }
 
 * { box-sizing: border-box; }
@@ -39,17 +51,20 @@ button {
   min-height: 40px;
   padding: 9px 16px;
   border: 0;
-  border-radius: 7px;
-  background: #e7c84f;
+  border-radius: var(--ayna-radius-control);
+  background: var(--ayna-gold);
   color: #173d37;
   font: inherit;
   font-size: 14px;
   font-weight: 650;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(23, 58, 53, .10);
+  transition: transform .16s ease, background-color .16s ease, box-shadow .16s ease;
 }
-button:hover { background: #dbbb43; }
-button.secondary { border-color: #bdcdc8; background: transparent; box-shadow: none; }
+button:hover { background: var(--ayna-gold-hover); transform: translateY(-1px); }
+button:active { transform: translateY(0); }
+button:focus-visible { outline: 2px solid #4d8379; outline-offset: 2px; }
+button.secondary { border: 1px solid #bdcdc8; background: #fff; box-shadow: none; }
 button.secondary:hover { background: #eef3f1; }
 
 .filters {
@@ -60,7 +75,7 @@ button.secondary:hover { background: #eef3f1; }
   margin: 20px 0 12px;
   padding: 15px 16px;
   border: 1px solid #d6dfdc;
-  border-radius: 8px;
+  border-radius: var(--ayna-radius-panel);
   background: #fff;
 }
 .filters label { display: grid; gap: 6px; color: #375b55; font-size: 13px; font-weight: 650; }
@@ -69,7 +84,7 @@ button.secondary:hover { background: #eef3f1; }
   height: 42px;
   padding: 8px 11px;
   border: 1px solid #bdcdc8;
-  border-radius: 6px;
+  border-radius: var(--ayna-radius-control);
   outline: none;
   background: #fff;
   color: #173d37;
@@ -82,9 +97,9 @@ button.secondary:hover { background: #eef3f1; }
 .table-wrap {
   overflow: hidden;
   border: 1px solid #ccd8d4;
-  border-radius: 8px;
+  border-radius: var(--ayna-radius-panel);
   background: #fff;
-  box-shadow: 0 8px 24px rgba(25, 60, 53, .05);
+  box-shadow: var(--ayna-shadow-panel);
 }
 table { width: 100%; table-layout: fixed; border-collapse: collapse; }
 th, td { height: 58px; padding: 0 18px; border-bottom: 1px solid #e1e7e5; text-align: left; vertical-align: middle; }

@@ -1,6 +1,21 @@
+:root {
+  --ayna-bg: #f4f1e8;
+  --ayna-surface: #ffffff;
+  --ayna-surface-soft: #f7faf9;
+  --ayna-ink: #173a35;
+  --ayna-muted: #657873;
+  --ayna-green: #173f39;
+  --ayna-border: #d6e1de;
+  --ayna-gold: #e7c84f;
+  --ayna-gold-hover: #d9b93f;
+  --ayna-radius-control: 10px;
+  --ayna-radius-panel: 16px;
+  --ayna-shadow-panel: 0 10px 30px rgba(23, 58, 53, 0.07);
+}
+
 body {
   margin: 0;
-  background-color: #f4f1e8;
+  background-color: var(--ayna-bg);
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: 14px;
   color: #173a35;
@@ -1192,20 +1207,21 @@ main {
 }
 
 .card {
-  background-color: white;
+  background-color: var(--ayna-surface);
   padding: 24px;
   margin-bottom: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(23, 58, 53, 0.08);
+  border: 1px solid rgba(23, 58, 53, 0.09);
+  border-radius: var(--ayna-radius-panel);
+  box-shadow: var(--ayna-shadow-panel);
 }
 
 button {
   max-width: 100%;
-  background-color: #e4c455;
+  background-color: var(--ayna-gold);
   color: #173a35;
   border: none;
   padding: 12px 20px;
-  border-radius: 8px;
+  border-radius: var(--ayna-radius-control);
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: 14px;
   font-weight: bold;
@@ -1226,7 +1242,7 @@ input[type="file"]::file-selector-button {
 }
 
 button:hover {
-  background-color: #d4b43f;
+  background-color: var(--ayna-gold-hover);
 }
 
 input[type="file"] {
