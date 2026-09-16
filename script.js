@@ -77,6 +77,7 @@ const tvAnnouncementsEnabled = document.querySelector("#tv-announcements-enabled
 const tvEventsEnabled = document.querySelector("#tv-events-enabled");
 const tvLeaderboardEnabled = document.querySelector("#tv-leaderboard-enabled");
 const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
+const tvLeaderboardTopCount = document.querySelector("#tv-leaderboard-top-count");
 const tvLeaderboardGroupMode = document.querySelector("#tv-leaderboard-group-mode");
 const leaderboardScopeTitle = document.querySelector("#leaderboard-scope-title");
 const leaderboardScopePanel = document.querySelector("#leaderboard-scope-panel");
@@ -729,6 +730,7 @@ async function loadTvLeaderboardSettings() {
     tvAnnouncementsEnabled.checked = data.show_announcements !== false;
     tvEventsEnabled.checked = data.show_events !== false;
     tvLeaderboardPeriod.value = data.period_type;
+    tvLeaderboardTopCount.value = data.top_count ?? 10;
     tvLeaderboardGroupMode.value = data.group_mode || "all";
     leaderboardClassShifts = data.class_shift_map && typeof data.class_shift_map === "object" ? data.class_shift_map : {};
     leaderboardSelectedGroups = Array.isArray(data.selected_groups) ? data.selected_groups.map(String) : [];
@@ -909,6 +911,8 @@ async function saveTvSettings(event) {
     const settings = { updated_at: new Date().toISOString() };
     if (isRanking) {
       if (!leaderboardSettingsLoaded) throw new Error("Настройки рейтинга ещё не загрузились. Обновите страницу.");
+      const topCount = Number(tvLeaderboardTopCount.value);
+      if (!Number.isInteger(topCount) || topCount < 1 || topCount > 20) throw new Error("Укажите число учеников от 1 до 20");
       const classShiftMap = {};
       classShiftList.querySelectorAll("select[data-class-name]").forEach(function (select) {
         if (select.value) classShiftMap[select.dataset.className] = Number(select.value);
@@ -918,6 +922,7 @@ async function saveTvSettings(event) {
       if (tvLeaderboardGroupMode.value === "shift" && !Object.keys(classShiftMap).length) throw new Error("Сначала назначьте смены классам");
       Object.assign(settings, {
         period_type: tvLeaderboardPeriod.value,
+        top_count: topCount,
         group_mode: tvLeaderboardGroupMode.value,
         selected_groups: selectedGroups,
         class_shift_map: classShiftMap
@@ -945,8 +950,11 @@ async function saveTvSettings(event) {
       .from("screen_leaderboard_settings")
       .update(settings)
       .eq("user_id", userId)
-      .select("period_type,group_mode,selected_groups,class_shift_map")
+      .select("period_type,top_count,group_mode,selected_groups,class_shift_map")
       .single(), 20000);
+    if (error && /top_count/i.test(error.message || "")) {
+      throw new Error("Сначала выполните supabase-leaderboard-top-count-update.sql в Supabase");
+    }
     if (error && /group_mode|selected_groups|class_shift_map/i.test(error.message || "")) {
       throw new Error("Обновление базы для группировки рейтинга ещё не применено");
     }
@@ -954,7 +962,7 @@ async function saveTvSettings(event) {
     const sameShiftMap = isRanking && Object.keys({ ...saved.class_shift_map, ...settings.class_shift_map }).every(
       className => Number(saved.class_shift_map?.[className] || 0) === Number(settings.class_shift_map?.[className] || 0)
     );
-    if (isRanking && (saved.group_mode !== settings.group_mode || saved.period_type !== settings.period_type || !sameShiftMap ||
+    if (isRanking && (saved.group_mode !== settings.group_mode || saved.period_type !== settings.period_type || saved.top_count !== settings.top_count || !sameShiftMap ||
       [...(saved.selected_groups || [])].map(String).sort().join("|") !== [...settings.selected_groups].map(String).sort().join("|"))) {
       throw new Error("Не удалось подтвердить сохранение настроек рейтинга");
     }

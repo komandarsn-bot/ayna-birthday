@@ -761,7 +761,7 @@ body {
 
 #settings-panel .tv-ranking-manager .tv-leaderboard-settings {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(120px, 0.4fr);
   align-items: start;
   justify-content: start;
   gap: 12px;
@@ -811,11 +811,13 @@ body {
   box-sizing: border-box;
   line-height: 1;
 }
-#settings-panel .tv-ranking-manager #tv-leaderboard-period {
+#settings-panel .tv-ranking-manager #tv-leaderboard-period,
+#settings-panel .tv-ranking-manager #tv-leaderboard-top-count {
   height: 46px;
   min-height: 46px;
   box-sizing: border-box;
 }
+#settings-panel .tv-ranking-manager #tv-leaderboard-top-count { width: 100%; }
 
 #settings-panel .settings-inline-visibility .tv-setting-toggle {
   display: flex;

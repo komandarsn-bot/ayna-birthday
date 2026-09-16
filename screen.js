@@ -324,9 +324,10 @@ function renderLeaderboard(slide) {
   heading.className = "leaderboard-heading";
   const headingText = document.createElement("div");
   const title = document.createElement("h1");
-  title.textContent = "Топ-10 учеников";
+  const studentWord = slide.top_count === 1 ? "ученик" : slide.top_count >= 2 && slide.top_count <= 4 ? "ученика" : "учеников";
+  title.textContent = `Топ-${slide.top_count} ${studentWord}`;
   const period = document.createElement("p");
-  period.textContent = slide.period_label;
+  period.textContent = slide.period_label + (slide.page_count > 1 ? ` · ${slide.page_index * 10 + 1}–${slide.page_index * 10 + slide.rows.length}` : "");
   headingText.append(title, period);
   const classes = document.createElement("span");
   classes.textContent = slide.group_label;
@@ -496,22 +497,28 @@ function startSequence() {
 function updateLeaderboard(data) {
   const hadLeaderboardSlides = leaderboardSlides.length > 0;
   const groupKeys = Array.from(new Set(data.map(item => String(item.group_key || item.shift_number || "all"))));
-  const normalized = groupKeys.map(function (groupKey) {
+  const normalized = groupKeys.flatMap(function (groupKey) {
     const rows = data.filter(item => String(item.group_key || item.shift_number || "all") === groupKey);
-    if (!rows.length) return null;
-    return {
+    if (!rows.length) return [];
+    const base = {
       group_key: groupKey,
       group_label: rows[0].group_label || (rows[0].shift_number ? rows[0].shift_number + " смена" : "Общий рейтинг"),
       period_label: rows[0].period_label || "",
-      rows: rows.map(item => ({
+      top_count: Math.max(1, Math.min(20, Number(rows[0].top_count) || 10))
+    };
+    const normalizedRows = rows.map(item => ({
         place_number: Number(item.place_number),
         student_name: normalizePersonName(item.student_name),
         class_name: item.class_name,
         achievements_count: Number(item.achievements_count),
         total_points: Number(item.total_points)
-      }))
-    };
-  }).filter(Boolean);
+      }));
+    const pageCount = Math.ceil(normalizedRows.length / 10);
+    return Array.from({ length: pageCount }, (_, pageIndex) => ({
+      ...base, page_index: pageIndex, page_count: pageCount,
+      rows: normalizedRows.slice(pageIndex * 10, (pageIndex + 1) * 10)
+    }));
+  });
   const changed = JSON.stringify(normalized) !== JSON.stringify(leaderboardSlides);
   leaderboardSlides = normalized;
   if (!activeKind) startSequence();
