@@ -519,6 +519,8 @@ function updateLeaderboard(data) {
   else if (!hadLeaderboardSlides && leaderboardSlides.length) scheduleNextSlide();
   else if (changed && activeKind === "leaderboard") {
     activeIndex = Math.min(activeIndex, leaderboardSlides.length - 1);
+    renderCurrentSlide();
+    scheduleNextSlide();
   }
 }
 

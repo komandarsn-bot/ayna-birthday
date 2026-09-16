@@ -6,7 +6,7 @@
     <title>Панель управления - Ayna</title>
     <link rel="icon" href="ayna-favicon-v2.svg" type="image/svg+xml">
     <link rel="stylesheet" href="ayna-ui.css?v=1">
-    <link rel="stylesheet" href="style.css?v=121">
+    <link rel="stylesheet" href="style.css?v=122">
   </head>
 
   <body>
@@ -254,19 +254,17 @@
               <option value="class">По классам</option>
             </select>
           </label>
-          <div class="leaderboard-scope-panel">
+          <div class="leaderboard-scope-panel" id="leaderboard-scope-panel" hidden>
             <strong id="leaderboard-scope-title">Выбранные группы</strong>
             <div id="leaderboard-scope-options" class="leaderboard-scope-options"></div>
           </div>
-          <div class="tv-settings-actions leaderboard-save-actions">
-            <button type="button" id="save-tv-leaderboard-settings">Сохранить настройки рейтинга</button>
-          </div>
-          <div class="class-shift-settings">
-            <div class="class-shift-heading">
-              <strong>Классы и смены</strong>
-              <small>Укажите смену один раз — рейтинг и ТВ будут использовать эту привязку.</small>
-            </div>
+          <details class="class-shift-settings">
+            <summary><strong>Классы и смены</strong><span id="class-shift-summary">Укажите смену для классов</span></summary>
             <div id="class-shift-list" class="class-shift-list"></div>
+          </details>
+          <div class="tv-settings-actions leaderboard-save-actions">
+            <span id="leaderboard-save-status" role="status" aria-live="polite"></span>
+            <button type="button" id="save-tv-leaderboard-settings">Сохранить настройки рейтинга</button>
           </div>
         </div>
       </div>
@@ -655,9 +653,9 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="admin-i18n.js?v=6"></script>
+    <script src="admin-i18n.js?v=7"></script>
     <script src="ayna-ui.js?v=1"></script>
-    <script src="script.js?v=88"></script>
+    <script src="script.js?v=89"></script>
     <script src="top-table-scroll.js?v=1"></script>
   </body>
 </html>
