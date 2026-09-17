@@ -883,6 +883,9 @@ leaderboardScopeOptions.addEventListener("change", function () {
 tvLeaderboardPeriod.addEventListener("change", function () {
   leaderboardSaveStatus.textContent = "Есть несохранённые изменения";
 });
+tvLeaderboardTopCount.addEventListener("input", function () {
+  leaderboardSaveStatus.textContent = "Есть несохранённые изменения";
+});
 
 async function verifyTvLeaderboard(userId) {
   if (!tvLeaderboardEnabled.checked) return { message: "Сохранено · показ рейтинга на ТВ выключен", type: "warning" };

@@ -787,7 +787,7 @@ body {
 }
 #settings-panel .tv-ranking-manager .leaderboard-save-actions {
   position: sticky;
-  bottom: 8px;
+  top: 8px;
   z-index: 3;
   display: flex;
   grid-column: 1 / -1;
