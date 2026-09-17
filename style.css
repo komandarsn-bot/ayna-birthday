@@ -231,20 +231,14 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
 }
-.leaderboard-scope-panel,
-.class-shift-settings { grid-column: 1 / -1; display: grid; gap: 10px; }
+.leaderboard-scope-panel { grid-column: 1 / -1; display: grid; gap: 10px; }
 .leaderboard-scope-panel { padding: 14px; border: 1px solid #d4e0dd; border-radius: 12px; background: #fff; }
 .leaderboard-scope-panel[hidden] { display: none !important; }
 .leaderboard-scope-options { display: flex; flex-wrap: wrap; gap: 8px; }
 .leaderboard-scope-options label { display: inline-flex !important; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; border: 1px solid #d4e0dd; border-radius: 10px; background: #f8fbfa; font-weight: 600; }
 .leaderboard-scope-options input { width: 18px; height: 18px; }
-.class-shift-settings { border: 1px solid #d4e0dd; border-radius: 12px; background: #fff; }
-.class-shift-settings summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; cursor: pointer; list-style: none; }
-.class-shift-settings summary::-webkit-details-marker { display: none; }
-.class-shift-settings summary span { color: #657873; font-size: 13px; font-weight: 500; }
-.class-shift-settings[open] summary { border-bottom: 1px solid #e1e8e6; }
-.class-shift-settings:not([open]) .class-shift-list { display: none; }
-.class-shift-list { display: grid; gap: 12px; padding: 14px; }
+.class-shift-summary { margin: 0 0 12px; color: #657873; font-size: 13px; }
+.class-shift-list { display: grid; gap: 12px; padding: 0; }
 .class-shift-group { display: grid; gap: 8px; }
 .class-shift-group h4 { margin: 0; font-size: 13px; color: #657873; }
 .class-shift-group-rows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
@@ -252,6 +246,17 @@ body {
 .class-shift-row select { min-height: 38px !important; }
 .tv-ranking-manager .tv-settings-actions { grid-column: 1 / -1; justify-content: flex-end; }
 .tv-ranking-manager .leaderboard-save-actions button { min-width: 240px; }
+.tv-class-shifts-manager .class-shift-save-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #e1e8e6;
+}
+.tv-class-shifts-manager .class-shift-save-actions span { margin-right: auto; color: #657873; font-size: 13px; }
+.tv-class-shifts-manager .class-shift-save-actions button { width: auto; margin: 0; }
 @media (max-width: 800px) {
   #settings-panel .tv-ranking-manager .tv-leaderboard-settings,
   .class-shift-group-rows { grid-template-columns: 1fr; }
@@ -533,6 +538,7 @@ body {
 
 #app-content #settings-panel .tv-content-manager .achievement-reference-content,
 #app-content #settings-panel .tv-ranking-manager .achievement-reference-content,
+#app-content #settings-panel .tv-class-shifts-manager .achievement-reference-content,
 #app-content #settings-panel .scoring-manager .achievement-reference-content {
   width: 100%;
   margin: 0 0 8px;
