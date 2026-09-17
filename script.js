@@ -732,14 +732,16 @@ async function loadTvLeaderboardSettings() {
     tvLeaderboardPeriod.value = data.period_type;
     tvLeaderboardTopCount.value = data.top_count ?? 10;
     tvLeaderboardGroupMode.value = data.group_mode || "all";
-    leaderboardClassShifts = data.class_shift_map && typeof data.class_shift_map === "object" ? data.class_shift_map : {};
-    leaderboardSelectedGroups = Array.isArray(data.selected_groups) ? data.selected_groups.map(String) : [];
+    leaderboardClassShifts = AynaClass.normalizeShiftMap(data.class_shift_map);
+    leaderboardSelectedGroups = Array.isArray(data.selected_groups)
+      ? data.selected_groups.map(value => tvLeaderboardGroupMode.value === "class" ? AynaClass.normalize(value) : String(value))
+      : [];
     quarterDateControls.forEach((controls, index) => {
       controls.start.value = data[`quarter_${index + 1}_start`] || "";
       controls.end.value = data[`quarter_${index + 1}_end`] || "";
     });
   }
-  leaderboardClasses = Array.from(new Set((classesResult.data || []).map(item => item.class_name?.trim()).filter(Boolean)))
+  leaderboardClasses = Array.from(new Set((classesResult.data || []).map(item => AynaClass.normalize(item.class_name)).filter(Boolean)))
     .sort((a, b) => a.localeCompare(b, "ru", { numeric: true }));
   renderLeaderboardClassShifts();
   renderLeaderboardScopeOptions();
@@ -760,7 +762,7 @@ async function fetchStudentRows(columns) {
 
 function syncLeaderboardClasses(students) {
   if (!leaderboardSettingsLoaded) return;
-  const currentClasses = Array.from(new Set(students.map(student => student.class_name?.trim()).filter(Boolean)))
+  const currentClasses = Array.from(new Set(students.map(student => AynaClass.normalize(student.class_name)).filter(Boolean)))
     .sort((a, b) => a.localeCompare(b, "ru", { numeric: true }));
   if (JSON.stringify(currentClasses) === JSON.stringify(leaderboardClasses)) return;
 
@@ -1855,6 +1857,7 @@ async function loadStudents() {
   }
   const normalizedStudents = data.map(student => ({
     ...student,
+    class_name: AynaClass.normalize(student.class_name),
     last_name: normalizePersonName(student.last_name),
     first_name: normalizePersonName(student.first_name),
     middle_name: normalizePersonName(student.middle_name) || null
@@ -3629,7 +3632,7 @@ async function loadAchievements() {
     achievementsList.textContent = "Ошибка: " + error.message;
     return;
   }
-  loadedAchievements = data || [];
+  loadedAchievements = (data || []).map(item => ({ ...item, class_name: AynaClass.normalize(item.class_name) }));
   refreshAchievementFilterOptions();
   renderAchievementsTable();
 }

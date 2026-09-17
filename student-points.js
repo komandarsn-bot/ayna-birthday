@@ -161,9 +161,9 @@ async function loadPoints(silent = false) {
   }
   sourceSignature = nextSignature;
   pointEntries = pointsResult.data || [];
-  students = studentsResult.data || [];
+  students = (studentsResult.data || []).map(item => ({ ...item, class_name: AynaClass.normalize(item.class_name) }));
   achievementsById = new Map((achievementsResult.data || []).map(item => [item.id, item]));
-  classShiftMap = settingsResult.error ? {} : (settingsResult.data?.class_shift_map || {});
+  classShiftMap = settingsResult.error ? {} : AynaClass.normalizeShiftMap(settingsResult.data?.class_shift_map);
   fillClassFilter();
   fillShiftFilter();
   rebuildPointRows();

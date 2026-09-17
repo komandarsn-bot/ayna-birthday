@@ -308,8 +308,8 @@ async function load() {
   const { data, error } = achievementsResult;
   if (error) { tableWrap.textContent = "Ошибка: " + error.message; return; }
   if (studentsResult.error) { tableWrap.textContent = "Ошибка загрузки учеников: " + studentsResult.error.message; return; }
-  records = data || [];
-  students = studentsResult.data || [];
+  records = (data || []).map(item => ({ ...item, class_name: AynaClass.normalize(item.class_name) }));
+  students = (studentsResult.data || []).map(item => ({ ...item, class_name: AynaClass.normalize(item.class_name) }));
   const referenceResults = [eventsResult, ordersResult, subjectsResult, typesResult, resultsResult, teachersResult, organizersResult, countriesResult, citiesResult];
   const referenceError = referenceResults.find(result => result.error)?.error;
   if (referenceError) { tableWrap.textContent = "Ошибка загрузки справочников: " + referenceError.message; return; }
