@@ -76,6 +76,8 @@ const tvBirthdaysEnabled = document.querySelector("#tv-birthdays-enabled");
 const tvAnnouncementsEnabled = document.querySelector("#tv-announcements-enabled");
 const tvEventsEnabled = document.querySelector("#tv-events-enabled");
 const tvLeaderboardEnabled = document.querySelector("#tv-leaderboard-enabled");
+const tvAutoSaveStatuses = ["#tv-publications-save-status", "#tv-birthdays-save-status", "#tv-ranking-save-status"]
+  .map(selector => document.querySelector(selector));
 const tvLeaderboardPeriod = document.querySelector("#tv-leaderboard-period");
 const tvLeaderboardTopCount = document.querySelector("#tv-leaderboard-top-count");
 const tvLeaderboardGroupMode = document.querySelector("#tv-leaderboard-group-mode");
@@ -105,6 +107,7 @@ let renderedScheduleDay = "1";
 let schoolScheduleEditing = false;
 let leaderboardClasses = [];
 let leaderboardClassShifts = {};
+let leaderboardSavedClassShifts = {};
 let leaderboardSelectedGroups = [];
 let leaderboardSettingsLoaded = false;
 
@@ -737,6 +740,7 @@ async function loadTvLeaderboardSettings() {
     tvLeaderboardTopCount.value = data.top_count ?? 10;
     tvLeaderboardGroupMode.value = data.group_mode || "all";
     leaderboardClassShifts = AynaClass.normalizeShiftMap(data.class_shift_map);
+    leaderboardSavedClassShifts = { ...leaderboardClassShifts };
     leaderboardSelectedGroups = Array.isArray(data.selected_groups)
       ? data.selected_groups.map(value => tvLeaderboardGroupMode.value === "class" ? AynaClass.normalize(value) : String(value))
       : [];
@@ -907,36 +911,47 @@ async function verifyTvLeaderboard(userId) {
   return { message: "Сохранено · ТВ получает " + rows.length + " записей рейтинга", type: "success" };
 }
 
+let tvContentAutoSaveTimer = null;
+let tvContentAutoSaveQueued = false;
+let tvContentChangeVersion = 0;
 async function saveTvSettings(event) {
   const { data: sessionData } = await supabaseClient.auth.getSession();
   if (!sessionData.session) return;
   const activeButton = event.currentTarget;
-  const isRanking = activeButton === saveTvLeaderboardSettingsButton || activeButton === saveClassShiftsButton;
+  const isRanking = activeButton === saveTvLeaderboardSettingsButton;
+  const isClassShifts = activeButton === saveClassShiftsButton;
   const isQuarter = activeButton === saveQuarterSettingsButton;
+  const isContent = !isRanking && !isClassShifts && !isQuarter;
+  const contentSaveVersion = tvContentChangeVersion;
   const originalButtonText = activeButton.textContent;
   activeButton.disabled = true;
   activeButton.textContent = "Сохраняем...";
   try {
     const userId = sessionData.session.user.id;
     const settings = { updated_at: new Date().toISOString() };
-    if (isRanking) {
+    if (isRanking || isClassShifts) {
       if (!leaderboardSettingsLoaded) throw new Error("Настройки рейтинга ещё не загрузились. Обновите страницу.");
+    }
+    if (isRanking) {
       const topCount = Number(tvLeaderboardTopCount.value);
       if (!Number.isInteger(topCount) || topCount < 1 || topCount > 20) throw new Error("Укажите число учеников от 1 до 20");
-      const classShiftMap = {};
-      classShiftList.querySelectorAll("select[data-class-name]").forEach(function (select) {
-        if (select.value) classShiftMap[select.dataset.className] = Number(select.value);
-      });
       const selectedGroups = Array.from(leaderboardScopeOptions.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
       if (tvLeaderboardGroupMode.value !== "all" && !selectedGroups.length) throw new Error("Выберите хотя бы одну группу для рейтинга");
-      if (tvLeaderboardGroupMode.value === "shift" && !Object.keys(classShiftMap).length) throw new Error("Сначала назначьте смены классам");
+      if (tvLeaderboardGroupMode.value === "shift" && !leaderboardClasses.some(className => leaderboardSavedClassShifts[className])) {
+        throw new Error("Сначала назначьте смены классам");
+      }
       Object.assign(settings, {
         period_type: tvLeaderboardPeriod.value,
         top_count: topCount,
         group_mode: tvLeaderboardGroupMode.value,
-        selected_groups: selectedGroups,
-        class_shift_map: classShiftMap
+        selected_groups: selectedGroups
       });
+    } else if (isClassShifts) {
+      const classShiftMap = {};
+      classShiftList.querySelectorAll("select[data-class-name]").forEach(function (select) {
+        if (select.value) classShiftMap[select.dataset.className] = Number(select.value);
+      });
+      settings.class_shift_map = classShiftMap;
     } else if (isQuarter) {
       const invalidQuarter = quarterDateControls.find(controls => !controls.start.value || !controls.end.value || controls.end.value < controls.start.value);
       if (invalidQuarter) throw new Error("Проверьте даты начала и окончания четвертей");
@@ -960,7 +975,7 @@ async function saveTvSettings(event) {
       .from("screen_leaderboard_settings")
       .update(settings)
       .eq("user_id", userId)
-      .select("period_type,top_count,group_mode,selected_groups,class_shift_map")
+      .select("period_type,top_count,group_mode,selected_groups,class_shift_map,is_enabled,show_birthdays,show_announcements,show_events")
       .single(), 20000);
     if (error && /top_count/i.test(error.message || "")) {
       throw new Error("Сначала выполните supabase-leaderboard-top-count-update.sql в Supabase");
@@ -969,41 +984,64 @@ async function saveTvSettings(event) {
       throw new Error("Обновление базы для группировки рейтинга ещё не применено");
     }
     if (error) throw error;
-    const sameShiftMap = isRanking && Object.keys({ ...saved.class_shift_map, ...settings.class_shift_map }).every(
+    const sameShiftMap = isClassShifts && Object.keys({ ...saved.class_shift_map, ...settings.class_shift_map }).every(
       className => Number(saved.class_shift_map?.[className] || 0) === Number(settings.class_shift_map?.[className] || 0)
     );
-    if (isRanking && (saved.group_mode !== settings.group_mode || saved.period_type !== settings.period_type || saved.top_count !== settings.top_count || !sameShiftMap ||
+    if (isRanking && (saved.group_mode !== settings.group_mode || saved.period_type !== settings.period_type || saved.top_count !== settings.top_count ||
       [...(saved.selected_groups || [])].map(String).sort().join("|") !== [...settings.selected_groups].map(String).sort().join("|"))) {
       throw new Error("Не удалось подтвердить сохранение настроек рейтинга");
     }
+    if (isClassShifts && !sameShiftMap) throw new Error("Не удалось подтвердить сохранение классов и смен");
+    if (isContent && ["is_enabled", "show_birthdays", "show_announcements", "show_events"].some(key => saved[key] !== settings[key])) {
+      throw new Error("Не удалось подтвердить сохранение показа на ТВ");
+    }
     if (isRanking) {
-      leaderboardClassShifts = saved.class_shift_map || {};
       leaderboardSelectedGroups = saved.selected_groups || [];
-      renderLeaderboardClassShifts();
       leaderboardSaveStatus.textContent = "Сохранено · проверяем ТВ";
+    }
+    if (isClassShifts) {
+      leaderboardClassShifts = saved.class_shift_map || {};
+      leaderboardSavedClassShifts = { ...leaderboardClassShifts };
+      renderLeaderboardClassShifts();
       classShiftSaveStatus.textContent = "Сохранено · проверяем ТВ";
+    }
+    if (isRanking || isClassShifts) {
       try {
         const tvCheck = await verifyTvLeaderboard(userId);
-        leaderboardSaveStatus.textContent = tvCheck.message;
-        classShiftSaveStatus.textContent = tvCheck.message;
+        if (isRanking) leaderboardSaveStatus.textContent = tvCheck.message;
+        if (isClassShifts) classShiftSaveStatus.textContent = tvCheck.message;
         if (tvCheck.type !== "success") AynaUI.notify(tvCheck.message, tvCheck.type);
       } catch (tvError) {
-        leaderboardSaveStatus.textContent = "Сохранено, но ТВ-рейтинг не удалось проверить";
-        classShiftSaveStatus.textContent = "Сохранено, но ТВ-рейтинг не удалось проверить";
+        if (isRanking) leaderboardSaveStatus.textContent = "Сохранено, но ТВ-рейтинг не удалось проверить";
+        if (isClassShifts) classShiftSaveStatus.textContent = "Сохранено, но ТВ-рейтинг не удалось проверить";
         AynaUI.notify("Настройки сохранены, но ТВ-рейтинг не загрузился: " + (tvError.message || "ошибка запроса"), "warning");
       }
     }
     activeButton.textContent = "Сохранено";
-    if (!isRanking) AynaUI.notify("Настройки ТВ-экрана сохранены", "success");
+    if (isContent && contentSaveVersion === tvContentChangeVersion) tvAutoSaveStatuses.forEach(status => {
+      if (status.dataset.saveState === "pending") {
+        status.dataset.saveState = "saved";
+        status.textContent = "Сохранено";
+      }
+    });
+    if (isQuarter) AynaUI.notify("Настройки учебных периодов сохранены", "success");
   } catch (error) {
     activeButton.textContent = "Ошибка";
-    if (isRanking) {
-      leaderboardSaveStatus.textContent = "Не сохранено";
-      classShiftSaveStatus.textContent = "Не сохранено";
-    }
+    if (isRanking) leaderboardSaveStatus.textContent = "Не сохранено";
+    if (isClassShifts) classShiftSaveStatus.textContent = "Не сохранено";
+    if (isContent && contentSaveVersion === tvContentChangeVersion) tvAutoSaveStatuses.forEach(status => {
+      if (status.dataset.saveState === "pending") {
+        status.dataset.saveState = "error";
+        status.textContent = "Не сохранено";
+      }
+    });
     alert("Ошибка сохранения: " + (error.message || "не удалось сохранить настройки"));
   } finally {
     activeButton.disabled = false;
+    if (isContent && tvContentAutoSaveQueued) {
+      tvContentAutoSaveQueued = false;
+      saveTvContentSettingsButton.click();
+    }
     window.setTimeout(function () {
       activeButton.textContent = originalButtonText;
     }, 1800);
@@ -1011,11 +1049,20 @@ async function saveTvSettings(event) {
 }
 
 saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
-let tvContentAutoSaveTimer = null;
 [tvBirthdaysEnabled, tvAnnouncementsEnabled, tvEventsEnabled, tvLeaderboardEnabled].forEach(function (checkbox) {
   checkbox.addEventListener("change", function () {
+    tvContentChangeVersion += 1;
+    const status = checkbox.closest(".settings-inline-visibility")?.querySelector(".tv-auto-save-status");
+    if (status) {
+      status.dataset.saveState = "pending";
+      status.textContent = "Сохраняется...";
+    }
     window.clearTimeout(tvContentAutoSaveTimer);
     tvContentAutoSaveTimer = window.setTimeout(function () {
+      if (saveTvContentSettingsButton.disabled) {
+        tvContentAutoSaveQueued = true;
+        return;
+      }
       saveTvContentSettingsButton.click();
     }, 250);
   });
@@ -1028,6 +1075,11 @@ function organizeSettingsSections() {
   const panel = document.querySelector("#settings-panel");
   if (!panel || panel.dataset.organized === "true") return;
   panel.dataset.organized = "true";
+  const navigation = document.createElement("nav");
+  navigation.className = "settings-navigation";
+  navigation.setAttribute("aria-label", "Разделы настроек");
+  const pages = document.createElement("div");
+  pages.className = "settings-pages";
   const groups = [
     ["Общие", [".screen-access-row", ".tv-logo-manager", ".school-schedule-manager", ".school-base-manager"]],
     ["Достижения", [".achievement-fields-manager", ".achievement-upload-card:not(#achievement-export-panel)", ".scoring-manager", "#achievement-export-panel"]],
@@ -1035,27 +1087,54 @@ function organizeSettingsSections() {
     ["Публикации", [".tv-publications-manager"]],
     ["Дни рождения", [".tv-birthdays-manager"]]
   ];
-  groups.forEach(function ([title, selectors]) {
-    const category = document.createElement("details");
+  function showCategory(selectedCategory) {
+    pages.querySelectorAll(".settings-category").forEach(function (category) {
+      category.hidden = category !== selectedCategory;
+    });
+    navigation.querySelectorAll("button").forEach(function (button) {
+      const active = button.getAttribute("aria-controls") === selectedCategory.id;
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+  }
+  groups.forEach(function ([title, selectors], index) {
+    const category = document.createElement("section");
     category.className = "settings-category";
-    const summary = document.createElement("summary");
-    summary.className = "settings-category-summary";
-    summary.innerHTML = `<span><strong>${title}</strong></span><span class="settings-category-action" aria-hidden="true"><span class="settings-category-open-label">Настроить</span><span class="settings-category-close-label">Скрыть</span></span>`;
+    category.id = "settings-category-" + index;
+    category.hidden = index !== 0;
+    const heading = document.createElement("h2");
+    heading.className = "settings-category-heading";
+    heading.textContent = title;
     const body = document.createElement("div");
     body.className = "settings-category-body";
-    category.append(summary, body);
-    panel.append(category);
+    category.append(heading, body);
+    pages.append(category);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = title;
+    button.setAttribute("aria-controls", category.id);
+    button.setAttribute("aria-current", index === 0 ? "page" : "false");
+    button.addEventListener("click", function () { showCategory(category); });
+    navigation.append(button);
     selectors.forEach(function (selector) {
       const section = panel.querySelector(selector);
-      if (section) body.append(section);
-    });
-    category.addEventListener("toggle", function () {
-      if (!category.open) return;
-      panel.querySelectorAll(".settings-category[open]").forEach(function (otherCategory) {
-        if (otherCategory !== category) otherCategory.open = false;
-      });
+      if (!section) return;
+      if (section.tagName === "DETAILS") {
+        const summary = section.querySelector(":scope > summary");
+        const staticCard = document.createElement("section");
+        staticCard.className = section.className;
+        const subsectionHeading = document.createElement("h3");
+        subsectionHeading.className = "settings-section-heading";
+        subsectionHeading.textContent = summary?.querySelector("strong")?.textContent?.trim() || title;
+        staticCard.append(subsectionHeading);
+        Array.from(section.children).filter(child => child !== summary).forEach(child => staticCard.append(child));
+        body.append(staticCard);
+        section.remove();
+      } else {
+        body.append(section);
+      }
     });
   });
+  panel.append(navigation, pages);
 }
 
 organizeSettingsSections();
