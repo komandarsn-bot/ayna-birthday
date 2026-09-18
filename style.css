@@ -2747,6 +2747,12 @@ input[type="file"] {
     text-align: center;
   }
   #app-content #settings-panel .settings-navigation button[aria-current="page"] { box-shadow: inset 0 -3px #28675d; }
+  #app-content #settings-panel .screen-access-row { display: grid; gap: 8px; }
+  #app-content #settings-panel .screen-access-row strong { line-height: 1.4; }
+  #app-content #settings-panel .screen-access-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; }
+  #app-content #settings-panel .screen-access-actions button,
+  #app-content #settings-panel #create-screen-button { width: 100%; min-width: 0; white-space: normal; }
   #settings-panel .tv-logo-copy { flex-basis: 0; }
   #settings-panel .tv-logo-actions { flex-basis: 100%; justify-content: flex-start; margin-left: 0; }
+  #app-content #settings-panel .tv-logo-actions button { flex: 1 1 100%; }
 }
