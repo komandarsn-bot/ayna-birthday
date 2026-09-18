@@ -2599,10 +2599,10 @@ input[type="file"] {
 /* Настройки: постоянная навигация и открытые панели вместо вложенных аккордеонов. */
 #app-content #settings-panel {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
+  grid-template-columns: 176px minmax(0, 1fr);
   align-items: start;
-  gap: 22px;
-  padding: 20px;
+  gap: 18px;
+  padding: 16px;
 }
 #settings-panel .settings-navigation {
   position: sticky;
@@ -2635,27 +2635,34 @@ input[type="file"] {
 #settings-panel .settings-pages { min-width: 0; }
 #settings-panel .settings-category[hidden] { display: none !important; }
 #settings-panel .settings-category-heading {
-  margin: 0 0 16px;
-  color: #173f39;
-  font-size: 20px;
-  font-weight: 750;
-  line-height: 1.25;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 #settings-panel .settings-category-body {
   display: grid;
-  gap: 14px;
+  gap: 0;
   padding: 0;
   border: 0;
 }
 #app-content #settings-panel .settings-category-body > .card {
-  border: 1px solid #dce6e3;
-  border-radius: 10px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid #e1e8e6;
+  border-radius: 0;
   background: #fff;
+  box-shadow: none;
 }
 #settings-panel .settings-section-heading {
   margin: 0;
-  padding: 13px 16px;
-  border-bottom: 1px solid #e1e8e6;
+  padding: 18px 2px 8px;
+  border: 0;
   color: #214b44;
   font-size: 15px;
   font-weight: 700;
@@ -2665,12 +2672,57 @@ input[type="file"] {
 #app-content #settings-panel .achievement-reference-content {
   width: 100%;
   margin: 0;
-  padding: 16px;
+  padding: 8px 2px 16px;
   border: 0;
   box-sizing: border-box;
 }
-#settings-panel .settings-category-body > .screen-access-row { margin: 0; }
-#settings-panel .settings-category-body > .settings-inline-visibility:not(.tv-publications-manager) { flex-wrap: wrap; }
+#app-content #settings-panel .settings-category-body > .screen-access-row {
+  margin: 0;
+  padding: 4px 2px 14px;
+  border: 0;
+  border-bottom: 1px solid #e1e8e6;
+  border-radius: 0;
+  background: transparent;
+}
+#settings-panel .tv-logo-settings { display: flex; flex-wrap: wrap; gap: 12px; }
+#settings-panel .tv-logo-preview { flex: 0 0 100px; width: 100px; height: 54px; }
+#settings-panel .tv-logo-copy { flex: 1 1 0; align-self: center; }
+#settings-panel .tv-logo-copy > strong,
+#settings-panel .tv-logo-copy > span { display: none; }
+#settings-panel .tv-logo-actions { flex: 0 1 auto; flex-wrap: wrap; margin-left: auto; }
+#settings-panel .shift-schedule-editors { gap: 10px; margin-top: 10px; }
+#settings-panel .shift-schedule-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+#settings-panel .shift-schedule-card textarea { min-height: 108px; }
+#settings-panel .schedule-footer { padding-top: 8px; }
+#settings-panel .settings-category-body > .settings-inline-visibility:not(.tv-publications-manager) {
+  flex-wrap: wrap;
+  padding: 8px 2px !important;
+}
+#settings-panel .settings-category-body > .settings-inline-visibility:not(.tv-publications-manager) .tv-content-toggles {
+  grid-template-columns: max-content;
+  justify-content: end;
+  margin-left: auto;
+}
+#settings-panel .tv-ranking-manager .leaderboard-save-actions {
+  position: static;
+  min-height: 0;
+  padding: 8px 0 14px;
+  border-top: 0;
+}
+#settings-panel .tv-class-shifts-manager .class-shift-save-actions {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 0;
+}
+#settings-panel .leaderboard-scope-panel {
+  padding: 8px 0;
+  border: 0;
+  border-radius: 0;
+}
 #settings-panel .tv-auto-save-status:not(:empty) {
   display: block;
   flex: 0 0 100%;
@@ -2680,7 +2732,7 @@ input[type="file"] {
   font-size: 12px;
 }
 @media (max-width: 760px) {
-  #app-content #settings-panel { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 12px; }
+  #app-content #settings-panel { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 12px; }
   #settings-panel .settings-navigation {
     position: static;
     display: flex;
@@ -2695,4 +2747,6 @@ input[type="file"] {
     text-align: center;
   }
   #app-content #settings-panel .settings-navigation button[aria-current="page"] { box-shadow: inset 0 -3px #28675d; }
+  #settings-panel .tv-logo-copy { flex-basis: 0; }
+  #settings-panel .tv-logo-actions { flex-basis: 100%; justify-content: flex-start; margin-left: 0; }
 }
