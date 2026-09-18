@@ -1118,6 +1118,7 @@ function organizeSettingsSections() {
     selectors.forEach(function (selector) {
       const section = panel.querySelector(selector);
       if (!section) return;
+      let mountedSection = section;
       if (section.tagName === "DETAILS") {
         const summary = section.querySelector(":scope > summary");
         const staticCard = document.createElement("section");
@@ -1129,9 +1130,20 @@ function organizeSettingsSections() {
         Array.from(section.children).filter(child => child !== summary).forEach(child => staticCard.append(child));
         body.append(staticCard);
         section.remove();
+        mountedSection = staticCard;
       } else {
         body.append(section);
       }
+      mountedSection.querySelectorAll("details").forEach(function (details) {
+        const summary = details.querySelector(":scope > summary");
+        if (!summary) return;
+        const subsectionHeading = document.createElement("h3");
+        subsectionHeading.className = "settings-section-heading";
+        subsectionHeading.textContent = summary.querySelector("strong")?.textContent?.trim() || title;
+        details.insertBefore(subsectionHeading, summary);
+        summary.remove();
+        details.open = true;
+      });
     });
   });
   panel.append(navigation, pages);
@@ -3882,6 +3894,7 @@ achievementForm.addEventListener("submit", async function (event) {
     achievementExportDetails.open = true;
     const settingsTab = document.querySelector("#settings-tab");
     if (settingsTab) selectAdminTab(settingsTab);
+    document.querySelector('#settings-panel .settings-navigation button[aria-controls="settings-category-1"]')?.click();
     achievementExportPanel.scrollIntoView({ behavior: "smooth", block: "center" });
     finishAchievementsButton.focus();
     return;

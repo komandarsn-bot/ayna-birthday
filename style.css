@@ -2723,6 +2723,39 @@ input[type="file"] {
   border: 0;
   border-radius: 0;
 }
+#settings-panel .achievement-upload-card .achievement-reference-manager {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+#app-content #settings-panel .achievement-upload-card .achievement-reference-content,
+#app-content #settings-panel #achievement-export-panel .achievement-reference-content {
+  margin: 0;
+  padding: 8px 2px 16px;
+  background: transparent;
+}
+#app-content #settings-panel #achievement-export-panel .achievement-export-status {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+#settings-panel .achievement-fields-settings {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+#settings-panel .achievement-fields-settings label {
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 0;
+  border-bottom: 1px solid #e1e8e6;
+  border-radius: 0;
+  background: transparent;
+}
+#settings-panel .achievement-fields-settings label.is-required { background: #f7faf9; }
 #settings-panel .tv-auto-save-status:not(:empty) {
   display: block;
   flex: 0 0 100%;
@@ -2755,4 +2788,7 @@ input[type="file"] {
   #settings-panel .tv-logo-copy { flex-basis: 0; }
   #settings-panel .tv-logo-actions { flex-basis: 100%; justify-content: flex-start; margin-left: 0; }
   #app-content #settings-panel .tv-logo-actions button { flex: 1 1 100%; }
+}
+@media (max-width: 520px) {
+  #settings-panel .achievement-fields-settings { grid-template-columns: minmax(0, 1fr); }
 }
