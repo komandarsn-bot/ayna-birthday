@@ -202,7 +202,6 @@ const loadAchievementsButton = document.querySelector("#load-achievements-button
 const finishAchievementsButton = document.querySelector("#finish-achievements-button");
 const achievementExportMessage = document.querySelector("#achievement-export-message");
 const achievementExportPanel = document.querySelector("#achievement-export-panel");
-const achievementExportDetails = document.querySelector("#achievement-export-details");
 const achievementExportSummary = document.querySelector("#achievement-export-summary");
 const copyLastAchievementButton = document.querySelector("#copy-last-achievement-button");
 const cancelAchievementEditButton = document.querySelector("#cancel-achievement-edit-button");
@@ -1137,12 +1136,15 @@ function organizeSettingsSections() {
       mountedSection.querySelectorAll("details").forEach(function (details) {
         const summary = details.querySelector(":scope > summary");
         if (!summary) return;
+        const staticSubsection = document.createElement("section");
+        staticSubsection.className = details.className;
+        if (details.id) staticSubsection.id = details.id;
         const subsectionHeading = document.createElement("h3");
         subsectionHeading.className = "settings-section-heading";
         subsectionHeading.textContent = summary.querySelector("strong")?.textContent?.trim() || title;
-        details.insertBefore(subsectionHeading, summary);
-        summary.remove();
-        details.open = true;
+        staticSubsection.append(subsectionHeading);
+        Array.from(details.children).filter(child => child !== summary).forEach(child => staticSubsection.append(child));
+        details.replaceWith(staticSubsection);
       });
     });
   });
@@ -3891,7 +3893,6 @@ achievementForm.addEventListener("submit", async function (event) {
   if (!achievementExportDirectory) {
     achievementExportMessage.textContent = "Сначала выберите папку для сохранения Excel-файлов";
     achievementExportPanel.classList.add("needs-attention");
-    achievementExportDetails.open = true;
     const settingsTab = document.querySelector("#settings-tab");
     if (settingsTab) selectAdminTab(settingsTab);
     document.querySelector('#settings-panel .settings-navigation button[aria-controls="settings-category-1"]')?.click();

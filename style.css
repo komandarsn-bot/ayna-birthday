@@ -2756,6 +2756,22 @@ input[type="file"] {
   background: transparent;
 }
 #settings-panel .achievement-fields-settings label.is-required { background: #f7faf9; }
+#settings-panel details > summary { display: none !important; }
+#settings-panel .scoring-table-wrap {
+  width: 100%;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+}
+#settings-panel .scoring-table {
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+}
+#settings-panel .scoring-table th,
+#settings-panel .scoring-table td { padding: 6px 4px; }
+#settings-panel .scoring-table thead th:first-child { width: 126px; }
+#settings-panel .scoring-table input { width: min(100%, 52px); }
 #settings-panel .tv-auto-save-status:not(:empty) {
   display: block;
   flex: 0 0 100%;
@@ -2791,4 +2807,48 @@ input[type="file"] {
 }
 @media (max-width: 520px) {
   #settings-panel .achievement-fields-settings { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  #settings-panel .scoring-table,
+  #settings-panel .scoring-table tbody { display: block; }
+  #settings-panel .scoring-table thead { display: none; }
+  #settings-panel .scoring-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #dce6e3;
+  }
+  #settings-panel .scoring-table tbody th {
+    grid-column: 1 / -1;
+    height: auto;
+    padding: 2px 0 8px;
+    border: 0;
+    background: transparent;
+  }
+  #settings-panel .scoring-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    height: auto;
+    min-height: 42px;
+    padding: 5px 0;
+    border-right: 0;
+    border-bottom: 1px solid #edf2f0;
+    text-align: left;
+  }
+  #settings-panel .scoring-table tbody td::before { color: #526c66; font-size: 12px; }
+  #settings-panel .scoring-table tbody td:nth-of-type(1)::before { content: "1 место"; }
+  #settings-panel .scoring-table tbody td:nth-of-type(2)::before { content: "2 место"; }
+  #settings-panel .scoring-table tbody td:nth-of-type(3)::before { content: "3 место"; }
+  #settings-panel .scoring-table tbody td:nth-of-type(4)::before { content: "Номинация"; }
+  #settings-panel .scoring-table tbody td:nth-of-type(5)::before { content: "Сертификат"; }
+  html[lang="kk"] #settings-panel .scoring-table tbody td:nth-of-type(1)::before { content: "1 орын"; }
+  html[lang="kk"] #settings-panel .scoring-table tbody td:nth-of-type(2)::before { content: "2 орын"; }
+  html[lang="kk"] #settings-panel .scoring-table tbody td:nth-of-type(3)::before { content: "3 орын"; }
+  #settings-panel .scoring-table input { flex: 0 0 52px; }
+}
+@media (max-width: 520px) {
+  #settings-panel .scoring-table tbody tr { grid-template-columns: minmax(0, 1fr); }
 }
