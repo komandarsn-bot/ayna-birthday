@@ -3798,12 +3798,6 @@ cancelAchievementEditButton.addEventListener("click", function () {
 achievementForm.addEventListener("submit", async function (event) {
   event.preventDefault();
 
-  const { data: sessionData } = await supabaseClient.auth.getSession();
-  if (!sessionData.session) {
-    achievementMessage.textContent = "Сначала войдите в аккаунт";
-    return;
-  }
-
   chooseAchievementStudent();
   if (!selectedAchievementStudent) {
     achievementMessage.textContent = "Выберите существующего ученика из подсказок";
@@ -3887,6 +3881,27 @@ achievementForm.addEventListener("submit", async function (event) {
   ) {
     achievementMessage.textContent = "Дата окончания не может быть раньше даты начала";
     achievementEndDate.focus();
+    return;
+  }
+
+  try {
+    // Открываем системный выбор папки до первого await обработчика: браузеру
+    // требуется активное пользовательское нажатие для showDirectoryPicker().
+    const directory = await ensureAchievementExportDirectory();
+    achievementExportPanel.classList.remove("needs-attention");
+    achievementExportMessage.textContent = "";
+    achievementExportSummary.textContent = directory.name;
+    finishAchievementsButton.textContent = "Изменить папку";
+  } catch (error) {
+    achievementMessage.textContent = error.name === "AbortError"
+      ? "Выбор папки отменён. Достижение не сохранено."
+      : "Не удалось выбрать папку: " + error.message + ". Достижение не сохранено.";
+    return;
+  }
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  if (!sessionData.session) {
+    achievementMessage.textContent = "Сначала войдите в аккаунт";
     return;
   }
 
