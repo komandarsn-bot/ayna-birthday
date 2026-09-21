@@ -1316,16 +1316,16 @@ input[type="file"] {
   margin-bottom: 20px;
   border: 1px solid #d5dfdc;
   border-radius: 14px;
-  background: #e9eeec;
+  background: #ffffff;
   box-shadow: 0 6px 18px rgba(23, 58, 53, 0.06);
 }
 
 .admin-tabs button {
   min-width: 0;
   padding: 12px 8px;
-  border: 0;
+  border: 1px solid #e1eae7;
   border-radius: 9px;
-  background: transparent;
+  background: #ffffff;
   color: #31514c;
   font-size: clamp(12px, 1.4vw, 15px);
   line-height: 1.15;
@@ -1334,12 +1334,13 @@ input[type="file"] {
 }
 
 .admin-tabs button:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: #f4f8f7;
   color: #173a35;
 }
 
 .admin-tabs button[aria-selected="true"] {
   background: #173a35;
+  border-color: #173a35;
   color: #ffffff;
   box-shadow: 0 5px 14px rgba(23, 58, 53, 0.2);
 }
