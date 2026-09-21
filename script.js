@@ -3890,17 +3890,6 @@ achievementForm.addEventListener("submit", async function (event) {
     return;
   }
 
-  if (!achievementExportDirectory) {
-    achievementExportMessage.textContent = "Сначала выберите папку для сохранения Excel-файлов";
-    achievementExportPanel.classList.add("needs-attention");
-    const settingsTab = document.querySelector("#settings-tab");
-    if (settingsTab) selectAdminTab(settingsTab);
-    document.querySelector('#settings-panel .settings-navigation button[aria-controls="settings-category-1"]')?.click();
-    achievementExportPanel.scrollIntoView({ behavior: "smooth", block: "center" });
-    finishAchievementsButton.focus();
-    return;
-  }
-
   const costValue = isAchievementFieldEnabled("cost") ? document.querySelector("#achievement-cost").value : "";
   const achievement = {
     user_id: sessionData.session.user.id,
@@ -4027,8 +4016,10 @@ achievementForm.addEventListener("submit", async function (event) {
     achievementMessage.textContent = exportResult.createdNewFile
       ? savedText + " Создан новый Excel-файл: " + exportResult.fileName
       : savedText + " Excel-файл обновлён: " + exportResult.fileName;
-  } else if (exportResult.status === "folder-not-selected" || exportResult.status === "permission-required") {
-    achievementMessage.textContent = savedText + " Выберите папку для сохранения Excel-файлов";
+  } else if (exportResult.status === "folder-not-selected") {
+    achievementMessage.textContent = savedText + " Excel-копия не создана: папка не выбрана.";
+  } else if (exportResult.status === "permission-required") {
+    achievementMessage.textContent = savedText + " Excel-копия не обновлена: нет доступа к папке.";
   } else {
     achievementMessage.textContent = savedText + " Excel обновить не удалось";
   }
