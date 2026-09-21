@@ -910,22 +910,25 @@ async function verifyTvLeaderboard(userId) {
   return { message: "Сохранено · ТВ получает " + rows.length + " записей рейтинга", type: "success" };
 }
 
-let tvContentAutoSaveTimer = null;
 let tvContentAutoSaveQueued = false;
 let tvContentChangeVersion = 0;
 async function saveTvSettings(event) {
-  const { data: sessionData } = await supabaseClient.auth.getSession();
-  if (!sessionData.session) return;
   const activeButton = event.currentTarget;
   const isRanking = activeButton === saveTvLeaderboardSettingsButton;
   const isClassShifts = activeButton === saveClassShiftsButton;
   const isQuarter = activeButton === saveQuarterSettingsButton;
   const isContent = !isRanking && !isClassShifts && !isQuarter;
+  if (activeButton.disabled) {
+    if (isContent) tvContentAutoSaveQueued = true;
+    return;
+  }
   const contentSaveVersion = tvContentChangeVersion;
   const originalButtonText = activeButton.textContent;
   activeButton.disabled = true;
   activeButton.textContent = "Сохраняем...";
   try {
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    if (!sessionData.session) throw new Error("Сначала войдите в аккаунт");
     const userId = sessionData.session.user.id;
     const settings = { updated_at: new Date().toISOString() };
     if (isRanking || isClassShifts) {
@@ -1039,7 +1042,7 @@ async function saveTvSettings(event) {
     activeButton.disabled = false;
     if (isContent && tvContentAutoSaveQueued) {
       tvContentAutoSaveQueued = false;
-      saveTvContentSettingsButton.click();
+      void saveTvSettings({ currentTarget: saveTvContentSettingsButton });
     }
     window.setTimeout(function () {
       activeButton.textContent = originalButtonText;
@@ -1056,14 +1059,8 @@ saveTvContentSettingsButton.addEventListener("click", saveTvSettings);
       status.dataset.saveState = "pending";
       status.textContent = "Сохраняется...";
     }
-    window.clearTimeout(tvContentAutoSaveTimer);
-    tvContentAutoSaveTimer = window.setTimeout(function () {
-      if (saveTvContentSettingsButton.disabled) {
-        tvContentAutoSaveQueued = true;
-        return;
-      }
-      saveTvContentSettingsButton.click();
-    }, 250);
+    if (saveTvContentSettingsButton.disabled) tvContentAutoSaveQueued = true;
+    else void saveTvSettings({ currentTarget: saveTvContentSettingsButton });
   });
 });
 saveTvLeaderboardSettingsButton.addEventListener("click", saveTvSettings);

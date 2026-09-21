@@ -602,14 +602,23 @@ async function loadContent() {
     const rawSettings = !settingsResult.error && Array.isArray(settingsResult.data)
       ? settingsResult.data[0]
       : null;
+    if (!rawSettings) {
+      updateBirthdays([]);
+      updateNews([]);
+      updateLeaderboard([]);
+      showScreenState("Настройки ТВ временно недоступны", "Повторим загрузку через несколько секунд.");
+      return;
+    }
     const displaySettings = {
       birthdays: rawSettings?.show_birthdays !== false,
       announcements: rawSettings?.show_announcements !== false,
       events: rawSettings?.show_events !== false,
       leaderboard: rawSettings?.show_leaderboard !== false
     };
-    if (!birthdayResult.error) updateBirthdays(displaySettings.birthdays ? (birthdayResult.data || []) : []);
-    if (!newsResult.error) {
+    if (!displaySettings.birthdays) updateBirthdays([]);
+    else if (!birthdayResult.error) updateBirthdays(birthdayResult.data || []);
+    if (!displaySettings.announcements && !displaySettings.events) updateNews([]);
+    else if (!newsResult.error) {
       const visibleNews = (newsResult.data || []).filter(function (item) {
         const paths = Array.isArray(item.news_image_paths) ? item.news_image_paths.filter(Boolean) : [];
         const isAnnouncement = !paths.length && !item.news_image_path && Boolean(item.news_link_url);
@@ -617,7 +626,8 @@ async function loadContent() {
       });
       updateNews(visibleNews);
     }
-    if (!leaderboardResult.error) updateLeaderboard(displaySettings.leaderboard ? (leaderboardResult.data || []) : []);
+    if (!displaySettings.leaderboard) updateLeaderboard([]);
+    else if (!leaderboardResult.error) updateLeaderboard(leaderboardResult.data || []);
     if (!scheduleResult.error) {
       schoolSchedule = Array.isArray(scheduleResult.data) ? (scheduleResult.data[0] || null) : scheduleResult.data;
       renderSchoolLogo();
