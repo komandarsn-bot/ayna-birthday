@@ -759,11 +759,22 @@ async function fetchStudentRows(columns) {
   const rows = [];
   const pageSize = 500;
   for (let offset = 0; ; offset += pageSize) {
-    const { data, error } = await supabaseClient.from("students")
-      .select(columns).order("id").range(offset, offset + pageSize - 1);
+    const { data, error } = await retryFutureJwtError(() => supabaseClient.from("students")
+      .select(columns).order("id").range(offset, offset + pageSize - 1));
     if (error) return { data: null, error };
     rows.push(...data);
     if (data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function retryFutureJwtError(request) {
+  const delays = [1500, 3000, 6000];
+  for (let attempt = 0; ; attempt++) {
+    const result = await request();
+    if (!result.error || !/JWT issued at future/i.test(result.error.message || "") || attempt >= delays.length) {
+      return result;
+    }
+    await new Promise(resolve => setTimeout(resolve, delays[attempt]));
   }
 }
 
@@ -2193,9 +2204,9 @@ achievementFirstName.addEventListener("focus", showFirstNameSuggestions);
 
 async function loadTeachers() {
   teachersList.textContent = "Загрузка...";
-  const { data, error } = await supabaseClient
+  const { data, error } = await retryFutureJwtError(() => supabaseClient
     .from("teachers")
-    .select("id,last_name,first_name,middle_name,position,birth_date,gender");
+    .select("id,last_name,first_name,middle_name,position,birth_date,gender"));
   if (error) {
     teachersList.textContent = "Ошибка: " + error.message;
     return;
