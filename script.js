@@ -2422,6 +2422,25 @@ function excelDate(row, heading) {
   return "";
 }
 
+function bindSchoolImportTemplate(buttonId, sheetName, columns, message) {
+  document.getElementById(buttonId).addEventListener("click", function () {
+    try {
+      const headers = ["Фамилия", "Имя", "Отчество", ...columns];
+      const sheet = XLSX.utils.aoa_to_sheet([headers]);
+      sheet["!cols"] = headers.map(name => ({ wch: Math.max(18, name.length + 2) }));
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, sheet, sheetName);
+      XLSX.writeFile(workbook, `Ayna — ${sheetName}.xlsx`);
+    } catch (error) {
+      console.warn("Ошибка скачивания шаблона Excel", error);
+      message.textContent = "Не удалось скачать шаблон Excel. Обновите страницу и попробуйте ещё раз.";
+    }
+  });
+}
+
+bindSchoolImportTemplate("download-students-template", "Ученики", ["Класс", "Дата рождения"], studentsUploadMessage);
+bindSchoolImportTemplate("download-teachers-template", "Учителя", ["Должность", "Дата рождения", "Пол"], teachersUploadMessage);
+
 async function uploadSchoolPeople(options) {
   const file = options.fileInput.files[0];
   if (!file) {
