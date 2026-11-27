@@ -260,7 +260,7 @@ const achievementEndDate = document.querySelector("#achievement-end-date");
 let achievementStudents = [];
 let selectedAchievementStudent = null;
 let achievementTeachers = [];
-let selectedAchievementSupervisor = null;
+let originalAchievementSupervisors = [];
 let achievementEvents = [];
 let selectedAchievementEvent = null;
 let achievementOrders = [];
@@ -321,7 +321,6 @@ function restoreAchievementFormDraft() {
   chooseAchievementSubject();
   chooseAchievementType();
   chooseAchievementResult();
-  chooseAchievementSupervisor();
   chooseLocationReference(achievementCountryReference);
   chooseLocationReference(achievementCityReference);
   chooseLocationReference(achievementOrganizerReference);
@@ -2226,21 +2225,18 @@ function teacherFullName(teacher) {
     .join(" ");
 }
 
-function chooseAchievementSupervisor() {
-  const value = achievementSupervisor.value.trim().toLocaleLowerCase("ru");
-  selectedAchievementSupervisor = achievementTeachers.find(function (teacher) {
-    const fullName = teacherFullName(teacher);
-    const reverseName = [teacher.first_name, teacher.middle_name, teacher.last_name].filter(Boolean).join(" ");
-    return fullName.toLocaleLowerCase("ru") === value ||
-      reverseName.toLocaleLowerCase("ru") === value;
-  }) || null;
+function achievementSupervisorNames() {
+  return achievementSupervisor.value.split(";").map(name => name.trim()).filter(Boolean);
 }
 
 function showSupervisorSuggestions() {
-  const query = achievementSupervisor.value.trim().toLocaleLowerCase("ru");
+  const parts = achievementSupervisor.value.split(";");
+  const query = parts.pop().trim().toLocaleLowerCase("ru");
+  const chosen = new Set(parts.map(name => name.trim().toLocaleLowerCase("ru")));
   const matches = achievementTeachers
     .filter(function (teacher) {
       const fullName = teacherFullName(teacher);
+      if (chosen.has(fullName.toLocaleLowerCase("ru"))) return false;
       const reverseName = [teacher.first_name, teacher.middle_name, teacher.last_name].filter(Boolean).join(" ");
       return fullName.toLocaleLowerCase("ru").includes(query) ||
         reverseName.toLocaleLowerCase("ru").includes(query);
@@ -2263,16 +2259,12 @@ function showSupervisorSuggestions() {
       };
     }),
     function (item) {
-      selectedAchievementSupervisor = item.teacher;
-      achievementSupervisor.value = item.label;
+      achievementSupervisor.value = [...parts.map(name => name.trim()).filter(Boolean), item.label].join("; ") + "; ";
     }
   );
 }
 
-achievementSupervisor.addEventListener("input", function () {
-  selectedAchievementSupervisor = null;
-  showSupervisorSuggestions();
-});
+achievementSupervisor.addEventListener("input", showSupervisorSuggestions);
 achievementSupervisor.addEventListener("focus", showSupervisorSuggestions);
 achievementSupervisor.addEventListener("keydown", function (event) {
   if (event.key === "Escape") closeSuggestionMenu(achievementSupervisor, achievementSupervisors);
@@ -3532,7 +3524,10 @@ function fillAchievementForm(achievement) {
   updateAutomaticAchievementPoints();
   document.querySelector("#achievement-format").value = achievement.event_format || "";
   achievementSupervisor.value = achievement.supervisor_name || "";
-  chooseAchievementSupervisor();
+  originalAchievementSupervisors = achievementSupervisorNames();
+  if (originalAchievementSupervisors.length) {
+    achievementSupervisor.value = originalAchievementSupervisors.join("; ") + "; ";
+  }
   achievementOrganizerReference.selected = achievement.organizers ? { name: achievement.organizers } : null;
   achievementOrganizers.value = achievement.organizers || "";
   achievementCountryReference.selected = achievement.country ? { name: achievement.country } : null;
@@ -3840,7 +3835,16 @@ achievementForm.addEventListener("submit", async function (event) {
     showAchievementResultSuggestions();
     return;
   }
-  if (isAchievementFieldEnabled("supervisor") && achievementSupervisor.value.trim() && !selectedAchievementSupervisor) {
+  const supervisorNames = isAchievementFieldEnabled("supervisor") ? achievementSupervisorNames() : [];
+  const allowedSupervisors = new Map(achievementTeachers.map(teacher => {
+    const name = teacherFullName(teacher);
+    return [name.toLocaleLowerCase("ru"), name];
+  }));
+  if (editingAchievementId) {
+    originalAchievementSupervisors.forEach(name => allowedSupervisors.set(name.toLocaleLowerCase("ru"), name));
+  }
+  const supervisors = supervisorNames.map(name => allowedSupervisors.get(name.toLocaleLowerCase("ru")));
+  if (supervisors.some(name => !name)) {
     achievementMessage.textContent = "Выберите руководителя из списка учителей";
     achievementSupervisor.focus();
     showSupervisorSuggestions();
@@ -3919,9 +3923,7 @@ achievementForm.addEventListener("submit", async function (event) {
     event_format: isAchievementFieldEnabled("format") ? achievementValue("#achievement-format") : null,
     result: isAchievementFieldEnabled("result") && selectedAchievementResult ? selectedAchievementResult.name : null,
     manual_points: isAchievementFieldEnabled("points") && achievementPointsManuallyEdited ? Number(achievementPoints.value) : null,
-    supervisor_name: isAchievementFieldEnabled("supervisor") && selectedAchievementSupervisor
-      ? teacherFullName(selectedAchievementSupervisor)
-      : null,
+    supervisor_name: [...new Set(supervisors)].join("; ") || null,
     organizers: isAchievementFieldEnabled("organizers") && achievementOrganizerReference.selected ? achievementOrganizerReference.selected.name : null,
     event_date: isAchievementFieldEnabled("dates") ? achievementValue("#achievement-date") : null,
     event_end_date: isAchievementFieldEnabled("dates") ? achievementValue("#achievement-end-date") : null,
@@ -4009,7 +4011,6 @@ achievementForm.addEventListener("submit", async function (event) {
   closeSuggestionMenu(achievementType, achievementTypesMenu);
   selectedAchievementResult = null;
   closeSuggestionMenu(achievementResult, achievementResultsMenu);
-  selectedAchievementSupervisor = null;
   closeSuggestionMenu(achievementSupervisor, achievementSupervisors);
   achievementOrganizerReference.selected = null;
   closeSuggestionMenu(achievementOrganizers, achievementOrganizersMenu);
