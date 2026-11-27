@@ -467,7 +467,6 @@ function updateNewsTypeFields() {
   const isAnnouncement = newsType.value === "announcement";
   newsImageField.hidden = isAnnouncement;
   if (isAnnouncement) newsImage.value = "";
-  newsLink.required = isAnnouncement;
 }
 
 newsType.addEventListener("change", updateNewsTypeFields);
@@ -1643,11 +1642,6 @@ addNewsButton.addEventListener("click", async function () {
 
   if (!isAnnouncement && !files.length && !editingNewsImagePaths.length) {
     newsMessage.textContent = "Для материала выберите хотя бы одну фотографию";
-    return;
-  }
-
-  if (isAnnouncement && !linkUrl) {
-    newsMessage.textContent = "Для объявления укажите ссылку для QR-кода";
     return;
   }
 
