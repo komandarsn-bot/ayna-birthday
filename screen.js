@@ -227,10 +227,23 @@ function fillNewsContent(content, item, slide) {
     setNewsBodyContent(body, slide.text);
     textPane.append(body);
 
-    const qrPane = document.createElement("div");
-    qrPane.classList.add("news-announcement-qr");
-    const qrTarget = fillQrContent(qrPane, item);
-    content.append(textPane, qrPane);
+    if (slide.path) {
+      const image = document.createElement("img");
+      image.className = "news-announcement-image";
+      image.src = imageUrl(slide.path);
+      image.alt = item.title;
+      content.classList.add("has-photo");
+      content.append(image);
+    }
+    content.append(textPane);
+    let qrTarget;
+    if (item.link_url) {
+      const qrPane = document.createElement("div");
+      qrPane.classList.add("news-announcement-qr");
+      qrTarget = fillQrContent(qrPane, item);
+      content.classList.add("has-qr");
+      content.append(qrPane);
+    }
     return { body, qrTarget, textContainer: textPane };
   }
 
@@ -547,16 +560,23 @@ function updateBirthdays(data) {
   }
 }
 
+function isNewsAnnouncement(imagePaths) {
+  return !imagePaths.length || /\/announcement-/.test(imagePaths[0]);
+}
+
 function updateNews(data) {
   const normalized = data.map(function (item) {
     const imagePaths = Array.isArray(item.news_image_paths) && item.news_image_paths.length
       ? item.news_image_paths.filter(Boolean)
       : (item.news_image_path ? [item.news_image_path] : []);
     const textParts = [String(item.news_body || "").trim()];
-    const slides = imagePaths.map(path => ({ type: "photo", path }));
-    if (!imagePaths.length && item.news_link_url) {
-      slides.push({ type: "announcement", text: textParts[0] || "" });
+    const slides = [];
+    if (isNewsAnnouncement(imagePaths)) {
+      for (const path of imagePaths.length ? imagePaths : [null]) {
+        slides.push({ type: "announcement", path, text: textParts[0] });
+      }
     } else {
+      imagePaths.forEach(path => slides.push({ type: "photo", path }));
       textParts.filter(Boolean).forEach(text => slides.push({ type: "text", text }));
       if (item.news_link_url) slides.push({ type: "qr" });
     }
@@ -621,7 +641,7 @@ async function loadContent() {
     else if (!newsResult.error) {
       const visibleNews = (newsResult.data || []).filter(function (item) {
         const paths = Array.isArray(item.news_image_paths) ? item.news_image_paths.filter(Boolean) : [];
-        const isAnnouncement = !paths.length && !item.news_image_path && Boolean(item.news_link_url);
+        const isAnnouncement = isNewsAnnouncement(paths.length ? paths : [item.news_image_path].filter(Boolean));
         return isAnnouncement ? displaySettings.announcements : displaySettings.events;
       });
       updateNews(visibleNews);

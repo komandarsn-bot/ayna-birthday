@@ -186,7 +186,6 @@ const newsTitle = document.querySelector("#news-title");
 const newsType = document.querySelector("#news-type");
 const newsBody = document.querySelector("#news-body");
 const newsImage = document.querySelector("#news-image");
-const newsImageField = document.querySelector("#news-image-field");
 const newsLink = document.querySelector("#news-link");
 const newsQrText = document.querySelector("#news-qr-text");
 const newsActiveDays = document.querySelector("#news-active-days");
@@ -463,14 +462,6 @@ syncAchievementDateRange();
 let editingNewsId = null;
 let editingNewsImagePaths = [];
 
-function updateNewsTypeFields() {
-  const isAnnouncement = newsType.value === "announcement";
-  newsImageField.hidden = isAnnouncement;
-  if (isAnnouncement) newsImage.value = "";
-}
-
-newsType.addEventListener("change", updateNewsTypeFields);
-
 function getNewsImageUrl(imagePath) {
   return supabaseClient.storage
     .from("news-images")
@@ -496,7 +487,6 @@ function resetNewsForm() {
   newsActiveDays.value = "7";
   addNewsButton.textContent = "Опубликовать";
   cancelNewsEditButton.hidden = true;
-  updateNewsTypeFields();
 }
 
 cancelNewsEditButton.addEventListener("click", function () {
@@ -1551,8 +1541,7 @@ loadNewsButton.addEventListener("click", async function () {
     editButton.addEventListener("click", function () {
       editingNewsId = item.id;
       editingNewsImagePaths = imagePaths;
-      newsType.value = imagePaths.length ? "story" : "announcement";
-      updateNewsTypeFields();
+      newsType.value = !imagePaths.length || /\/announcement-/.test(imagePaths[0]) ? "announcement" : "story";
       newsTitle.value = item.title || "";
       newsBody.value = item.body || "";
       newsImage.value = "";
@@ -1645,6 +1634,12 @@ addNewsButton.addEventListener("click", async function () {
     return;
   }
 
+  if (!files.length && editingNewsImagePaths.length &&
+      isAnnouncement !== /\/announcement-/.test(editingNewsImagePaths[0])) {
+    newsMessage.textContent = "При изменении вида публикации выберите фотографию заново";
+    return;
+  }
+
   if (files.length > 8) {
     newsMessage.textContent = "Для одной публикации можно выбрать не больше 8 фотографий";
     return;
@@ -1698,7 +1693,7 @@ addNewsButton.addEventListener("click", async function () {
   try {
     for (let index = 0; index < files.length; index += 1) {
       const file = files[index];
-      const imagePath = userId + "/" + crypto.randomUUID() + "." + allowedTypes[file.type];
+      const imagePath = userId + "/" + (isAnnouncement ? "announcement-" : "") + crypto.randomUUID() + "." + allowedTypes[file.type];
       newsMessage.textContent = `Загружаем фотографию ${index + 1} из ${files.length}...`;
       const { error: uploadError } = await supabaseClient.storage
         .from("news-images")
@@ -1716,10 +1711,7 @@ addNewsButton.addEventListener("click", async function () {
       expires_at: new Date(Date.now() + activeDays * 24 * 60 * 60 * 1000).toISOString()
     };
 
-    if (isAnnouncement) {
-      publicationData.image_path = null;
-      publicationData.image_paths = [];
-    } else if (uploadedPaths.length) {
+    if (uploadedPaths.length) {
       publicationData.image_path = uploadedPaths[0];
       publicationData.image_paths = uploadedPaths;
     }
@@ -1739,7 +1731,7 @@ addNewsButton.addEventListener("click", async function () {
 
     if (saveError) throw saveError;
 
-    if (editingNewsId && (uploadedPaths.length || isAnnouncement) && editingNewsImagePaths.length) {
+    if (editingNewsId && uploadedPaths.length && editingNewsImagePaths.length) {
       const { error: oldImagesError } = await supabaseClient.storage
         .from("news-images")
         .remove(editingNewsImagePaths);
