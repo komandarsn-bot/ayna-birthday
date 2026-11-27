@@ -228,12 +228,15 @@ function fillNewsContent(content, item, slide) {
     textPane.append(body);
 
     if (slide.path) {
+      const frame = document.createElement("div");
+      frame.className = "news-announcement-frame";
       const image = document.createElement("img");
       image.className = "news-announcement-image";
       image.src = imageUrl(slide.path);
       image.alt = item.title;
       content.classList.add("has-photo");
-      content.append(image);
+      frame.append(image);
+      content.append(frame);
     }
     content.append(textPane);
     let qrTarget;
